@@ -15,7 +15,7 @@
 
 // @ts-check
 import { test, expect } from "playwright-test-coverage";
-import { Utilities } from "../utilities";
+import { Utilities } from "../../utilities";
 
 let utils;
 test.beforeEach(async ({ page }) => {
