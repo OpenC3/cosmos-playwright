@@ -18,6 +18,9 @@ import { test, expect } from 'playwright-test-coverage'
 import { Utilities } from '../../utilities'
 import * as fs from 'fs'
 
+// Be an Admin for all these tests
+test.use({ storageState: 'adminStorageState.json' })
+
 let utils
 test.beforeEach(async ({ page }) => {
   utils = new Utilities(page)
@@ -26,35 +29,25 @@ test.beforeEach(async ({ page }) => {
   await page.locator('.v-app-bar__nav-icon').click()
 })
 
-if (process.env.ENTERPRISE === '1') {
-  test('login as admin user', async ({ page }) => {
-    // TODO: Replace button[role="button"] with next line once base released
-    // await page.locator('[data-test="user-menu"]').click()
-    await page.locator('button[role="button"]').nth(3).click();
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('button:has-text("Logout")').click(),
-    ])
-
-    await page.locator('input[name="username"]').fill('admin')
-    await page.locator('input[name="password"]').fill('admin')
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('input:has-text("Sign In")').click(),
-    ])
-  })
-}
-
 test('shows and hides built-in tools', async ({ page }) => {
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
-  await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-admin'
-  )
+  if (process.env.ENTERPRISE === '1') {
+    await expect(page.locator('id=openc3-tool')).not.toContainText(
+      'openc3-enterprise-tool-admin'
+    )
+    await expect(page.locator('id=openc3-tool')).not.toContainText(
+      'openc3-enterprise-tool-base'
+    )
+  } else {
+    await expect(page.locator('id=openc3-tool')).not.toContainText(
+      'openc3-tool-admin'
+    )
+    await expect(page.locator('id=openc3-tool')).not.toContainText(
+      'openc3-tool-base'
+    )
+  }
   await expect(page.locator('id=openc3-tool')).not.toContainText(
     'openc3-tool-autonomic'
-  )
-  await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-base'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
     'openc3-tool-calendar'
@@ -247,92 +240,97 @@ test('installs a new plugin', async ({ page }) => {
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
 })
 
-test('modifies plugin files', async ({ page }) => {
-  // Check that there are no links (a) under the current plugin (no modified files)
-  await expect(
-    await page
-      .locator(
-        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-      )
-      .count()
-  ).toEqual(0)
+// Playwright requires a separate test.describe to then call test.use
+test.describe(() => {
+  // Must be the operator to modify files
+  test.use({ storageState: 'storageState.json' })
+  test('modifies plugin files', async ({ page }) => {
+    // Check that there are no links (a) under the current plugin (no modified files)
+    await expect(
+      await page
+        .locator(
+          `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+        )
+        .count()
+    ).toEqual(0)
 
-  // Create a new script
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
-  await page.locator('button:has-text("Close")').click()
-  await page.locator('textarea').fill('puts "modify the PW_TEST"')
-  await page.locator('[data-test=script-runner-file]').click()
-  await page.locator('text=Save File').click()
-  await page.locator('text=File Save As')
-  await page.locator('.v-treeview-node:has-text("PW_TEST") >> button').click()
-  await page.locator('text=procedures').click()
-  await page.locator('[data-test=file-open-save-filename]').click()
-  await page.type('[data-test=file-open-save-filename]', '/save_new.rb')
-  await page.locator('[data-test=file-open-save-submit-btn]').click()
-  await expect(page.locator('#sr-controls')).toContainText(
-    'PW_TEST/procedures/save_new.rb'
-  )
+    // Create a new script
+    await page.goto('/tools/scriptrunner')
+    await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
+    await page.locator('.v-app-bar__nav-icon').click()
+    await page.locator('button:has-text("Close")').click()
+    await page.locator('textarea').fill('puts "modify the PW_TEST"')
+    await page.locator('[data-test=script-runner-file]').click()
+    await page.locator('text=Save File').click()
+    await page.locator('text=File Save As')
+    await page.locator('.v-treeview-node:has-text("PW_TEST") >> button').click()
+    await page.locator('text=procedures').click()
+    await page.locator('[data-test=file-open-save-filename]').click()
+    await page.type('[data-test=file-open-save-filename]', '/save_new.rb')
+    await page.locator('[data-test=file-open-save-submit-btn]').click()
+    await expect(page.locator('#sr-controls')).toContainText(
+      'PW_TEST/procedures/save_new.rb'
+    )
 
-  // Create a new screen
-  await page.goto('/tools/tlmviewer')
-  await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  await page.locator('div[role="button"]:has-text("Select Target")').click()
-  await page.locator(`.v-list-item__title:text-is("PW_TEST")`).click()
-  await utils.sleep(500)
-  await page.locator('button:has-text("New Screen")').click()
-  await expect(
-    page.locator(`.v-system-bar:has-text("New Screen")`)
-  ).toBeVisible()
-  await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
-  await page.locator('button:has-text("Ok")').click()
-  await expect(
-    page.locator(`.v-system-bar:has-text("PW_TEST NEW_SCREEN")`)
-  ).toBeVisible()
+    // Create a new screen
+    await page.goto('/tools/tlmviewer')
+    await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
+    await page.locator('.v-app-bar__nav-icon').click()
+    await page.locator('div[role="button"]:has-text("Select Target")').click()
+    await page.locator(`.v-list-item__title:text-is("PW_TEST")`).click()
+    await utils.sleep(500)
+    await page.locator('button:has-text("New Screen")').click()
+    await expect(
+      page.locator(`.v-system-bar:has-text("New Screen")`)
+    ).toBeVisible()
+    await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
+    await page.locator('button:has-text("Ok")').click()
+    await expect(
+      page.locator(`.v-system-bar:has-text("PW_TEST NEW_SCREEN")`)
+    ).toBeVisible()
 
-  // Download the changes
-  await page.goto('/tools/admin/plugins')
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
+    // Download the changes
+    await page.goto('/tools/admin/plugins')
+    await expect(page.locator('.v-app-bar')).toContainText('Administrator')
+    await page.locator('.v-app-bar__nav-icon').click()
 
-  // Check that we have a link to click
-  await expect(
-    await page
-      .locator(
-        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-      )
-      .count()
-  ).toEqual(1)
+    // Check that we have a link to click
+    await expect(
+      await page
+        .locator(
+          `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+        )
+        .count()
+    ).toEqual(1)
 
-  const [download] = await Promise.all([
-    // Start waiting for the download
-    page.waitForEvent('download'),
-    // Download the modified plugin
-    page
-      .locator(
-        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-      )
-      .click(),
-  ])
-  // Wait for the download process to complete
-  const JSZip = require('jszip')
-  const path = await download.path()
-  fs.readFile(path, function (err, data) {
-    if (err) throw err
-    JSZip.loadAsync(data).then(function (zip) {
-      Object.keys(zip.files).forEach(function (filename) {
-        zip.files[filename].async('string').then(function (fileData) {
-          // Check the zip file contents
-          // We should have the new script:
-          if (filename.includes('save_new.rb')) {
-            expect(fileData).toBe('puts "modify the PW_TEST"')
-          }
-          // We should have the new screen:
-          if (filename.includes('new_screen.txt')) {
-            expect(fileData).toContain('SCREEN')
-          }
+    const [download] = await Promise.all([
+      // Start waiting for the download
+      page.waitForEvent('download'),
+      // Download the modified plugin
+      page
+        .locator(
+          `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+        )
+        .click(),
+    ])
+    // Wait for the download process to complete
+    const JSZip = require('jszip')
+    const path = await download.path()
+    fs.readFile(path, function (err, data) {
+      if (err) throw err
+      JSZip.loadAsync(data).then(function (zip) {
+        Object.keys(zip.files).forEach(function (filename) {
+          zip.files[filename].async('string').then(function (fileData) {
+            // Check the zip file contents
+            // We should have the new script:
+            if (filename.includes('save_new.rb')) {
+              expect(fileData).toBe('puts "modify the PW_TEST"')
+            }
+            // We should have the new screen:
+            if (filename.includes('new_screen.txt')) {
+              expect(fileData).toContain('SCREEN')
+            }
+          })
         })
       })
     })
@@ -550,22 +548,3 @@ test('deletes a plugin', async ({ page }) => {
   )
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
 })
-
-if (process.env.ENTERPRISE === '1') {
-  test('login as operator user', async ({ page }) => {
-    // TODO: Replace button[role="button"] with next line once base released
-    // await page.locator('[data-test="user-menu"]').click()
-    await page.locator('button[role="button"]').nth(3).click();
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('button:has-text("Logout")').click(),
-    ])
-
-    await page.locator('input[name="username"]').fill('operator')
-    await page.locator('input[name="password"]').fill('operator')
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('input:has-text("Sign In")').click(),
-    ])
-  })
-}

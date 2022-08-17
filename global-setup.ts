@@ -7,23 +7,27 @@ async function globalSetup(config: FullConfig) {
   const page = await browser.newPage()
 
   await page.goto(`${baseURL}/tools/cmdtlmserver`)
-  try {
-    // Check for Enterprise login
-    await page
-      .locator('text=Sign in to your account')
-      .waitFor({ timeout: 5000 })
+  if (process.env.ENTERPRISE === '1') {
     await page.locator('input[name="username"]').fill('operator')
     await page.locator('input[name="password"]').fill('operator')
     await Promise.all([
       page.waitForNavigation(),
       page.locator('input:has-text("Sign In")').click(),
     ])
-  } catch (error) {
-    // We expect a TimeoutError if this is base OpenC3 (not Enterprise)
-    // so if we don't get that then it's a real error and we throw it
-    if (error.name !== 'TimeoutError') {
-      throw error
-    }
+    // Save signed-in state to 'storageState.json'.
+    await page.context().storageState({ path: 'storageState.json' })
+
+    const adminPage = await browser.newPage()
+    await adminPage.goto(`${baseURL}/tools/cmdtlmserver`)
+    await adminPage.locator('input[name="username"]').fill('admin')
+    await adminPage.locator('input[name="password"]').fill('admin')
+    await Promise.all([
+      adminPage.waitForNavigation(),
+      adminPage.locator('input:has-text("Sign In")').click(),
+    ])
+    // Save signed-in state to 'adminStorageState.json'.
+    await adminPage.context().storageState({ path: 'adminStorageState.json' })
+  } else {
     // Wait for the nav bar to populate
     for (let i = 0; i < 10; i++) {
       await page
@@ -42,6 +46,10 @@ async function globalSetup(config: FullConfig) {
       await page.fill('data-test=confirm-password', 'password')
       await page.click('data-test=set-password')
     }
+
+    // Save signed-in state to 'storageState.json' and adminStorageState to match Enterprise
+    await page.context().storageState({ path: 'storageState.json' })
+    await page.context().storageState({ path: 'adminStorageState.json' })
   }
 
   // On the initial load you might get the Clock out of sync dialog
@@ -50,8 +58,6 @@ async function globalSetup(config: FullConfig) {
     await page.locator('button:has-text("Dismiss")').click()
   }
 
-  // Save signed-in state to 'storageState.json'.
-  await page.context().storageState({ path: 'storageState.json' })
   await browser.close()
 }
 

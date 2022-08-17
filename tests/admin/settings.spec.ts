@@ -20,24 +20,8 @@
 // @ts-check
 import { test, expect } from 'playwright-test-coverage'
 
-if (process.env.ENTERPRISE === '1') {
-  test('login as admin user', async ({ page }) => {
-    // TODO: Replace button[role="button"] with next line once base released
-    // await page.locator('[data-test="user-menu"]').click()
-    await page.locator('button[role="button"]').nth(3).click();
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('button:has-text("Logout")').click(),
-    ])
-
-    await page.locator('input[name="username"]').fill('admin')
-    await page.locator('input[name="password"]').fill('admin')
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('input:has-text("Sign In")').click(),
-    ])
-  })
-}
+// Be an Admin for all these tests
+test.use({ storageState: 'adminStorageState.json' });
 
 test('resets clock sync warning suppression', async ({ page }) => {
   await page.goto('/tools/admin/settings')
@@ -61,9 +45,9 @@ test('resets clock sync warning suppression', async ({ page }) => {
 test('clears recent configs', async ({ page }) => {
   await page.goto('/tools/dataviewer')
   let config = 'spec' + Math.floor(Math.random() * 10000)
-  await page.locator('[data-test="data-viewer-file"]').click()
+  await page.locator('[data-test=data-viewer-file]').click()
   await page.locator('text=Save Configuration').click()
-  await page.locator('[data-test="name-input-save-config-dialog"]').fill(config)
+  await page.locator('[data-test=name-input-save-config-dialog]').fill(config)
   await page.locator('button:has-text("Ok")').click()
   let localStorage = await page.evaluate(() => window.localStorage)
   expect(localStorage['lastconfig__data_viewer']).toBe(config)
@@ -138,22 +122,3 @@ test('changes the source url', async ({ page }) => {
 })
 
 // TODO: Test Rubygems URL
-
-if (process.env.ENTERPRISE === '1') {
-  test('login as operator user', async ({ page }) => {
-    // TODO: Replace button[role="button"] with next line once base released
-    // await page.locator('[data-test="user-menu"]').click()
-    await page.locator('button[role="button"]').nth(3).click();
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('button:has-text("Logout")').click(),
-    ])
-
-    await page.locator('input[name="username"]').fill('operator')
-    await page.locator('input[name="password"]').fill('operator')
-    await Promise.all([
-      page.waitForNavigation(),
-      page.locator('input:has-text("Sign In")').click(),
-    ])
-  })
-}

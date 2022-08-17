@@ -13,6 +13,19 @@ NOTE: All commands are assumed to be executed from this (playwright) directory u
         playwright> yarn
         playwright> npx playwright install
 
+1.  Generate the test plugins (must be located above this directory). If openc3.sh isn't in your path you might need to ues an absolute or relative path to it.
+
+        playwright> cd ..
+        > openc3.sh cliroot generate plugin PW_TEST
+        > cd openc3-pw-test
+        openc3-pw-test> openc3.sh cliroot rake build VERSION=1.0.0
+        openc3-pw-test> mv openc3-pw-test*.gem openc3-pw-test-1.0.0.gem
+        openc3-pw-test> cp openc3-pw-test-1.0.0.gem openc3-pw-test-1.0.1.gem
+
+1.  Set Enterprise if running against OpenC3 Enterprise
+
+        playwright> set ENTERPRISE=1
+
 1.  Open playwright and run tests
 
         playwright> yarn playwright test --headed --project=chromium

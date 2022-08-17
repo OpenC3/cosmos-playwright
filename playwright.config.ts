@@ -33,7 +33,11 @@ const config: PlaywrightTestConfig = {
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* See if explict WORKERS count was given, otherwise allow parallelism on CI/CD */
-  workers: process.env.WORKERS ? parseInt(process.env.WORKERS) : process.env.CI ? 3 : 1,
+  workers: process.env.WORKERS
+    ? parseInt(process.env.WORKERS)
+    : process.env.CI
+    ? 3
+    : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'github' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

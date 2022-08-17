@@ -34,7 +34,7 @@ export class Utilities {
 
   async addTargetPacketItem(target: string, packet: string, item: string) {
     await this.selectTargetPacketItem(target, packet, item)
-    await this.page.locator('[data-test="select-send"]').click()
+    await this.page.locator('[data-test=select-send]').click()
   }
 
   async download(page, locator, validator = null, encoding = 'utf-8') {
