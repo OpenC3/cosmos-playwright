@@ -28,7 +28,9 @@ test.beforeEach(async ({ page }) => {
 
 if (process.env.ENTERPRISE === '1') {
   test('login as admin user', async ({ page }) => {
-    await page.locator('[data-test="user-menu"]').click()
+    // TODO: Replace button[role="button"] with next line once base released
+    // await page.locator('[data-test="user-menu"]').click()
+    await page.locator('button[role="button"]').nth(3).click();
     await Promise.all([
       page.waitForNavigation(),
       page.locator('button:has-text("Logout")').click(),
@@ -551,7 +553,9 @@ test('deletes a plugin', async ({ page }) => {
 
 if (process.env.ENTERPRISE === '1') {
   test('login as operator user', async ({ page }) => {
-    await page.locator('[data-test="user-menu"]').click()
+    // TODO: Replace button[role="button"] with next line once base released
+    // await page.locator('[data-test="user-menu"]').click()
+    await page.locator('button[role="button"]').nth(3).click();
     await Promise.all([
       page.waitForNavigation(),
       page.locator('button:has-text("Logout")').click(),
