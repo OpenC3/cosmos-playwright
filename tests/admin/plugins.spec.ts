@@ -26,64 +26,155 @@ test.beforeEach(async ({ page }) => {
   await page.locator('.v-app-bar__nav-icon').click()
 })
 
+if (process.env.ENTERPRISE === '1') {
+  test('login as admin user', async ({ page }) => {
+    await page.locator('[data-test="user-menu"]').click()
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('button:has-text("Logout")').click(),
+    ])
+
+    await page.locator('input[name="username"]').fill('admin')
+    await page.locator('input[name="password"]').fill('admin')
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('input:has-text("Sign In")').click(),
+    ])
+  })
+}
+
 test('shows and hides built-in tools', async ({ page }) => {
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-admin')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-autonomic')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-base')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-calendar')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-cmdsender')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-cmdtlmserver')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-dataextractor')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-dataviewer')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-handbooks')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-limitsmonitor')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-packetviewer')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-scriptrunner')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-tablemanager')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-tlmgrapher')
-  await expect(page.locator('id=openc3-tool')).not.toContainText('openc3-tool-tlmviewer')
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-admin'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-autonomic'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-base'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-calendar'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-cmdsender'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-cmdtlmserver'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-dataextractor'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-dataviewer'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-handbooks'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-limitsmonitor'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-packetviewer'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-scriptrunner'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-tablemanager'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-tlmgrapher'
+  )
+  await expect(page.locator('id=openc3-tool')).not.toContainText(
+    'openc3-tool-tlmviewer'
+  )
 
   await page.locator('text=Show Default Tools').click()
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
   if (process.env.ENTERPRISE === '1') {
-    await expect(page.locator('id=openc3-tool')).toContainText('openc3-enterprise-tool-admin')
-    await expect(page.locator('id=openc3-tool')).toContainText('openc3-enterprise-tool-base')
+    await expect(page.locator('id=openc3-tool')).toContainText(
+      'openc3-enterprise-tool-admin'
+    )
+    await expect(page.locator('id=openc3-tool')).toContainText(
+      'openc3-enterprise-tool-base'
+    )
   } else {
-    await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-admin')
-    await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-base')
+    await expect(page.locator('id=openc3-tool')).toContainText(
+      'openc3-tool-admin'
+    )
+    await expect(page.locator('id=openc3-tool')).toContainText(
+      'openc3-tool-base'
+    )
   }
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-autonomic')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-calendar')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-cmdsender')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-cmdtlmserver')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-dataextractor')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-dataviewer')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-handbooks')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-limitsmonitor')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-packetviewer')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-scriptrunner')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-tablemanager')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-tlmgrapher')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-tlmviewer')
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-autonomic'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-calendar'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-cmdsender'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-cmdtlmserver'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-dataextractor'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-dataviewer'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-handbooks'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-limitsmonitor'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-packetviewer'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-scriptrunner'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-tablemanager'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-tlmgrapher'
+  )
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-tool-tlmviewer'
+  )
 })
 
 test('shows targets associated with plugins', async ({ page }) => {
   // Check that the openc3-demo contains the following targets:
   await expect(
-    page.locator('[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")')
+    page.locator(
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+    )
   ).toContainText('EXAMPLE')
   await expect(
-    page.locator('[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")')
+    page.locator(
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+    )
   ).toContainText('INST')
   await expect(
-    page.locator('[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")')
+    page.locator(
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+    )
   ).toContainText('INST2')
   await expect(
-    page.locator('[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")')
+    page.locator(
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+    )
   ).toContainText('SYSTEM')
   await expect(
-    page.locator('[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")')
+    page.locator(
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+    )
   ).toContainText('TEMPLATED')
 })
 
@@ -107,24 +198,36 @@ test('installs a new plugin', async ({ page }) => {
   await fileChooser.setFiles(`../${plugin}/${pluginGem}`)
   await expect(page.locator('.v-dialog:has-text("Variables")')).toBeVisible()
   await page.locator('data-test=edit-submit').click()
-  await expect(page.locator('[data-test=plugin-alert]')).toContainText('Started installing')
+  await expect(page.locator('[data-test=plugin-alert]')).toContainText(
+    'Started installing'
+  )
   // Plugin install can go so fast we can't count on 'Running' to be present so try catch this
-  let regexp = new RegExp(`Processing plugin_install: ${pluginGem}__.* - Running`)
+  let regexp = new RegExp(
+    `Processing plugin_install: ${pluginGem}__.* - Running`
+  )
   try {
-    await expect(page.locator('[data-test=process-list]')).toContainText(regexp, {
-      timeout: 30000,
-    })
+    await expect(page.locator('[data-test=process-list]')).toContainText(
+      regexp,
+      {
+        timeout: 30000,
+      }
+    )
   } catch {}
   // Ensure no Running are left
-  await expect(page.locator('[data-test=process-list]')).not.toContainText(regexp, {
-    timeout: 30000,
-  })
+  await expect(page.locator('[data-test=process-list]')).not.toContainText(
+    regexp,
+    {
+      timeout: 30000,
+    }
+  )
   // Check for Complete
   regexp = new RegExp(`Processing plugin_install: ${pluginGem} - Complete`)
   await expect(page.locator('[data-test=process-list]')).toContainText(regexp)
 
   await expect(
-    page.locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`)
+    page.locator(
+      `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`
+    )
   ).toContainText('PW_TEST')
   // Show the process output
   await page
@@ -133,8 +236,12 @@ test('installs a new plugin', async ({ page }) => {
     )
     .first()
     .click()
-  await expect(page.locator('.v-dialog--active')).toContainText('Process Output')
-  await expect(page.locator('.v-dialog--active')).toContainText(`Loading new plugin: ${pluginGem}`)
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'Process Output'
+  )
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    `Loading new plugin: ${pluginGem}`
+  )
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
 })
 
@@ -142,7 +249,9 @@ test('modifies plugin files', async ({ page }) => {
   // Check that there are no links (a) under the current plugin (no modified files)
   await expect(
     await page
-      .locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`)
+      .locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
       .count()
   ).toEqual(0)
 
@@ -160,7 +269,9 @@ test('modifies plugin files', async ({ page }) => {
   await page.locator('[data-test=file-open-save-filename]').click()
   await page.type('[data-test=file-open-save-filename]', '/save_new.rb')
   await page.locator('[data-test=file-open-save-submit-btn]').click()
-  await expect(page.locator('#sr-controls')).toContainText('PW_TEST/procedures/save_new.rb')
+  await expect(page.locator('#sr-controls')).toContainText(
+    'PW_TEST/procedures/save_new.rb'
+  )
 
   // Create a new screen
   await page.goto('/tools/tlmviewer')
@@ -170,10 +281,14 @@ test('modifies plugin files', async ({ page }) => {
   await page.locator(`.v-list-item__title:text-is("PW_TEST")`).click()
   await utils.sleep(500)
   await page.locator('button:has-text("New Screen")').click()
-  await expect(page.locator(`.v-system-bar:has-text("New Screen")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("New Screen")`)
+  ).toBeVisible()
   await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
   await page.locator('button:has-text("Ok")').click()
-  await expect(page.locator(`.v-system-bar:has-text("PW_TEST NEW_SCREEN")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("PW_TEST NEW_SCREEN")`)
+  ).toBeVisible()
 
   // Download the changes
   await page.goto('/tools/admin/plugins')
@@ -183,7 +298,9 @@ test('modifies plugin files', async ({ page }) => {
   // Check that we have a link to click
   await expect(
     await page
-      .locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`)
+      .locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
       .count()
   ).toEqual(1)
 
@@ -191,7 +308,11 @@ test('modifies plugin files', async ({ page }) => {
     // Start waiting for the download
     page.waitForEvent('download'),
     // Download the modified plugin
-    page.locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`).click(),
+    page
+      .locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
+      .click(),
   ])
   // Wait for the download process to complete
   const JSZip = require('jszip')
@@ -236,18 +357,28 @@ test('upgrades existing plugin', async ({ page }) => {
   // Check the delete box
   await page.locator('text=DELETE MODIFIED').click()
   await page.locator('data-test=modified-plugin-submit').click()
-  await expect(page.locator('[data-test=plugin-alert]')).toContainText('Started installing')
+  await expect(page.locator('[data-test=plugin-alert]')).toContainText(
+    'Started installing'
+  )
   // Plugin install can go so fast we can't count on 'Running' to be present so try catch this
-  let regexp = new RegExp(`Processing plugin_install: ${pluginGem}__.* - Running`)
+  let regexp = new RegExp(
+    `Processing plugin_install: ${pluginGem}__.* - Running`
+  )
   try {
-    await expect(page.locator('[data-test=process-list]')).toContainText(regexp, {
-      timeout: 30000,
-    })
+    await expect(page.locator('[data-test=process-list]')).toContainText(
+      regexp,
+      {
+        timeout: 30000,
+      }
+    )
   } catch {}
   // Ensure no Running are left
-  await expect(page.locator('[data-test=process-list]')).not.toContainText(regexp, {
-    timeout: 30000,
-  })
+  await expect(page.locator('[data-test=process-list]')).not.toContainText(
+    regexp,
+    {
+      timeout: 30000,
+    }
+  )
   // Check for Complete
   regexp = new RegExp(`Processing plugin_install: ${pluginGem1} - Complete`)
   await expect(page.locator('[data-test=process-list]')).toContainText(regexp)
@@ -255,7 +386,9 @@ test('upgrades existing plugin', async ({ page }) => {
   // Check that there are no longer any links (modified targets)
   await expect(
     await page
-      .locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`)
+      .locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
       .count()
   ).toEqual(0)
 })
@@ -269,7 +402,9 @@ test('edits existing plugin', async ({ page }) => {
     .click()
   await expect(page.locator('.v-dialog:has-text("Variables")')).toBeVisible()
   await page.locator('data-test=edit-cancel').click()
-  await expect(page.locator('.v-dialog:has-text("Variables")')).not.toBeVisible()
+  await expect(
+    page.locator('.v-dialog:has-text("Variables")')
+  ).not.toBeVisible()
   // Edit and change a target name (forces re-install)
   await page
     .locator(
@@ -278,30 +413,46 @@ test('edits existing plugin', async ({ page }) => {
     .click()
   await expect(page.locator('.v-dialog:has-text("Variables")')).toBeVisible()
   await page
-    .locator('.v-dialog:has-text("Variables") .v-input:has-text("pw_test_target_name") >> input')
+    .locator(
+      '.v-dialog:has-text("Variables") .v-input:has-text("pw_test_target_name") >> input'
+    )
     .fill('NEW_TGT')
   await page.locator('data-test=edit-submit').click()
-  await expect(page.locator('[data-test=plugin-alert]')).toContainText('Started installing')
+  await expect(page.locator('[data-test=plugin-alert]')).toContainText(
+    'Started installing'
+  )
   // Plugin install can go so fast we can't count on 'Running' to be present so try catch this
-  let regexp = new RegExp(`Processing plugin_install: ${pluginGem}__.* - Running`)
+  let regexp = new RegExp(
+    `Processing plugin_install: ${pluginGem}__.* - Running`
+  )
   try {
-    await expect(page.locator('[data-test=process-list]')).toContainText(regexp, {
-      timeout: 30000,
-    })
+    await expect(page.locator('[data-test=process-list]')).toContainText(
+      regexp,
+      {
+        timeout: 30000,
+      }
+    )
   } catch {}
   // Ensure no Running are left
-  await expect(page.locator('[data-test=process-list]')).not.toContainText(regexp, {
-    timeout: 30000,
-  })
+  await expect(page.locator('[data-test=process-list]')).not.toContainText(
+    regexp,
+    {
+      timeout: 30000,
+    }
+  )
   // Check for Complete ... note new installs append '__<TIMESTAMP>'
   regexp = new RegExp(`Processing plugin_install: ${pluginGem1}__.* - Complete`)
   await expect(page.locator('[data-test=process-list]')).toContainText(regexp)
   // Ensure the target list is updated to show the new name
   await expect(
-    page.locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`)
+    page.locator(
+      `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`
+    )
   ).not.toContainText('PW_TEST')
   await expect(
-    page.locator(`[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`)
+    page.locator(
+      `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}")`
+    )
   ).toContainText('NEW_TGT')
   // Show the process output
   await page
@@ -310,7 +461,9 @@ test('edits existing plugin', async ({ page }) => {
     )
     .first()
     .click()
-  await expect(page.locator('.v-dialog--active')).toContainText('Process Output')
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'Process Output'
+  )
   // TODO: Should this be Loading new or Updating existing?
   // await expect(page.locator('.v-dialog--active')).toContainText('Updating existing plugin')
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
@@ -325,10 +478,14 @@ test('deletes a plugin', async ({ page }) => {
   await page.locator(`.v-list-item__title:text-is("NEW_TGT")`).click()
   await utils.sleep(500)
   await page.locator('button:has-text("New Screen")').click()
-  await expect(page.locator(`.v-system-bar:has-text("New Screen")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("New Screen")`)
+  ).toBeVisible()
   await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
   await page.locator('button:has-text("Ok")').click()
-  await expect(page.locator(`.v-system-bar:has-text("NEW_TGT NEW_SCREEN")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("NEW_TGT NEW_SCREEN")`)
+  ).toBeVisible()
 
   await page.goto('/tools/admin/plugins')
   await expect(page.locator('.v-app-bar')).toContainText('Administrator')
@@ -346,22 +503,36 @@ test('deletes a plugin', async ({ page }) => {
   await page.locator('text=DELETE MODIFIED').click()
   await page.locator('data-test=modified-plugin-submit').click()
 
-  await expect(page.locator('[data-test=plugin-alert]')).toContainText('Removing plugin')
+  await expect(page.locator('[data-test=plugin-alert]')).toContainText(
+    'Removing plugin'
+  )
   // Plugin uninstall can go so fast we can't count on 'Running' to be present so try catch this
-  let regexp = new RegExp(`Processing plugin_install: ${pluginGem1}__.* - Running`)
+  let regexp = new RegExp(
+    `Processing plugin_install: ${pluginGem1}__.* - Running`
+  )
   try {
-    await expect(page.locator('[data-test=process-list]')).toContainText(regexp, {
-      timeout: 30000,
-    })
+    await expect(page.locator('[data-test=process-list]')).toContainText(
+      regexp,
+      {
+        timeout: 30000,
+      }
+    )
   } catch {}
   // Ensure no Running are left
-  await expect(page.locator('[data-test=process-list]')).not.toContainText(regexp, {
-    timeout: 30000,
-  })
+  await expect(page.locator('[data-test=process-list]')).not.toContainText(
+    regexp,
+    {
+      timeout: 30000,
+    }
+  )
   // Check for Complete ... note new installs append '__<TIMESTAMP>'
-  regexp = new RegExp(`Processing plugin_uninstall: ${pluginGem1}__.* - Complete`)
+  regexp = new RegExp(
+    `Processing plugin_uninstall: ${pluginGem1}__.* - Complete`
+  )
   await expect(page.locator('[data-test=process-list]')).toContainText(regexp)
-  await expect(page.locator(`[data-test=plugin-list]`)).not.toContainText(plugin)
+  await expect(page.locator(`[data-test=plugin-list]`)).not.toContainText(
+    plugin
+  )
   // Show the process output
   await page
     .locator(
@@ -369,7 +540,28 @@ test('deletes a plugin', async ({ page }) => {
     )
     .first()
     .click()
-  await expect(page.locator('.v-dialog--active')).toContainText('Process Output')
-  await expect(page.locator('.v-dialog--active')).toContainText('PluginModel destroyed')
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'Process Output'
+  )
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'PluginModel destroyed'
+  )
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
 })
+
+if (process.env.ENTERPRISE === '1') {
+  test('login as operator user', async ({ page }) => {
+    await page.locator('[data-test="user-menu"]').click()
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('button:has-text("Logout")').click(),
+    ])
+
+    await page.locator('input[name="username"]').fill('operator')
+    await page.locator('input[name="password"]').fill('operator')
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('input:has-text("Sign In")').click(),
+    ])
+  })
+}

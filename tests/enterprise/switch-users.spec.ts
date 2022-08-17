@@ -23,6 +23,9 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("sends a command as operator but not as viewer", async ({ page }) => {
+  await page.goto('/tools/cmdsender')
+  await expect(page.locator('.v-app-bar')).toContainText('Command Sender')
+  await page.locator('.v-app-bar__nav-icon').click()
   await utils.selectTargetPacketItem("INST", "ABORT");
   await page.locator('button:has-text("Send")').click();
   await expect(page.locator("main")).toContainText('cmd("INST ABORT") sent');
