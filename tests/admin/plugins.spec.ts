@@ -46,9 +46,14 @@ test('shows and hides built-in tools', async ({ page }) => {
 
   await page.locator('text=Show Default Tools').click()
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-admin')
+  if (process.env.ENTERPRISE === '1') {
+    await expect(page.locator('id=openc3-tool')).toContainText('openc3-enterprise-tool-admin')
+    await expect(page.locator('id=openc3-tool')).toContainText('openc3-enterprise-tool-base')
+  } else {
+    await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-admin')
+    await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-base')
+  }
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-autonomic')
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-base')
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-calendar')
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-cmdsender')
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-tool-cmdtlmserver')

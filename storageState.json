@@ -1,22 +1,65 @@
 {
-  "cookies": [],
-  "origins": [
+  "cookies": [
     {
-      "origin": "http://localhost:2900",
-      "localStorage": [
-        {
-          "name": "scope",
-          "value": "DEFAULT"
-        },
-        {
-          "name": "openc3Token",
-          "value": "password"
-        },
-        {
-          "name": "notoast",
-          "value": "true"
-        }
-      ]
+      "sameSite": "None",
+      "name": "AUTH_SESSION_ID",
+      "value": "828ad391-aaca-4ab7-964b-adb7a02738c4",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true
+    },
+    {
+      "sameSite": "Lax",
+      "name": "AUTH_SESSION_ID_LEGACY",
+      "value": "828ad391-aaca-4ab7-964b-adb7a02738c4",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false
+    },
+    {
+      "sameSite": "None",
+      "name": "KEYCLOAK_IDENTITY",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5NjNlMjJiMS0wZmYwLTRmZjktYTg0Zi1hOGI4MzcxOWFiMDEifQ.eyJleHAiOjE2NjA3NDEwMzIsImlhdCI6MTY2MDcwNTAzMiwianRpIjoiZTdiNDFkZTctYTBhNy00ZThhLThhMGQtOTdiNzFiNDllYWIwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyOTAwL2F1dGgvcmVhbG1zL29wZW5jMyIsInN1YiI6ImFjZTFlNmExLTkzMTktNDc2ZS1iZjQzLTZmM2NhYjllZTJkZSIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiODI4YWQzOTEtYWFjYS00YWI3LTk2NGItYWRiN2EwMjczOGM0Iiwic2lkIjoiODI4YWQzOTEtYWFjYS00YWI3LTk2NGItYWRiN2EwMjczOGM0Iiwic3RhdGVfY2hlY2tlciI6Ink2Uy01OEEyaktvRFZ5QlBKVlNSRW83V3p4dW8zRHVZYTlJdjN4dC13WEkifQ.Aujzz5CCvgmCYAOnwhRmxh7e0idmsegmDRY4kY0r1YE",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true
+    },
+    {
+      "sameSite": "Lax",
+      "name": "KEYCLOAK_IDENTITY_LEGACY",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5NjNlMjJiMS0wZmYwLTRmZjktYTg0Zi1hOGI4MzcxOWFiMDEifQ.eyJleHAiOjE2NjA3NDEwMzIsImlhdCI6MTY2MDcwNTAzMiwianRpIjoiZTdiNDFkZTctYTBhNy00ZThhLThhMGQtOTdiNzFiNDllYWIwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoyOTAwL2F1dGgvcmVhbG1zL29wZW5jMyIsInN1YiI6ImFjZTFlNmExLTkzMTktNDc2ZS1iZjQzLTZmM2NhYjllZTJkZSIsInR5cCI6IlNlcmlhbGl6ZWQtSUQiLCJzZXNzaW9uX3N0YXRlIjoiODI4YWQzOTEtYWFjYS00YWI3LTk2NGItYWRiN2EwMjczOGM0Iiwic2lkIjoiODI4YWQzOTEtYWFjYS00YWI3LTk2NGItYWRiN2EwMjczOGM0Iiwic3RhdGVfY2hlY2tlciI6Ink2Uy01OEEyaktvRFZ5QlBKVlNSRW83V3p4dW8zRHVZYTlJdjN4dC13WEkifQ.Aujzz5CCvgmCYAOnwhRmxh7e0idmsegmDRY4kY0r1YE",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false
+    },
+    {
+      "sameSite": "None",
+      "name": "KEYCLOAK_SESSION",
+      "value": "openc3/ace1e6a1-9319-476e-bf43-6f3cab9ee2de/828ad391-aaca-4ab7-964b-adb7a02738c4",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": 1660741032.565109,
+      "httpOnly": false,
+      "secure": true
+    },
+    {
+      "sameSite": "Lax",
+      "name": "KEYCLOAK_SESSION_LEGACY",
+      "value": "openc3/ace1e6a1-9319-476e-bf43-6f3cab9ee2de/828ad391-aaca-4ab7-964b-adb7a02738c4",
+      "domain": "localhost",
+      "path": "/auth/realms/openc3/",
+      "expires": 1660741032.565114,
+      "httpOnly": false,
+      "secure": false
     }
-  ]
+  ],
+  "origins": []
 }

@@ -2,9 +2,16 @@
 import { chromium, FullConfig } from '@playwright/test'
 
 async function globalSetup(config: FullConfig) {
+  console.log(process.env)
   const { baseURL } = config.projects[0].use
   const browser = await chromium.launch()
   const page = await browser.newPage()
+
+  if (process.env.ENTERPRISE === '1') {
+    console.log('ENTERPRISE!!!')
+  } else {
+    console.log('OPEN')
+  }
 
   await page.goto(`${baseURL}/tools/cmdtlmserver`)
   try {
