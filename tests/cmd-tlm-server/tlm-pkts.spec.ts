@@ -27,6 +27,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
   await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
+  await utils.saveStorageState()
 })
 
 test('displays the list of telemetry', async ({ page }) => {

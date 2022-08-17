@@ -28,6 +28,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('.v-app-bar')).toContainText('Data Extractor')
   await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
+  await utils.saveStorageState()
   await utils.sleep(100)
 })
 

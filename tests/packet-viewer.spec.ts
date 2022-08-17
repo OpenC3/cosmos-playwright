@@ -27,6 +27,7 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('.v-app-bar')).toContainText('Packet Viewer')
   await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
+  await utils.saveStorageState()
 })
 
 // Checks the ITEM value against a regular expression.

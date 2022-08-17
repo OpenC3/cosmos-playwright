@@ -24,6 +24,7 @@ import { Utilities } from '../utilities'
 let utils
 test.beforeEach(async ({ page }) => {
   utils = new Utilities(page)
+  await utils.saveStorageState()
 })
 
 async function openPage(page, name) {
