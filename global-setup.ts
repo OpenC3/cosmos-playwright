@@ -6,7 +6,7 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch()
   const page = await browser.newPage()
 
-  await page.goto('/')
+  await page.goto(`${baseURL}/tools/cmdtlmserver`)
   try {
     // Check for Enterprise login
     await page
@@ -24,8 +24,6 @@ async function globalSetup(config: FullConfig) {
     if (error.name !== 'TimeoutError') {
       throw error
     }
-
-    await page.goto(`${baseURL}/login`)
     // Wait for the nav bar to populate
     for (let i = 0; i < 10; i++) {
       await page
