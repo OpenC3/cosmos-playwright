@@ -178,5 +178,7 @@ test('displays the limits log', async ({ page }) => {
   await expect(page.locator('[data-test=limits-events]')).toContainText(
     format(new Date(), 'yyyy-MM-dd')
   )
-  await expect(page.locator('[data-test=limits-events]')).toContainText(['RED', 'YELLOW', 'GREEN'])
+  await expect(page.locator('[data-test=limits-events]')).toContainText('RED')
+  await expect(page.locator('[data-test=limits-events]')).toContainText('YELLOW')
+  await expect(page.locator('[data-test=limits-events]')).toContainText('GREEN')
 })
