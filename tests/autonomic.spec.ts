@@ -24,13 +24,13 @@ import { Utilities } from '../utilities'
 let utils
 test.beforeEach(async ({ page }) => {
   utils = new Utilities(page)
-  await utils.saveStorageState()
 })
 
 async function openPage(page, name) {
   await page.goto(`/tools/autonomic/${name}`)
   await expect(page.locator('.v-app-bar')).toContainText('Autonomic')
   await page.locator('.v-app-bar__nav-icon').click()
+  await utils.saveStorageState()
 }
 
 test('test overview page create trigger group', async ({ page }) => {
