@@ -18,12 +18,14 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
+
+test.use({
+  toolPath: '/tools/scriptrunner',
+  toolName: 'Script Runner',
+})
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
@@ -45,10 +47,14 @@ test('keeps a debug command history', async ({ page }) => {
   await expect(page.locator('[data-test=debug-text]')).toBeVisible()
   await page.locator('[data-test=debug-text]').type('x')
   await page.keyboard.press('Enter')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('12345')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '12345'
+  )
   await page.locator('[data-test=debug-text]').type('puts "abc123!"')
   await page.keyboard.press('Enter')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('abc123!')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'abc123!'
+  )
   await page.locator('[data-test=debug-text]').type('x = 67890')
   await page.keyboard.press('Enter')
   // Test the history
@@ -56,7 +62,9 @@ test('keeps a debug command history', async ({ page }) => {
   await page.keyboard.press('ArrowUp')
   expect(await page.inputValue('[data-test=debug-text]')).toMatch('x = 67890')
   await page.keyboard.press('ArrowUp')
-  expect(await page.inputValue('[data-test=debug-text]')).toMatch('puts "abc123!"')
+  expect(await page.inputValue('[data-test=debug-text]')).toMatch(
+    'puts "abc123!"'
+  )
   await page.keyboard.press('ArrowUp')
   expect(await page.inputValue('[data-test=debug-text]')).toMatch('x')
   await page.keyboard.press('ArrowUp') // history wraps
@@ -64,7 +72,9 @@ test('keeps a debug command history', async ({ page }) => {
   await page.keyboard.press('ArrowDown')
   expect(await page.inputValue('[data-test=debug-text]')).toMatch('x')
   await page.keyboard.press('ArrowDown')
-  expect(await page.inputValue('[data-test=debug-text]')).toMatch('puts "abc123!"')
+  expect(await page.inputValue('[data-test=debug-text]')).toMatch(
+    'puts "abc123!"'
+  )
   await page.keyboard.press('ArrowDown')
   expect(await page.inputValue('[data-test=debug-text]')).toMatch('x = 67890')
   await page.keyboard.press('ArrowDown') // history wraps
@@ -80,7 +90,9 @@ test('keeps a debug command history', async ({ page }) => {
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
   // Verify we were able to change the 'x' variable
-  await expect(page.locator('[data-test=output-messages]')).toContainText('x:67890')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'x:67890'
+  )
 
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=Toggle Debug').click()
@@ -94,7 +106,9 @@ test('retries failed checks', async ({ page }) => {
     timeout: 20000,
   })
   // Check for the initial check message
-  await expect(page.locator('[data-test=output-messages]')).toContainText('1 == 2 is FALSE')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '1 == 2 is FALSE'
+  )
   await page.locator('[data-test=pause-retry-button]').click() // Retry
   // Now we should have two error messages
   await expect(
@@ -113,10 +127,9 @@ test('displays the call stack', async ({ page }) => {
   // See: https://github.com/microsoft/playwright/issues/13583
   // See: https://github.com/vuetifyjs/vuetify/issues/14968
   // await expect(page.locator('[data-test=script-runner-script-show-call-stack]')).toBeDisabled()
-  await expect(page.locator('[data-test=script-runner-script-show-call-stack]')).toHaveAttribute(
-    'aria-disabled',
-    'true'
-  )
+  await expect(
+    page.locator('[data-test=script-runner-script-show-call-stack]')
+  ).toHaveAttribute('aria-disabled', 'true')
   // await expect(page.locator('[data-test=script-runner-script-show-call-stack]')).toBeDisabled()
 
   await page.locator('textarea').fill(`
@@ -143,10 +156,9 @@ test('displays the call stack', async ({ page }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
 
   await page.locator('[data-test=script-runner-script]').click()
-  await expect(page.locator('[data-test=script-runner-script-show-call-stack]')).toHaveAttribute(
-    'aria-disabled',
-    'true'
-  )
+  await expect(
+    page.locator('[data-test=script-runner-script-show-call-stack]')
+  ).toHaveAttribute('aria-disabled', 'true')
 })
 
 test('displays disconnect icon', async ({ page }) => {
@@ -178,7 +190,9 @@ test('displays disconnect icon', async ({ page }) => {
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     'total:0' // collect count does not change
   )
-  await expect(page.locator('[data-test=output-messages]')).toContainText('disconnect:100')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'disconnect:100'
+  )
 
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=Toggle Disconnect').click()

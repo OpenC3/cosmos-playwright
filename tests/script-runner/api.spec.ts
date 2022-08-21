@@ -18,12 +18,14 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
+
+test.use({
+  toolPath: '/tools/scriptrunner',
+  toolName: 'Script Runner',
+})
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
@@ -61,7 +63,9 @@ test('opens a target file', async ({ page }) => {
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     'Reading DEFAULT/targets_modified/INST/test.txt'
   )
-  await expect(page.locator('[data-test=output-messages]')).toContainText('file contents')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'file contents'
+  )
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     'Deleting DEFAULT/targets_modified/INST/test.txt'
   )
@@ -70,10 +74,14 @@ test('opens a target file', async ({ page }) => {
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     'Reading DEFAULT/targets_modified/INST/screens/web.txt'
   )
-  await expect(page.locator('[data-test=output-messages]')).toContainText('Edited web')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'Edited web'
+  )
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     'Reading DEFAULT/targets/INST/screens/web.txt'
   )
-  await expect(page.locator('[data-test=output-messages]')).toContainText('Original web')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'Original web'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
 })

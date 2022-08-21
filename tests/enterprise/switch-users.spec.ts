@@ -14,19 +14,15 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
-import { Utilities } from '../../utilities'
+import { test, expect } from './../fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  utils = new Utilities(page)
+test.use({
+  toolPath: '/tools/cmdsender',
+  toolName: 'Command Sender',
 })
 
 test('sends a command as operator but not as viewer', async ({ page }) => {
-  await page.goto('/tools/cmdsender')
-  await expect(page.locator('.v-app-bar')).toContainText('Command Sender')
-  await page.locator('.v-app-bar__nav-icon').click()
-  await utils.selectTargetPacketItem('INST', 'ABORT')
+  await page.utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
 
@@ -45,7 +41,7 @@ test('sends a command as operator but not as viewer', async ({ page }) => {
     page.locator('input:has-text("Sign In")').click(),
   ])
 
-  await utils.selectTargetPacketItem('INST', 'ABORT')
+  await page.utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await page.locator(
     'span:has-text("Error sending INST ABORT due to OpenC3::AuthError")'

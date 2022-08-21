@@ -18,27 +18,29 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
-import { Utilities } from '../utilities'
+import { test, expect } from './fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  utils = new Utilities(page)
+test.use({
+  toolPath: '/tools/autonomic',
+  toolName: 'Autonomic',
 })
 
 async function openPage(page, name) {
   await page.goto(`/tools/autonomic/${name}`)
   await expect(page.locator('.v-app-bar')).toContainText('Autonomic')
   await page.locator('.v-app-bar__nav-icon').click()
-  await utils.saveStorageState()
 }
 
 test('test overview page create trigger group', async ({ page }) => {
   await openPage(page, 'overview')
   // groups
-  await utils.download(page, '[data-test="group-download"]', function (contents) {
-    expect(contents).toContain('[]') // % is empty array
-  })
+  await page.utils.download(
+    page,
+    '[data-test="group-download"]',
+    function (contents) {
+      expect(contents).toContain('[]') // % is empty array
+    }
+  )
   // Open dialog and cancel and do not create the trigger group
   await page.locator('[data-test=new-group]').click()
   await page.locator('[data-test=group-input-name]').fill('Alpha')
@@ -50,23 +52,33 @@ test('test overview page create trigger group', async ({ page }) => {
   // events
   await page.locator('[data-test=events-clear]').click()
   await page.locator('[data-test=confirm-dialog-clear]').click()
-  await utils.download(page, '[data-test=events-download]', function (contents) {
-    expect(contents).toContain('[]') // % is empty array
-  })
+  await page.utils.download(
+    page,
+    '[data-test=events-download]',
+    function (contents) {
+      expect(contents).toContain('[]') // % is empty array
+    }
+  )
 })
 
 test('test trigger page', async ({ page }) => {
   await openPage(page, 'triggers')
   // download json of triggers
-  await utils.download(page, '[data-test=trigger-download]', function (contents) {
-    expect(contents).toContain('[]') // % is empty array
-  })
+  await page.utils.download(
+    page,
+    '[data-test=trigger-download]',
+    function (contents) {
+      expect(contents).toContain('[]') // % is empty array
+    }
+  )
   // Open dialog and cancel and do not create the trigger
   await page.locator('[data-test=new-trigger]').click()
   // select FLOAT as operand
   await page.locator('[data-test=trigger-operand-left-type]').click()
   await page
-    .locator('[data-test=trigger-operand-left-type-FLOAT] div:has-text("FLOAT")')
+    .locator(
+      '[data-test=trigger-operand-left-type-FLOAT] div:has-text("FLOAT")'
+    )
     .first()
     .click()
   await page.locator('[data-test=trigger-operand-left-float]').fill('12345')
@@ -75,7 +87,9 @@ test('test trigger page', async ({ page }) => {
   // select STRING as operand
   await page.locator('[data-test=trigger-operand-left-type]').click()
   await page.locator('[data-test=trigger-operand-left-type-STRING]').click()
-  await page.locator('[data-test=trigger-operand-left-string]').fill('This should be a string')
+  await page
+    .locator('[data-test=trigger-operand-left-string]')
+    .fill('This should be a string')
   // reset
   await page.locator('[data-test=trigger-create-reset-icon]').click()
   // select LIMIT as operand
@@ -95,7 +109,9 @@ test('test trigger page', async ({ page }) => {
   // select FLOAT as right operand
   await page.locator('[data-test=trigger-operand-right-type]').click()
   await page
-    .locator('[data-test=trigger-operand-right-type-FLOAT] div:has-text("FLOAT")')
+    .locator(
+      '[data-test=trigger-operand-right-type-FLOAT] div:has-text("FLOAT")'
+    )
     .first()
     .click()
   await page.locator('[data-test=trigger-operand-right-float]').fill('0')
@@ -107,15 +123,19 @@ test('test trigger page', async ({ page }) => {
   await page.locator('[data-test="trigger-create-select-operator->"]').click()
   //
   await page.locator('[data-test=trigger-create-submit-btn]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
 })
 
 test('test reactions page', async ({ page }) => {
   await openPage(page, 'reactions')
   // download json of reactions
-  await utils.download(page, '[data-test=reaction-download]', function (contents) {
-    expect(contents).toContain('[]') // % is empty array
-  })
+  await page.utils.download(
+    page,
+    '[data-test=reaction-download]',
+    function (contents) {
+      expect(contents).toContain('[]') // % is empty array
+    }
+  )
   //
   await page.locator('[data-test=new-reaction]').click()
   await page.locator('[data-test=reaction-select-triggers]').click()
@@ -138,34 +158,36 @@ test('test reactions page', async ({ page }) => {
   await page.locator('[data-test=reaction-create-step-three-btn]').click()
   //
   await page.locator('[data-test=reaction-snooze-input]').fill('333')
-  await page.locator('[data-test=reaction-description-input]').fill('INST CLEAR on Alpha Trigger')
+  await page
+    .locator('[data-test=reaction-description-input]')
+    .fill('INST CLEAR on Alpha Trigger')
   //
   await page.locator('[data-test=reaction-create-submit-btn]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
 })
 
 test('test reaction card actions', async ({ page }) => {
   await openPage(page, 'reactions')
   //
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=reaction-deactivate-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=reaction-activate-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=reaction-delete-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
 })
 
 test('test trigger card actions', async ({ page }) => {
   await openPage(page, 'triggers')
   //
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=trigger-deactivate-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=trigger-activate-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   await page.locator('[data-test=trigger-delete-icon-0]').click()
-  await utils.sleep(100)
+  await page.utils.sleep(100)
 })
 
 test('test overview page delete trigger group', async ({ page }) => {
@@ -177,9 +199,13 @@ test('test overview page delete trigger group', async ({ page }) => {
   await page.locator('[data-test=delete-group-0]').click()
   await page.locator('[data-test=confirm-dialog-delete]').click()
   //
-  await utils.sleep(100)
+  await page.utils.sleep(100)
   // groups
-  await utils.download(page, '[data-test="group-download"]', function (contents) {
-    expect(contents).toContain('[]') // % is empty array
-  })
+  await page.utils.download(
+    page,
+    '[data-test="group-download"]',
+    function (contents) {
+      expect(contents).toContain('[]') // % is empty array
+    }
+  )
 })

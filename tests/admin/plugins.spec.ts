@@ -14,18 +14,13 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
-import { Utilities } from '../../utilities'
+import { test, expect } from './../fixture'
 import * as fs from 'fs'
 
 test.use({
   toolPath: '/tools/admin/plugins',
+  toolName: 'Administrator',
   storageState: 'adminStorageState.json',
-});
-
-let utils
-test.beforeEach(async ({ page }) => {
-  utils = new Utilities(page)
 })
 
 test('shows and hides built-in tools', async ({ page }) => {
@@ -277,7 +272,7 @@ test.describe(() => {
     await page.locator('.v-app-bar__nav-icon').click()
     await page.locator('div[role="button"]:has-text("Select Target")').click()
     await page.locator(`.v-list-item__title:text-is("PW_TEST")`).click()
-    await utils.sleep(500)
+    await page.utils.sleep(500)
     await page.locator('button:has-text("New Screen")').click()
     await expect(
       page.locator(`.v-system-bar:has-text("New Screen")`)
@@ -468,34 +463,31 @@ test('edits existing plugin', async ({ page }) => {
   await page.locator('.v-dialog--active >> button:has-text("Ok")').click()
 })
 
-test('deletes a plugin', async ({ page }) => {
+// Playwright requires a separate test.describe to then call test.use
+test.describe(() => {
   // Must be the operator to modify files
   test.use({ storageState: 'storageState.json' })
+  test('creates new screen', async ({ page }) => {
+    // Create a new screen so we have modifications to delete
+    await page.goto('/tools/tlmviewer')
+    await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
+    await page.locator('.v-app-bar__nav-icon').click()
+    await page.locator('div[role="button"]:has-text("Select Target")').click()
+    await page.locator(`.v-list-item__title:text-is("NEW_TGT")`).click()
+    await page.utils.sleep(500)
+    await page.locator('button:has-text("New Screen")').click()
+    await expect(
+      page.locator(`.v-system-bar:has-text("New Screen")`)
+    ).toBeVisible()
+    await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
+    await page.locator('button:has-text("Ok")').click()
+    await expect(
+      page.locator(`.v-system-bar:has-text("NEW_TGT NEW_SCREEN")`)
+    ).toBeVisible()
+  })
+})
 
-  // Create a new screen so we have modifications to delete
-  await page.goto('/tools/tlmviewer')
-  await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  await page.locator('div[role="button"]:has-text("Select Target")').click()
-  await page.locator(`.v-list-item__title:text-is("NEW_TGT")`).click()
-  await utils.sleep(500)
-  await page.locator('button:has-text("New Screen")').click()
-  await expect(
-    page.locator(`.v-system-bar:has-text("New Screen")`)
-  ).toBeVisible()
-  await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
-  await page.locator('button:has-text("Ok")').click()
-  await expect(
-    page.locator(`.v-system-bar:has-text("NEW_TGT NEW_SCREEN")`)
-  ).toBeVisible()
-
-  // Must be admin to delete plugins
-  test.use({ storageState: 'adminStorageState.json' })
-
-  await page.goto('/tools/admin/plugins')
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
-
+test('deletes a plugin', async ({ page }) => {
   await page
     .locator(
       `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> [data-test=delete-plugin]`

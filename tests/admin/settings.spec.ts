@@ -18,15 +18,15 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
 
 test.use({
   toolPath: '/tools/admin/settings',
+  toolName: 'Administrator',
   storageState: 'adminStorageState.json',
-});
+})
 
 test('resets clock sync warning suppression', async ({ page }) => {
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
   await page.evaluate(
     `window.localStorage['suppresswarning__clock_out_of_sync_with_server'] = true`
   )
@@ -65,7 +65,6 @@ test('clears recent configs', async ({ page }) => {
 })
 
 test('sets a classification banner', async ({ page }) => {
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
   const bannerText = 'Test Classification Banner'
   const bannerHeight = '32'
   const bannerTextColor = 'Orange'
@@ -104,7 +103,6 @@ test('sets a classification banner', async ({ page }) => {
 })
 
 test('changes the source url', async ({ page }) => {
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
   await page.locator('[data-test=source-url]').fill('https://openc3.com')
   await page.locator('[data-test=save-source-url]').click()
   await page.reload()

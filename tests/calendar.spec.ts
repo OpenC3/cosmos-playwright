@@ -18,17 +18,12 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
+import { test, expect } from './fixture'
 import { format, add, sub } from 'date-fns'
-import { Utilities } from '../utilities'
 
 test.use({
   toolPath: '/tools/calendar',
-});
-
-let utils
-test.beforeEach(async ({ page }) => {
-  utils = new Utilities(page)
+  toolName: 'Calendar',
 })
 
 async function formatTime(date) {
@@ -74,9 +69,13 @@ test('test top bar functionality', async ({ page }) => {
   await page.locator('[data-test=display-utc-time]').click()
   // download event list
   await page.locator('[data-test=settings]').click()
-  await utils.download(page, '[data-test=download-event-list]', function (contents) {
-    expect(contents).toContain('') // % is empty
-  })
+  await page.utils.download(
+    page,
+    '[data-test=download-event-list]',
+    function (contents) {
+      expect(contents).toContain('') // % is empty
+    }
+  )
 })
 
 test('test create note functionality', async ({ page }) => {
@@ -92,7 +91,9 @@ test('test create note functionality', async ({ page }) => {
   await page.locator('[data-test=note-stop-time]').fill(stopTime)
   // step two
   await page.locator('[data-test=create-note-step-two-btn]').click()
-  await page.locator('[data-test=create-note-description]').fill('Cancel this test')
+  await page
+    .locator('[data-test=create-note-description]')
+    .fill('Cancel this test')
   await page.locator('[data-test=create-note-cancel-btn]').click()
   // Click create dropdown
   await page.locator('[data-test=create-event]').click()
@@ -209,7 +210,9 @@ test('test create activity functionality', async ({ page }) => {
   await page.locator('[data-test=create-activity-submit-btn]').click()
 })
 
-test('test timeline select and activity delete functionality', async ({ page }) => {
+test('test timeline select and activity delete functionality', async ({
+  page,
+}) => {
   // Delete the metadata, it shows something like 'Metadata, HH:MM AM - HH:MM AM'
   // So we use the comma to avoid selecting the other Metadata text on page
   await page.locator('text=Metadata,').click()

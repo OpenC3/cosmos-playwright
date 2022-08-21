@@ -18,15 +18,14 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
-import { Utilities } from '../utilities'
+import { test, expect } from './fixture'
 
-let utils
+test.use({
+  toolPath: '/tools/tlmviewer',
+  toolName: 'Telemetry Viewer'
+})
+
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/tlmviewer')
-  await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
   // Throw exceptions on any pageerror events
   page.on('pageerror', (exception) => {
     throw exception
@@ -39,12 +38,16 @@ async function showScreen(page, target, screen, callback = null) {
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
   await page.locator('button:has-text("Show Screen")').click()
-  await expect(page.locator(`.v-system-bar:has-text("${target} ${screen}")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("${target} ${screen}")`)
+  ).toBeVisible()
   if (callback) {
     await callback()
   }
   await page.locator('[data-test=close-screen-icon]').click()
-  await expect(page.locator(`.v-system-bar:has-text("${target} ${screen}")`)).not.toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("${target} ${screen}")`)
+  ).not.toBeVisible()
 }
 
 test('displays INST ADCS', async ({ page }) => {
@@ -110,13 +113,21 @@ test('displays INST SIMPLE', async ({ page }) => {
     await page.locator('button:has-text("Save")').click()
     await expect(page.locator(`text=${text}`)).toBeVisible()
     await page.locator('[data-test=edit-screen-icon]').click()
-    await expect(page.locator(`.v-system-bar:has-text("Edit Screen")`)).toBeVisible()
-    await utils.download(page, '[data-test=download-screen-icon]', function (contents) {
-      expect(contents).toContain(`LABEL ${text}`)
-      expect(contents).toContain('BIG INST HEALTH_STATUS TEMP2')
-    })
+    await expect(
+      page.locator(`.v-system-bar:has-text("Edit Screen")`)
+    ).toBeVisible()
+    await page.utils.download(
+      page,
+      '[data-test=download-screen-icon]',
+      function (contents) {
+        expect(contents).toContain(`LABEL ${text}`)
+        expect(contents).toContain('BIG INST HEALTH_STATUS TEMP2')
+      }
+    )
     await page.locator('button:has-text("Cancel")').click()
-    await expect(page.locator(`.v-system-bar:has-text("Edit Screen")`)).not.toBeVisible()
+    await expect(
+      page.locator(`.v-system-bar:has-text("Edit Screen")`)
+    ).not.toBeVisible()
   })
 })
 
@@ -129,9 +140,11 @@ let screen = 'SCREEN' + Math.floor(Math.random() * 10000)
 test('creates new screen', async ({ page }) => {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
-  await utils.sleep(500)
+  await page.utils.sleep(500)
   await page.locator('button:has-text("New Screen")').click()
-  await expect(page.locator(`.v-system-bar:has-text("New Screen")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("New Screen")`)
+  ).toBeVisible()
   // Spot check the list of existing screens
   await expect(page.locator(`.v-dialog:has-text("ADCS")`)).toBeVisible()
   await expect(page.locator(`.v-dialog:has-text("HS")`)).toBeVisible()
@@ -139,11 +152,15 @@ test('creates new screen', async ({ page }) => {
   await expect(page.locator(`.v-dialog:has-text("SIMPLE")`)).toBeVisible()
   await expect(page.locator(`.v-dialog:has-text("SIMPLE")`)).toBeVisible()
   // Check trying to create an existing screen
-  await page.locator('[data-test=new-screen-name]').fill("ADCS")
-  await expect(page.locator('.v-dialog')).toContainText('Screen ADCS already exists!')
+  await page.locator('[data-test=new-screen-name]').fill('ADCS')
+  await expect(page.locator('.v-dialog')).toContainText(
+    'Screen ADCS already exists!'
+  )
   await page.locator('[data-test=new-screen-name]').fill(screen)
   await page.locator('button:has-text("Ok")').click()
-  await expect(page.locator(`.v-system-bar:has-text("INST ${screen}")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("INST ${screen}")`)
+  ).toBeVisible()
 })
 
 test('deletes new screen', async ({ page }) => {
@@ -152,10 +169,14 @@ test('deletes new screen', async ({ page }) => {
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
   await page.locator('button:has-text("Show Screen")').click()
-  await expect(page.locator(`.v-system-bar:has-text("INST ${screen}")`)).toBeVisible()
+  await expect(
+    page.locator(`.v-system-bar:has-text("INST ${screen}")`)
+  ).toBeVisible()
   await page.locator('[data-test=edit-screen-icon]').click()
   await page.locator('[data-test=delete-screen-icon]').click()
   await page.locator('button:has-text("Delete")').click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
-  await expect(page.locator(`.v-list-item__title:text-is("${screen}")`)).not.toBeVisible()
+  await expect(
+    page.locator(`.v-list-item__title:text-is("${screen}")`)
+  ).not.toBeVisible()
 })

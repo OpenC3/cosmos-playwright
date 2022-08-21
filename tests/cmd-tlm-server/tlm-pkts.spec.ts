@@ -18,16 +18,11 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
-import { Utilities } from '../../utilities'
+import { test, expect } from './../fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/cmdtlmserver/tlm-packets')
-  await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
-  await utils.saveStorageState()
+test.use({
+  toolPath: '/tools/cmdtlmserver/tlm-packets',
+  toolName: 'CmdTlmServer',
 })
 
 test('displays the list of telemetry', async ({ page }) => {
@@ -39,8 +34,11 @@ test('displays the list of telemetry', async ({ page }) => {
 
 test('displays the packet count', async ({ page }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
+  await page.utils.sleep(1000) // Allow the telemetry to be fetched
   expect(
-    parseInt(await page.locator('text=INSTHEALTH_STATUS >> td >> nth=2').textContent())
+    parseInt(
+      await page.locator('text=INSTHEALTH_STATUS >> td >> nth=2').textContent()
+    )
   ).toBeGreaterThan(50)
   expect(
     parseInt(await page.locator('text=INSTADCS >> td >> nth=2').textContent())
@@ -50,13 +48,15 @@ test('displays the packet count', async ({ page }) => {
 test('displays a raw packet', async ({ page }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
   await page.locator('text=INSTHEALTH_STATUS >> td >> nth=3').click()
-  await expect(page.locator('.v-dialog')).toContainText('Raw Telemetry Packet: INST HEALTH_STATUS')
+  await expect(page.locator('.v-dialog')).toContainText(
+    'Raw Telemetry Packet: INST HEALTH_STATUS'
+  )
   await expect(page.locator('.v-dialog')).toContainText('Received Time:')
   await expect(page.locator('.v-dialog')).toContainText('Count:')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('Address')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('00000000:')
 
-  await utils.download(page, '[data-test=download]', function (contents) {
+  await page.utils.download(page, '[data-test=download]', function (contents) {
     expect(contents).toMatch('Raw Telemetry Packet: INST HEALTH_STATUS')
     expect(contents).toMatch('Received Time:')
     expect(contents).toMatch('Count:')
@@ -73,7 +73,9 @@ test('links to packet viewer', async ({ page }) => {
     page.context().waitForEvent('page'),
     await page.locator('text=INSTHEALTH_STATUS >> td >> nth=4').click(),
   ])
-  await expect(newPage.locator('.v-app-bar')).toContainText('Packet Viewer', { timeout: 30000 })
+  await expect(newPage.locator('.v-app-bar')).toContainText('Packet Viewer', {
+    timeout: 30000,
+  })
   await expect(newPage.locator('id=openc3-tool')).toContainText(
     'Health and status from the INST target'
   )

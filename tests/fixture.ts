@@ -13,7 +13,7 @@
 # GNU Affero General Public License for more details.
 */
 
-import { test as base } from '@playwright/test'
+import { expect, test as base } from '@playwright/test'
 import { Utilities } from '../utilities'
 
 // Extend the page fixture to goto the OpenC3 tool and wait for potential
@@ -21,7 +21,8 @@ import { Utilities } from '../utilities'
 // Login and click the hamburger nav icon to close the navigation drawer
 export const test = base.extend({
   toolPath: '/tools/cmdtlmserver',
-  page: async ({ baseURL, toolPath, page }, use) => {
+  toolName: 'CmdTlmServer',
+  page: async ({ baseURL, toolPath, toolName, page }, use) => {
     // Object.getPrototypeOf(page).utils = new Utilities(page)
     page['utils'] = new Utilities(page)
     await page.goto(`${baseURL}${toolPath}`, {
@@ -30,7 +31,7 @@ export const test = base.extend({
     if (process.env.ENTERPRISE === '1') {
       // Check to see if we redirect to authenticate
       if (page.url().includes('/auth/')) {
-        console.log('LOGIN!!!')
+        console.log('!!!Fixture Login!!!')
         await page.locator('input[name="username"]').fill('operator')
         await page.locator('input[name="password"]').fill('operator')
         await Promise.all([
@@ -40,6 +41,7 @@ export const test = base.extend({
         await page.context().storageState({ path: 'storageState.json' })
       }
     }
+    await expect(page.locator('.v-app-bar')).toContainText(toolName)
     await page.locator('.v-app-bar__nav-icon').click()
     // This is like a yield in a Ruby block where we call back to the
     // test and execute the individual test code

@@ -18,28 +18,30 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
 import { Utilities } from '../../utilities'
 
-let utils
+test.use({
+  toolPath: '/tools/scriptrunner',
+  toolName: 'Script Runner',
+})
+
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
   // Close the dialog that says how many running scripts there are
-  if (await page.$('text=running scripts')) {
-    await page.locator('button:has-text("Close")').click()
-  }
-  utils = new Utilities(page)
+  await page.locator('button:has-text("Close")').click()
 })
 
 async function saveAs(page, filename: string) {
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Save As...').click()
-  await page.locator('[data-test=file-open-save-filename]').fill(`INST/procedures/${filename}`)
+  await page
+    .locator('[data-test=file-open-save-filename]')
+    .fill(`INST/procedures/${filename}`)
   await page.locator('[data-test=file-open-save-submit-btn]').click()
   await expect(page.locator('[data-test=start-suite]')).toBeVisible()
-  expect(await page.locator('#sr-controls')).toContainText(`INST/procedures/${filename}`)
+  expect(await page.locator('#sr-controls')).toContainText(
+    `INST/procedures/${filename}`
+  )
 }
 
 async function deleteFile(page) {
@@ -51,7 +53,12 @@ async function deleteFile(page) {
 // Run by clicking on the passed startLocator and then wait for the results dialog
 // Call the checker function to verify the textarea has the desired results
 // and finally click OK to close the dialog
-async function runAndCheckResults(page, startLocator, validator, download = false) {
+async function runAndCheckResults(
+  page,
+  startLocator,
+  validator,
+  download = false
+) {
   await page.locator(startLocator).click()
   // Wait for the results ... allow for additional time
   await expect(page.locator('.v-dialog')).toContainText('Script Results', {
@@ -62,10 +69,14 @@ async function runAndCheckResults(page, startLocator, validator, download = fals
 
   // Downloading the report is additional processing so we make it optional
   if (download) {
-    await utils.download(page, 'button:has-text("Download")', function (contents) {
-      expect(contents).toContain('Test Report')
-      validator(contents)
-    })
+    await page.utils.download(
+      page,
+      'button:has-text("Download")',
+      function (contents) {
+        expect(contents).toContain('Test Report')
+        validator(contents)
+      }
+    )
   }
   await page.locator('button:has-text("Ok")').click()
 }
@@ -74,13 +85,15 @@ test('loads Suite controls when opening a suite', async ({ page }) => {
   // Open the file
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Open File').click()
-  await utils.sleep(1000)
+  await page.utils.sleep(1000)
   await page.locator('[data-test=file-open-save-search]').type('my_script_')
-  await utils.sleep(500)
+  await page.utils.sleep(500)
   await page.locator('[data-test=file-open-save-search]').type('suite')
   await page.locator('text=script_suite >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
-  expect(await page.locator('#sr-controls')).toContainText(`INST/procedures/my_script_suite.rb`)
+  expect(await page.locator('#sr-controls')).toContainText(
+    `INST/procedures/my_script_suite.rb`
+  )
   // Verify defaults in the Suite options
   await expect(page.locator('[data-test=pause-on-error]')).toBeChecked()
   await expect(page.locator('[data-test=manual]')).toBeChecked()
@@ -89,9 +102,15 @@ test('loads Suite controls when opening a suite', async ({ page }) => {
   await expect(page.locator('[data-test=abort-after-error]')).not.toBeChecked()
   await expect(page.locator('[data-test=break-loop-on-error]')).toBeDisabled()
   // Verify the drop downs are populated
-  await expect(page.locator('div[role="button"]:has-text("MySuite")')).toBeEnabled()
-  await expect(page.locator('div[role="button"]:has-text("ExampleGroup")')).toBeEnabled()
-  await expect(page.locator('div[role="button"]:has-text("script_2")')).toBeEnabled()
+  await expect(
+    page.locator('div[role="button"]:has-text("MySuite")')
+  ).toBeEnabled()
+  await expect(
+    page.locator('div[role="button"]:has-text("ExampleGroup")')
+  ).toBeEnabled()
+  await expect(
+    page.locator('div[role="button"]:has-text("script_2")')
+  ).toBeEnabled()
   // // Verify Suite Start buttons are enabled
   await expect(page.locator('[data-test=start-suite]')).toBeEnabled()
   await expect(page.locator('[data-test=start-group]')).toBeEnabled()
@@ -102,13 +121,15 @@ test('loads Suite controls when opening a suite', async ({ page }) => {
   // Verify Suite controls go away when loading a normal script
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Open File').click()
-  await utils.sleep(1000)
+  await page.utils.sleep(1000)
   await page.locator('[data-test=file-open-save-search]').type('dis')
-  await utils.sleep(500)
+  await page.utils.sleep(500)
   await page.locator('[data-test=file-open-save-search]').type('connect')
   await page.locator('text=disconnect >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
-  expect(await page.locator('#sr-controls')).toContainText(`INST/procedures/disconnect.rb`)
+  expect(await page.locator('#sr-controls')).toContainText(
+    `INST/procedures/disconnect.rb`
+  )
   await expect(page.locator('[data-test=start-suite]')).not.toBeVisible()
   await expect(page.locator('[data-test=start-group]')).not.toBeVisible()
   await expect(page.locator('[data-test=start-script]')).not.toBeVisible()
@@ -120,7 +141,7 @@ test('loads Suite controls when opening a suite', async ({ page }) => {
 
 test('disables all suite buttons when running', async ({ page }) => {
   await page.locator('textarea').fill(`
-  load "openc3/script/suite.rb"
+  require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group
     def test_test; wait; end
   end
@@ -155,7 +176,7 @@ test('disables all suite buttons when running', async ({ page }) => {
 
 test('starts a suite', async ({ page }) => {
   await page.locator('textarea').fill(`
-  load "openc3/script/suite.rb"
+  require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group
     def test_test; puts "test"; end
   end
@@ -173,18 +194,26 @@ test('starts a suite', async ({ page }) => {
   // Verify the suite startup, teardown buttons are enabled
   await expect(page.locator('[data-test=setup-suite]')).toBeEnabled()
   await expect(page.locator('[data-test=teardown-suite]')).toBeEnabled()
-  await runAndCheckResults(page, '[data-test=setup-suite]', function (textarea) {
-    expect(textarea).toMatch('setup:PASS')
-    expect(textarea).toMatch('Total Tests: 1')
-    expect(textarea).toMatch('Pass: 1')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=setup-suite]',
+    function (textarea) {
+      expect(textarea).toMatch('setup:PASS')
+      expect(textarea).toMatch('Total Tests: 1')
+      expect(textarea).toMatch('Pass: 1')
+    }
+  )
 
   // Run suite teardown
-  await runAndCheckResults(page, '[data-test=teardown-suite]', function (textarea) {
-    expect(textarea).toMatch('teardown:PASS')
-    expect(textarea).toMatch('Total Tests: 1')
-    expect(textarea).toMatch('Pass: 1')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=teardown-suite]',
+    function (textarea) {
+      expect(textarea).toMatch('teardown:PASS')
+      expect(textarea).toMatch('Total Tests: 1')
+      expect(textarea).toMatch('Pass: 1')
+    }
+  )
 
   // Run suite
   await runAndCheckResults(
@@ -201,7 +230,11 @@ test('starts a suite', async ({ page }) => {
 
   // Rewrite the script but remove setup and teardown
   await page.locator('.ace_content').click()
-  await page.keyboard.press('Control+A')
+  if (process.platform === 'darwin') {
+    await page.keyboard.press('Meta+A')
+  } else {
+    await page.keyboard.press('Control+A')
+  }
   await page.keyboard.press('Backspace')
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
@@ -251,30 +284,46 @@ test('starts a group', async ({ page }) => {
   // Verify the group startup, teardown buttons are enabled
   await expect(page.locator('[data-test=setup-group]')).toBeEnabled()
   await expect(page.locator('[data-test=teardown-group]')).toBeEnabled()
-  await runAndCheckResults(page, '[data-test=setup-group]', function (textarea) {
-    expect(textarea).toMatch('setup:PASS')
-    expect(textarea).toMatch('Total Tests: 1')
-    expect(textarea).toMatch('Pass: 1')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=setup-group]',
+    function (textarea) {
+      expect(textarea).toMatch('setup:PASS')
+      expect(textarea).toMatch('Total Tests: 1')
+      expect(textarea).toMatch('Pass: 1')
+    }
+  )
 
   // Run group teardown
-  await runAndCheckResults(page, '[data-test=teardown-group]', function (textarea) {
-    expect(textarea).toMatch('teardown:PASS')
-    expect(textarea).toMatch('Total Tests: 1')
-    expect(textarea).toMatch('Pass: 1')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=teardown-group]',
+    function (textarea) {
+      expect(textarea).toMatch('teardown:PASS')
+      expect(textarea).toMatch('Total Tests: 1')
+      expect(textarea).toMatch('Pass: 1')
+    }
+  )
 
   // Run group
-  await runAndCheckResults(page, '[data-test=start-group]', function (textarea) {
-    expect(textarea).toMatch('setup:PASS')
-    expect(textarea).toMatch('teardown:PASS')
-    expect(textarea).toMatch('Total Tests: 3')
-    expect(textarea).toMatch('Pass: 3')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=start-group]',
+    function (textarea) {
+      expect(textarea).toMatch('setup:PASS')
+      expect(textarea).toMatch('teardown:PASS')
+      expect(textarea).toMatch('Total Tests: 3')
+      expect(textarea).toMatch('Pass: 3')
+    }
+  )
 
   // Rewrite the script but remove setup and teardown
   await page.locator('.ace_content').click()
-  await page.keyboard.press('Control+A')
+  if (process.platform === 'darwin') {
+    await page.keyboard.press('Meta+A')
+  } else {
+    await page.keyboard.press('Control+A')
+  }
   await page.keyboard.press('Backspace')
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
@@ -320,11 +369,15 @@ test('starts a script', async ({ page }) => {
   `)
   await saveAs(page, 'test_suite3.rb')
   // Run script
-  await runAndCheckResults(page, '[data-test=start-script]', function (textarea) {
-    expect(textarea).toMatch('test1')
-    expect(textarea).toMatch('Total Tests: 1')
-    expect(textarea).toMatch('Pass: 1')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=start-script]',
+    function (textarea) {
+      expect(textarea).toMatch('test1')
+      expect(textarea).toMatch('Total Tests: 1')
+      expect(textarea).toMatch('Pass: 1')
+    }
+  )
   await deleteFile(page)
 })
 
@@ -345,21 +398,29 @@ test('handles manual mode', async ({ page }) => {
   await saveAs(page, 'test_suite4.rb')
 
   // Run group
-  await runAndCheckResults(page, '[data-test=start-group]', function (textarea) {
-    expect(textarea).toMatch('Manual = true')
-    expect(textarea).toMatch('manual1')
-    expect(textarea).not.toMatch('manual2')
-    expect(textarea).toMatch('Total Tests: 2')
-    expect(textarea).toMatch('Pass: 2')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=start-group]',
+    function (textarea) {
+      expect(textarea).toMatch('Manual = true')
+      expect(textarea).toMatch('manual1')
+      expect(textarea).not.toMatch('manual2')
+      expect(textarea).toMatch('Total Tests: 2')
+      expect(textarea).toMatch('Pass: 2')
+    }
+  )
   await page.locator('label:has-text("Manual")').click() // uncheck Manual
   // Run group
-  await runAndCheckResults(page, '[data-test=start-group]', function (textarea) {
-    expect(textarea).toMatch('Manual = false')
-    expect(textarea).not.toMatch('manual1')
-    expect(textarea).toMatch('manual2')
-    expect(textarea).toMatch('Total Tests: 2')
-    expect(textarea).toMatch('Pass: 2')
-  })
+  await runAndCheckResults(
+    page,
+    '[data-test=start-group]',
+    function (textarea) {
+      expect(textarea).toMatch('Manual = false')
+      expect(textarea).not.toMatch('manual1')
+      expect(textarea).toMatch('manual2')
+      expect(textarea).toMatch('Total Tests: 2')
+      expect(textarea).toMatch('Pass: 2')
+    }
+  )
   await deleteFile(page)
 })

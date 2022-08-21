@@ -18,15 +18,19 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
+import { test, expect } from './fixture'
 
 test('waits for the services to deploy and connect', async ({ page }) => {
   await page.goto('/tools/cmdtlmserver')
   // Check the 3rd column (nth starts at 0) on the row containing INST_INT says CONNECTED
-  await expect(page.locator('tr:has-text("INST_INT") td >> nth=2')).toContainText('CONNECTED', {
+  await expect(
+    page.locator('tr:has-text("INST_INT") td >> nth=2')
+  ).toContainText('CONNECTED', {
     timeout: 120000,
   })
-  await expect(page.locator('tr:has-text("INST2_INT") td >> nth=2')).toContainText('CONNECTED', {
+  await expect(
+    page.locator('tr:has-text("INST2_INT") td >> nth=2')
+  ).toContainText('CONNECTED', {
     timeout: 60000,
   })
 })

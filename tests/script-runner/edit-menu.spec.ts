@@ -18,12 +18,16 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
+
+test.use({
+  toolPath: '/tools/scriptrunner',
+  toolName: 'Script Runner',
+})
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
+  // Close the dialog that says how many running scripts there are
+  await page.locator('button:has-text("Close")').click()
 })
 
 test('finds text on page', async ({ page }) => {
@@ -39,7 +43,9 @@ openc3 is everything I thought it could be`
   await page.locator('textarea').press('Escape')
 
   await page.locator('[data-test=script-runner-edit]').click()
-  await page.locator('[data-test=script-runner-edit-replace] >> text=Replace').click()
+  await page
+    .locator('[data-test=script-runner-edit-replace] >> text=Replace')
+    .click()
   await page.locator('[placeholder="Search for"]').fill('openc3')
   await page.locator('[placeholder="Replace with"]').fill('OpenC3')
   await page.locator('text=All').nth(1).click() // Replace All

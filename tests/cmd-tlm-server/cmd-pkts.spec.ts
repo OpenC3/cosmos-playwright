@@ -18,16 +18,11 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
-import { Utilities } from '../../utilities'
+import { test, expect } from './../fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/cmdtlmserver/cmd-packets')
-  await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
-  await utils.saveStorageState()
+test.use({
+  toolPath: '/tools/cmdtlmserver/cmd-packets',
+  toolName: 'CmdTlmServer',
 })
 
 test('displays the list of command', async ({ page }) => {
@@ -39,23 +34,38 @@ test('displays the list of command', async ({ page }) => {
 })
 
 test('displays the command count', async ({ page }) => {
-  await expect(page.locator('text=INSTCOLLECT')).toBeVisible()
-  expect(
-    parseInt(await page.locator('text=INSTCOLLECT >> td >> nth=2').textContent())
-  ).toBeGreaterThan(0)
+  await expect(page.locator('text=INSTABORT')).toBeVisible()
+  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  const count = parseInt(
+    await page.locator('text=INSTABORT >> td >> nth=2').textContent()
+  )
+  // Send an ABORT command
+  await page.goto('/tools/cmdsender/INST/ABORT')
+  await page.locator('[data-test=select-send]').click()
+  await page.locator('text=cmd("INST ABORT") sent')
+  await page.utils.sleep(1000)
+  await page.goto('/tools/cmdtlmserver/cmd-packets')
+  await expect(page.locator('text=INSTABORT')).toBeVisible()
+  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  const count2 = parseInt(
+    await page.locator('text=INSTABORT >> td >> nth=2').textContent()
+  )
+  expect(count2).toEqual(count + 1)
 })
 
 test('displays a raw command', async ({ page }) => {
-  await expect(page.locator('text=INSTCOLLECT')).toBeVisible()
-  await page.locator('text=INSTCOLLECT >> td >> nth=3').click()
-  await expect(page.locator('.v-dialog')).toContainText('Raw Command Packet: INST COLLECT')
+  await expect(page.locator('text=INSTABORT')).toBeVisible()
+  await page.locator('text=INSTABORT >> td >> nth=3').click()
+  await expect(page.locator('.v-dialog')).toContainText(
+    'Raw Command Packet: INST ABORT'
+  )
   await expect(page.locator('.v-dialog')).toContainText('Received Time:')
   await expect(page.locator('.v-dialog')).toContainText('Count:')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('Address')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('00000000:')
 
-  await utils.download(page, '[data-test=download]', function (contents) {
-    expect(contents).toMatch('Raw Command Packet: INST COLLECT')
+  await page.utils.download(page, '[data-test=download]', function (contents) {
+    expect(contents).toMatch('Raw Command Packet: INST ABORT')
     expect(contents).toMatch('Received Time:')
     expect(contents).toMatch('Count:')
     expect(contents).toMatch('Address')
@@ -71,7 +81,9 @@ test('links to command sender', async ({ page }) => {
     page.context().waitForEvent('page'),
     await page.locator('text=INSTCOLLECT >> td >> nth=4').click(),
   ])
-  await expect(newPage.locator('.v-app-bar')).toContainText('Command Sender', { timeout: 30000 })
+  await expect(newPage.locator('.v-app-bar')).toContainText('Command Sender', {
+    timeout: 30000,
+  })
   await expect(newPage.locator('id=openc3-tool')).toContainText(
     'Starts a collect on the INST target'
   )

@@ -18,25 +18,21 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
-import { Utilities } from '../utilities'
+import { test, expect } from './fixture'
 import { format, sub } from 'date-fns'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/tlmgrapher')
-  await expect(page.locator('.v-app-bar')).toContainText('Telemetry Grapher')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
+test.use({
+  toolPath: '/tools/tlmgrapher',
+  toolName: 'Telemetry Grapher'
 })
 
 test('add item start, pause, resume and stop', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
   utils.sleep(3000) // Wait for graphing to occur
   // Add another item while it is already graphing
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP2')
   // Use the graph buttons first
@@ -57,13 +53,13 @@ test('add item start, pause, resume and stop', async ({ page }) => {
 })
 
 test('adds multiple graphs', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
   utils.sleep(1000) // Wait for graphing to occur
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Add Graph').click()
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart1')).toContainText('TEMP2')
   await expect(page.locator('#chart1')).not.toContainText('TEMP1')
@@ -77,7 +73,7 @@ test('adds multiple graphs', async ({ page }) => {
 })
 
 test('minimizes a graph', async ({ page }) => {
-  await utils.sleep(500) // Ensure chart is stable
+  await page.utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -94,7 +90,7 @@ test('minimizes a graph', async ({ page }) => {
 })
 
 test('shrinks and expands a graph width', async ({ page }) => {
-  await utils.sleep(500) // Ensure chart is stable
+  await page.utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -114,7 +110,7 @@ test('shrinks and expands a graph width', async ({ page }) => {
 })
 
 test('shrinks and expands a graph height', async ({ page }) => {
-  await utils.sleep(500) // Ensure chart is stable
+  await page.utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -133,7 +129,7 @@ test('shrinks and expands a graph height', async ({ page }) => {
 })
 
 test('shrinks and expands both width and height', async ({ page }) => {
-  await utils.sleep(500) // Ensure chart is stable
+  await page.utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -157,7 +153,7 @@ test('shrinks and expands both width and height', async ({ page }) => {
 })
 
 test('edits a graph', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
   utils.sleep(3000) // Wait for graphing to occur

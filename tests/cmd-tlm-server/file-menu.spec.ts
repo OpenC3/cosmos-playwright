@@ -18,15 +18,11 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
-import { Utilities } from '../../utilities'
+import { test, expect } from './../fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/cmdtlmserver')
-  await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
+test.use({
+  toolPath: '/tools/cmdtlmserver',
+  toolName: 'CmdTlmServer',
 })
 
 // Changing the polling rate is fraught with danger because it's all
@@ -38,12 +34,12 @@ test.skip('changes the polling rate', async ({ page }) => {
   await page.locator('.v-dialog input').fill('5000')
   await page.locator('.v-dialog input').press('Enter')
   await page.locator('.v-dialog').press('Escape')
-  await utils.sleep(1000)
+  await page.utils.sleep(1000)
   let rxbytes = await page.$('tr:has-text("INST_INT") td >> nth=7')
   const count1 = await rxbytes.textContent()
-  await utils.sleep(2500)
+  await page.utils.sleep(2500)
   expect(await rxbytes.textContent()).toBe(count1)
-  await utils.sleep(2500)
+  await page.utils.sleep(2500)
   // Now it's been more than 5s so it shouldn't match
   expect(await rxbytes.textContent()).not.toBe(count1)
   // Set it back to 1000
@@ -59,11 +55,11 @@ test('stops posting to the api after closing', async ({ page }) => {
   page.on('request', () => {
     requestCount++
   })
-  await utils.sleep(2000)
+  await page.utils.sleep(2000)
   // Commenting out the next two lines causes the test to fail
   await page.goto('/tools/tablemanager') // No API requests
   await expect(page.locator('.v-app-bar')).toContainText('Table Manager')
   const count = requestCount
-  await utils.sleep(2000) // Allow potential API requests to happen
+  await page.utils.sleep(2000) // Allow potential API requests to happen
   expect(requestCount).toBe(count) // no change
 })

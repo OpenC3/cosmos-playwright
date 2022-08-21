@@ -18,12 +18,16 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
+
+test.use({
+  toolPath: '/tools/scriptrunner',
+  toolName: 'Script Runner',
+})
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/scriptrunner')
-  await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
-  await page.locator('.v-app-bar__nav-icon').click()
+  // Close the dialog that says how many running scripts there are
+  await page.locator('button:has-text("Close")').click()
 })
 
 test('prompts for hazardous commands', async ({ page }) => {
@@ -36,11 +40,17 @@ test('prompts for hazardous commands', async ({ page }) => {
   await expect(page.locator('.v-dialog')).toContainText('Hazardous Command')
   await page.locator('.v-dialog >> button:has-text("Yes")').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: Yes')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('cmd("INST CLEAR")')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: Yes'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'cmd("INST CLEAR")'
+  )
 })
 
-test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', async ({ page }) => {
+test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', async ({
+  page,
+}) => {
   await page.locator('textarea').fill(`
   cmd_no_hazardous_check("INST CLEAR")
   cmd_no_checks("INST CLEAR")
@@ -52,17 +62,23 @@ test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', asyn
 })
 
 test('errors for out of range command parameters', async ({ page }) => {
-  await page.locator('textarea').fill(`cmd("INST COLLECT with DURATION 11, TYPE 'NORMAL'")`)
+  await page
+    .locator('textarea')
+    .fill(`cmd("INST COLLECT with DURATION 11, TYPE 'NORMAL'")`)
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('error', {
     timeout: 20000,
   })
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('11 not in valid range')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '11 not in valid range'
+  )
 })
 
-test('does not out of range error for cmd_no_range_check, cmd_no_checks', async ({ page }) => {
+test('does not out of range error for cmd_no_range_check, cmd_no_checks', async ({
+  page,
+}) => {
   await page.locator('textarea').fill(`
   cmd_no_range_check("INST COLLECT with DURATION 11, TYPE 'NORMAL'")
   cmd_no_checks("INST COLLECT with DURATION 11, TYPE 'NORMAL'")
@@ -90,34 +106,48 @@ test('ask accepts default, password, and required', async ({ page }) => {
     timeout: 20000,
   })
   await page.locator('.v-dialog >> button:has-text("Cancel")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: Cancel')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: Cancel'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
 
   // Clicking go re-launches the dialog
   await page.locator('[data-test=go-button]').click()
-  await expect(page.locator('.v-dialog >> button:has-text("Ok")')).toBeDisabled()
+  await expect(
+    page.locator('.v-dialog >> button:has-text("Ok")')
+  ).toBeDisabled()
   await page.locator('.v-dialog >> input').type('12345')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('12345')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '12345'
+  )
   // Now nothing is required so OK is enabled
   await expect(page.locator('.v-dialog >> button:has-text("Ok")')).toBeEnabled()
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('blank:true')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'blank:true'
+  )
   // Verify the default value
   expect(await page.inputValue('[data-test=ask-value-input]')).toMatch('67890')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('67890')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '67890'
+  )
   // Now type the secret password
   await page.locator('.v-dialog >> input').type('abc123!')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
 
   await expect(page.locator('[data-test=state]')).toHaveValue('waiting')
   // Verify we're not outputting the secret password on input
-  await expect(page.locator('[data-test=output-messages]')).not.toContainText('abc123!')
+  await expect(page.locator('[data-test=output-messages]')).not.toContainText(
+    'abc123!'
+  )
   // Once we restart we should see it since we print it
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('abc123!')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'abc123!'
+  )
 })
 
 test('converts value for ask but not ask_string', async ({ page }) => {
@@ -135,17 +165,25 @@ test('converts value for ask but not ask_string', async ({ page }) => {
   })
   await page.locator('.v-dialog >> input').type('123')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('int:123 Integer')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'int:123 Integer'
+  )
   await page.locator('.v-dialog >> input').type('5.5')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('float:5.5 Float')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'float:5.5 Float'
+  )
   await page.locator('.v-dialog >> input').type('5.5')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('string:5.5 String')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'string:5.5 String'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
 })
 
-test('opens a dialog with buttons for message_box, vertical_message_box', async ({ page }) => {
+test('opens a dialog with buttons for message_box, vertical_message_box', async ({
+  page,
+}) => {
   await page.locator('textarea').fill(`
   value = message_box("Select", "ONE", "TWO", "THREE")
   puts value
@@ -157,7 +195,9 @@ test('opens a dialog with buttons for message_box, vertical_message_box', async 
     timeout: 20000,
   })
   await page.locator('.v-dialog >> button:has-text("Cancel")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: Cancel')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: Cancel'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
 
   // Clicking Go re-launches the dialog
@@ -166,7 +206,9 @@ test('opens a dialog with buttons for message_box, vertical_message_box', async 
   await page.locator('.v-dialog >> button:has-text("FOUR")').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
   await expect(page.locator('[data-test=output-messages]')).toContainText('TWO')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('FOUR')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'FOUR'
+  )
 })
 
 test('opens a dialog with dropdowns for combo_box', async ({ page }) => {
@@ -179,7 +221,9 @@ test('opens a dialog with dropdowns for combo_box', async ({ page }) => {
     timeout: 20000,
   })
   await page.locator('.v-dialog >> button:has-text("Cancel")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: Cancel')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: Cancel'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
 
   // Clicking go re-launches the dialog
@@ -189,7 +233,9 @@ test('opens a dialog with dropdowns for combo_box', async ({ page }) => {
   await page.locator('div[role="listbox"] >> text=def456').click()
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: def456')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: def456'
+  )
 })
 
 test('opens a dialog for prompt', async ({ page }) => {
@@ -204,7 +250,9 @@ test('opens a dialog for prompt', async ({ page }) => {
   })
   await expect(page.locator('.v-dialog')).toContainText('Continue?')
   await page.locator('.v-dialog >> button:has-text("Cancel")').click()
-  await expect(page.locator('[data-test=output-messages]')).toContainText('User input: Cancel')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'User input: Cancel'
+  )
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
 
   // Clicking Go re-executes the prompt
@@ -227,7 +275,9 @@ test.skip('opens a file dialog', async ({ page }) => {
     timeout: 20000,
   })
   await expect(page.locator('.v-dialog')).toContainText('Open a single file')
-  await expect(page.locator('.v-dialog')).toContainText('Choose something interesting')
+  await expect(page.locator('.v-dialog')).toContainText(
+    'Choose something interesting'
+  )
   await page.locator('.v-dialog >> button:has-text("Cancel")').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
   // Clicking Go re-executes the prompt
@@ -245,6 +295,10 @@ test.skip('opens a file dialog', async ({ page }) => {
   await fileChooser.setFiles('.env')
   await page.locator('.v-dialog >> button:has-text("Ok")').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('File(s): [".env"]')
-  await expect(page.locator('[data-test=output-messages]')).toContainText('RUBYGEMS_URL')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'File(s): [".env"]'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'RUBYGEMS_URL'
+  )
 })

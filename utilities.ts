@@ -10,10 +10,6 @@ export class Utilities {
     await new Promise((resolve) => setTimeout(resolve, time))
   }
 
-  async saveStorageState(file = 'storageState.json') {
-    await this.page.context().storageState({ path: file })
-  }
-
   async selectTargetPacketItem(target: string, packet: string, item: string) {
     await this.page.locator('[data-test=select-target] i').click()
     await this.page

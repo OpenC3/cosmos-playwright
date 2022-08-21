@@ -18,15 +18,11 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
-import { Utilities } from '../utilities'
+import { test, expect } from './fixture'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/dataviewer')
-  await expect(page.locator('.v-app-bar')).toContainText('Data Viewer')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
+test.use({
+  toolPath: '/tools/dataviewer',
+  toolName: 'Data Viewer',
 })
 
 test('loads and saves the configuration', async ({ page }) => {
@@ -39,7 +35,7 @@ test('loads and saves the configuration', async ({ page }) => {
   await page.locator('[data-test="rename-tab-input"]').fill('Test1')
   await page.locator('[data-test="rename"]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test="add-packet-button"]').click()
 
   // Setup another tab
@@ -53,7 +49,7 @@ test('loads and saves the configuration', async ({ page }) => {
   await page.locator('div[role="tab"]:has-text("Test2")').click()
   // Get the last data-test=new-packet (on the new tab)
   await page.locator('[data-test=new-packet] >> nth=-1').click()
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test="add-packet-button"]').click()
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
@@ -102,31 +98,43 @@ test('loads and saves the configuration', async ({ page }) => {
 test('adds a raw packet to a new tab', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test=add-packet-button]').click()
   await page.locator('[data-test=start-button]').click()
-  await utils.sleep(500)
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch('00000010:')
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch('00000020:')
+  await page.utils.sleep(500)
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    '00000010:'
+  )
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    '00000020:'
+  )
 })
 
 test('adds a decom packet to a new tab', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('text=Decom').click()
   await expect(page.locator('[data-test=add-packet-value-type]')).toBeVisible()
   await page.locator('[data-test=add-packet-button]').click()
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('.v-window-item > div')).toHaveCount(1)
-  await utils.sleep(500)
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch('POSX:')
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch('POSY:')
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch('POSZ:')
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).not.toMatch('00000010:')
+  await page.utils.sleep(500)
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    'POSX:'
+  )
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    'POSY:'
+  )
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    'POSZ:'
+  )
+  expect(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  ).not.toMatch('00000010:')
   // add another packet to the existing connection
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test=add-packet-button]').click()
   await expect(page.locator('.v-window-item > div')).toHaveCount(2)
 })
@@ -148,15 +156,15 @@ test('renames a tab', async ({ page }) => {
 test('deletes a component and tab', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test=add-packet-button]').click()
-  await expect(page.locator('.v-window-item > .v-card > .v-card__title')).toHaveText(
-    'INST ADCS [ RAW ]'
-  )
+  await expect(
+    page.locator('.v-window-item > .v-card > .v-card__title')
+  ).toHaveText('INST ADCS [ RAW ]')
   await page.locator('[data-test=delete-packet]').click()
-  await expect(page.locator('.v-window-item > .v-card > .v-card__title')).toHaveText(
-    'This tab is empty'
-  )
+  await expect(
+    page.locator('.v-window-item > .v-card > .v-card__title')
+  ).toHaveText('This tab is empty')
   await page.locator('[data-test=tab]').click({ button: 'right' })
   await page.locator('[data-test=context-menu-delete] > div').click()
   await expect(page.locator('.v-card > .v-card__title').first()).toHaveText(
@@ -167,36 +175,46 @@ test('deletes a component and tab', async ({ page }) => {
 test('controls playback', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test=add-packet-button]').click()
   await page.locator('[data-test=start-button]').click()
-  await utils.sleep(1000) // Allow a few packets to come in
+  await page.utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-play-pause]').click()
-  await utils.sleep(500) // Ensure it's stopped and draws the last packet contents
-  let content: string = await page.inputValue('[data-test=dump-component-text-area]')
+  await page.utils.sleep(500) // Ensure it's stopped and draws the last packet contents
+  let content: string = await page.inputValue(
+    '[data-test=dump-component-text-area]'
+  )
   // Step back and forth
   await page.locator('[aria-label="prepend icon"]').click()
-  expect(content).not.toEqual(await page.inputValue('[data-test=dump-component-text-area]'))
+  expect(content).not.toEqual(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  )
   await page.locator('[aria-label="append icon"]').click()
-  expect(content).toEqual(await page.inputValue('[data-test=dump-component-text-area]'))
+  expect(content).toEqual(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  )
   // Resume
   await page.locator('[data-test=dump-component-play-pause]').click()
-  expect(content).not.toEqual(await page.inputValue('[data-test=dump-component-text-area]'))
+  expect(content).not.toEqual(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  )
   // Stop
   await page.locator('[data-test="stop-button"]').click()
-  await utils.sleep(500) // Ensure it's stopped and draws the last packet contents
+  await page.utils.sleep(500) // Ensure it's stopped and draws the last packet contents
   content = await page.inputValue('[data-test=dump-component-text-area]')
-  await utils.sleep(500) // Wait for potential changes
-  expect(content).toEqual(await page.inputValue('[data-test=dump-component-text-area]'))
+  await page.utils.sleep(500) // Wait for potential changes
+  expect(content).toEqual(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  )
 })
 
 test('changes display settings', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test=add-packet-button]').click()
   await page.locator('[data-test=start-button]').click()
-  await utils.sleep(1000) // Allow a few packets to come in
+  await page.utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-open-settings]').click()
   await expect(page.locator('[data-test=display-settings-card]')).toBeVisible()
   await page.locator('text=ASCII').click()
@@ -204,30 +222,50 @@ test('changes display settings', async ({ page }) => {
   await page.locator('text=Show line address').click()
   await page.locator('text=Show timestamp').click()
   // check number input validation
-  await page.locator('[data-test=dump-component-settings-num-packets]').fill('0')
-  await page.locator('[data-test="dump-component-settings-num-packets"]').press('Enter') // fire the validation
-  await expect(page.locator('[data-test=dump-component-settings-num-packets]')).toHaveValue('1')
-  await page.locator('[data-test=dump-component-settings-num-packets]').fill('101')
-  await page.locator('[data-test="dump-component-settings-num-packets"]').press('Enter') // fire the validation
-  await expect(page.locator('[data-test=dump-component-settings-num-packets]')).toHaveValue('100')
+  await page
+    .locator('[data-test=dump-component-settings-num-packets]')
+    .fill('0')
+  await page
+    .locator('[data-test="dump-component-settings-num-packets"]')
+    .press('Enter') // fire the validation
+  await expect(
+    page.locator('[data-test=dump-component-settings-num-packets]')
+  ).toHaveValue('1')
+  await page
+    .locator('[data-test=dump-component-settings-num-packets]')
+    .fill('101')
+  await page
+    .locator('[data-test="dump-component-settings-num-packets"]')
+    .press('Enter') // fire the validation
+  await expect(
+    page.locator('[data-test=dump-component-settings-num-packets]')
+  ).toHaveValue('100')
   await page.locator('[data-test=dump-component-settings-num-bytes]').fill('0')
-  await page.locator('[data-test="dump-component-settings-num-bytes"]').press('Enter') // fire the validation
-  await expect(page.locator('[data-test=dump-component-settings-num-bytes]')).toHaveValue('1')
+  await page
+    .locator('[data-test="dump-component-settings-num-bytes"]')
+    .press('Enter') // fire the validation
+  await expect(
+    page.locator('[data-test=dump-component-settings-num-bytes]')
+  ).toHaveValue('1')
 })
 
 test('downloads a file', async ({ page }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.utils.selectTargetPacketItem('INST', 'ADCS')
   await page.locator('[data-test=add-packet-button]').click()
   await page.locator('[data-test=start-button]').click()
-  await utils.sleep(1000) // Allow a few packets to come in
+  await page.utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-play-pause]').click()
 
   const textarea = await page.inputValue('[data-test=dump-component-text-area]')
-  await utils.download(page, '[data-test=dump-component-download]', function (contents) {
-    expect(contents).toEqual(textarea)
-  })
+  await page.utils.download(
+    page,
+    '[data-test=dump-component-download]',
+    function (contents) {
+      expect(contents).toEqual(textarea)
+    }
+  )
 })
 
 test('validates start and end time inputs', async ({ page }) => {
@@ -255,7 +293,9 @@ test('validates start and end time values', async ({ page }) => {
   await page.locator('[data-test=start-date]').fill('4000-01-01') // If this version of OpenC3 is still used 2000 years from now, this test will need to be updated
   await page.locator('[data-test=start-time]').fill('12:15:15')
   await page.locator('[data-test=start-button]').click()
-  await expect(page.locator('.warning')).toContainText('Start date/time is in the future!')
+  await expect(page.locator('.warning')).toContainText(
+    'Start date/time is in the future!'
+  )
 
   // validate start/end time equal to each other
   await page.locator('[data-test=start-date]').fill('2020-01-01')
@@ -263,7 +303,9 @@ test('validates start and end time values', async ({ page }) => {
   await page.locator('[data-test=end-date]').fill('2020-01-01')
   await page.locator('[data-test=end-time]').fill('12:15:15')
   await page.locator('[data-test=start-button]').click()
-  await expect(page.locator('.warning')).toContainText('Start date/time is equal to end date/time!')
+  await expect(page.locator('.warning')).toContainText(
+    'Start date/time is equal to end date/time!'
+  )
 
   // validate future end date
   await page.locator('[data-test=start-date]').fill('2020-01-01')

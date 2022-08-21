@@ -18,38 +18,39 @@
 */
 
 // @ts-check
-import { test, expect } from './fixture';
-import { Utilities } from '../utilities'
+import { test, expect } from './fixture'
 
 test.use({
   toolPath: '/tools/cmdsender',
-});
-
-// let utils
-// test.beforeEach(async ({ page }) => {
-//   utils = new Utilities(page)
-// })
+  toolName: 'Command Sender',
+})
 
 // Helper function to select a parameter dropdown
 async function selectValue(page, param, value) {
-  await page.locator(`tr:has-text("${param}") [data-test=cmd-param-select]`).click()
+  await page
+    .locator(`tr:has-text("${param}") [data-test=cmd-param-select]`)
+    .click()
   await page.locator(`text=${value}`).click()
   await expect(page.locator('tr:has-text("TYPE")')).toContainText(value)
 }
 
 // Helper function to set parameter value
 async function setValue(page, param, value) {
-  await page.locator(`tr:has-text("${param}") [data-test=cmd-param-value]`).fill(value)
+  await page
+    .locator(`tr:has-text("${param}") [data-test=cmd-param-value]`)
+    .fill(value)
   // Trigger the update handler that sets the drop down by pressing Enter
-  await page.locator(`tr:has-text("${param}") [data-test=cmd-param-value]`).press('Enter')
+  await page
+    .locator(`tr:has-text("${param}") [data-test=cmd-param-value]`)
+    .press('Enter')
   await checkValue(page, param, value)
 }
 
 // Helper function to check parameter value
 async function checkValue(page, param, value) {
-  expect(await page.inputValue(`tr:has-text("${param}") [data-test=cmd-param-value]`)).toMatch(
-    value
-  )
+  expect(
+    await page.inputValue(`tr:has-text("${param}") [data-test=cmd-param-value]`)
+  ).toMatch(value)
 }
 
 // Helper function to check command history
@@ -73,7 +74,11 @@ test('selects a target and packet', async ({ page }) => {
 test('displays INST COLLECT using the route', async ({ page }) => {
   await page.goto('/tools/cmdsender/INST/COLLECT')
   await page.utils.inputValue(page, '[data-test=select-target] input', 'INST')
-  await page.utils.inputValue(page, '[data-test=select-packet] input', 'COLLECT')
+  await page.utils.inputValue(
+    page,
+    '[data-test=select-packet] input',
+    'COLLECT'
+  )
   await expect(page.locator('main')).toContainText('Starts a collect')
   await expect(page.locator('main')).toContainText('Parameters')
   await expect(page.locator('main')).toContainText('DURATION')
@@ -91,7 +96,9 @@ test('supports manually entered state values', async ({ page }) => {
   await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await setValue(page, 'TYPE', '3')
   // Typing in the state value should automatically switch the state
-  await expect(page.locator('tr:has-text("TYPE")')).toContainText('MANUALLY ENTERED')
+  await expect(page.locator('tr:has-text("TYPE")')).toContainText(
+    'MANUALLY ENTERED'
+  )
 
   // Manually typing in an existing state value should change the state drop down
   await setValue(page, 'TYPE', '0x0')
@@ -103,7 +110,10 @@ test('supports manually entered state values', async ({ page }) => {
   await expect(page.locator('main')).toContainText(
     'Status: cmd("INST COLLECT with TYPE 3, DURATION 1, OPCODE 171, TEMP 0") sent'
   )
-  await checkHistory(page, 'cmd("INST COLLECT with TYPE 3, DURATION 1, OPCODE 171, TEMP 0")')
+  await checkHistory(
+    page,
+    'cmd("INST COLLECT with TYPE 3, DURATION 1, OPCODE 171, TEMP 0")'
+  )
 })
 
 test('warns for hazardous commands', async ({ page }) => {
@@ -139,7 +149,10 @@ test('warns for hazardous parameters', async ({ page }) => {
   await expect(page.locator('main')).toContainText(
     '("INST COLLECT with TYPE 1, DURATION 1, OPCODE 171, TEMP 0") sent'
   )
-  await checkHistory(page, 'cmd("INST COLLECT with TYPE 1, DURATION 1, OPCODE 171, TEMP 0")')
+  await checkHistory(
+    page,
+    'cmd("INST COLLECT with TYPE 1, DURATION 1, OPCODE 171, TEMP 0")'
+  )
 })
 
 test('handles float values and scientific notation', async ({ page }) => {
@@ -150,7 +163,10 @@ test('handles float values and scientific notation', async ({ page }) => {
   await expect(page.locator('main')).toContainText(
     '("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000") sent'
   )
-  await checkHistory(page, 'cmd("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000")')
+  await checkHistory(
+    page,
+    'cmd("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000")'
+  )
 })
 
 test('handles array values', async ({ page }) => {
@@ -164,7 +180,10 @@ test('handles array values', async ({ page }) => {
   await expect(page.locator('main')).toContainText(
     'cmd("INST ARYCMD with ARRAY [ 1, 2, 3, 4 ], CRC 0") sent'
   )
-  await checkHistory(page, 'cmd("INST ARYCMD with ARRAY [ 1, 2, 3, 4 ], CRC 0")')
+  await checkHistory(
+    page,
+    'cmd("INST ARYCMD with ARRAY [ 1, 2, 3, 4 ], CRC 0")'
+  )
 })
 
 // // TODO: This needs work
@@ -197,13 +216,17 @@ test('executes commands from history', async ({ page }) => {
   await page.locator('[data-test=sender-history]').press('Enter')
   await page.locator('.v-dialog button:has-text("Yes")').click()
   // Now history says it was sent twice (2)
-  await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent. (2)')
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST CLEAR") sent. (2)'
+  )
   await page.locator('[data-test=sender-history]').click()
   await page.locator('[data-test=sender-history]').press('ArrowUp')
   await page.locator('[data-test=sender-history]').press('Enter')
   await page.locator('.v-dialog button:has-text("Yes")').click()
   // Now history says it was sent three times (3)
-  await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent. (3)')
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST CLEAR") sent. (3)'
+  )
 
   // Send a different command: INST SETPARAMS
   await page.utils.selectTargetPacketItem('INST', 'SETPARAMS')
@@ -307,7 +330,9 @@ test('disable parameter conversions', async ({ page }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
-  await expect(page.locator('[data-test=output-messages]')).toContainText('00000010: 00 02')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '00000010: 00 02'
+  )
 
   await page.locator('text=Command Sender').click()
   await expect(page.locator('.v-app-bar')).toContainText('Command Sender')
@@ -326,5 +351,7 @@ test('disable parameter conversions', async ({ page }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
-  await expect(page.locator('[data-test=output-messages]')).toContainText('00000010: 00 01')
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '00000010: 00 01'
+  )
 })

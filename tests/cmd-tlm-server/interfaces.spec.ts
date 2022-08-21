@@ -18,19 +18,28 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
+
+test.use({
+  toolPath: '/tools/cmdtlmserver/interfaces',
+  toolName: 'CmdTlmServer',
+})
 
 test('disconnects & connects an interface', async ({ page }) => {
-  await page.goto('/tools/cmdtlmserver/interfaces')
-  await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
-  await page.locator('.v-app-bar__nav-icon').click()
-
-  await expect(page.locator('tr:has-text("INST_INT") td >> nth=2')).toContainText('CONNECTED')
+  await expect(
+    page.locator('tr:has-text("INST_INT") td >> nth=2')
+  ).toContainText('CONNECTED')
   await page.locator('tr:has-text("INST_INT") td >> nth=1').click()
-  await expect(page.locator('tr:has-text("INST_INT") td >> nth=2')).toContainText('DISCONNECTED')
-  await expect(page.locator('[data-test=log-messages]')).toContainText('INST_INT: Disconnect')
+  await expect(
+    page.locator('tr:has-text("INST_INT") td >> nth=2')
+  ).toContainText('DISCONNECTED')
+  await expect(page.locator('[data-test=log-messages]')).toContainText(
+    'INST_INT: Disconnect'
+  )
   await page.locator('tr:has-text("INST_INT") td >> nth=1').click()
-  await expect(page.locator('tr:has-text("INST_INT") td >> nth=2')).toContainText('CONNECTED')
+  await expect(
+    page.locator('tr:has-text("INST_INT") td >> nth=2')
+  ).toContainText('CONNECTED')
   await expect(page.locator('[data-test=log-messages]')).toContainText(
     'INST_INT: Connection Success'
   )

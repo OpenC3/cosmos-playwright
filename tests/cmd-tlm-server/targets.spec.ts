@@ -18,27 +18,35 @@
 */
 
 // @ts-check
-import { test, expect } from './../fixture';
+import { test, expect } from './../fixture'
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/cmdtlmserver/targets')
-  await expect(page.locator('.v-app-bar')).toContainText('CmdTlmServer')
-  await page.locator('.v-app-bar__nav-icon').click()
+test.use({
+  toolPath: '/tools/cmdtlmserver/targets',
+  toolName: 'CmdTlmServer',
 })
 
 test('displays the list of targets', async ({ page }) => {
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST')
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST2')
-  await expect(page.locator('[data-test=targets-table]')).toContainText('EXAMPLE')
-  await expect(page.locator('[data-test=targets-table]')).toContainText('TEMPLATED')
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'EXAMPLE'
+  )
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'TEMPLATED'
+  )
 })
 
 test('displays the command & telemetry count', async ({ page }) => {
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST')
+  await page.utils.sleep(1000) // Allow the telemetry to be fetched
   expect(
-    parseInt(await page.locator('tr:has-text("INST_INT") td >> nth=2').textContent())
+    parseInt(
+      await page.locator('tr:has-text("INST_INT") td >> nth=2').textContent()
+    )
   ).toBeGreaterThan(1)
   expect(
-    parseInt(await page.locator('tr:has-text("INST_INT") td >> nth=3').textContent())
+    parseInt(
+      await page.locator('tr:has-text("INST_INT") td >> nth=3').textContent()
+    )
   ).toBeGreaterThan(50)
 })
