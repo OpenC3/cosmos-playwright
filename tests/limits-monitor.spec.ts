@@ -18,15 +18,16 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './fixture';
 import { Utilities } from '../utilities'
 import { format } from 'date-fns'
 
+test.use({
+  toolPath: '/tools/limitsmonitor',
+});
+
 let utils
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/limitsmonitor')
-  await expect(page.locator('.v-app-bar')).toContainText('Limits Monitor')
-  await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
 })
 

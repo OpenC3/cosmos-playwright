@@ -14,19 +14,18 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './../fixture';
 import { Utilities } from '../../utilities'
 import * as fs from 'fs'
 
-// Be an Admin for all these tests
-test.use({ storageState: 'adminStorageState.json' })
+test.use({
+  toolPath: '/tools/admin/plugins',
+  storageState: 'adminStorageState.json',
+});
 
 let utils
 test.beforeEach(async ({ page }) => {
   utils = new Utilities(page)
-  await page.goto('/tools/admin/plugins')
-  await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
 })
 
 test('shows and hides built-in tools', async ({ page }) => {
@@ -470,6 +469,9 @@ test('edits existing plugin', async ({ page }) => {
 })
 
 test('deletes a plugin', async ({ page }) => {
+  // Must be the operator to modify files
+  test.use({ storageState: 'storageState.json' })
+
   // Create a new screen so we have modifications to delete
   await page.goto('/tools/tlmviewer')
   await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
@@ -486,6 +488,9 @@ test('deletes a plugin', async ({ page }) => {
   await expect(
     page.locator(`.v-system-bar:has-text("NEW_TGT NEW_SCREEN")`)
   ).toBeVisible()
+
+  // Must be admin to delete plugins
+  test.use({ storageState: 'adminStorageState.json' })
 
   await page.goto('/tools/admin/plugins')
   await expect(page.locator('.v-app-bar')).toContainText('Administrator')

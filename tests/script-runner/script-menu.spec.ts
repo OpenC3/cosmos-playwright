@@ -18,7 +18,7 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './../fixture';
 import { format } from 'date-fns'
 import { Utilities } from '../../utilities'
 

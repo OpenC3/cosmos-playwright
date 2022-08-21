@@ -18,15 +18,16 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './fixture';
 import { format, add, sub } from 'date-fns'
 import { Utilities } from '../utilities'
 
+test.use({
+  toolPath: '/tools/calendar',
+});
+
 let utils
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/calendar')
-  await expect(page.locator('.v-app-bar')).toContainText('Calendar')
-  await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
 })
 

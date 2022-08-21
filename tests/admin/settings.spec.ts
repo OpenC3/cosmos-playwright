@@ -18,16 +18,15 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './../fixture';
 
-// Be an Admin for all these tests
-test.use({ storageState: 'adminStorageState.json' });
+test.use({
+  toolPath: '/tools/admin/settings',
+  storageState: 'adminStorageState.json',
+});
 
 test('resets clock sync warning suppression', async ({ page }) => {
-  await page.goto('/tools/admin/settings')
   await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
-
   await page.evaluate(
     `window.localStorage['suppresswarning__clock_out_of_sync_with_server'] = true`
   )
@@ -66,10 +65,7 @@ test('clears recent configs', async ({ page }) => {
 })
 
 test('sets a classification banner', async ({ page }) => {
-  await page.goto('/tools/admin/settings')
   await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
-
   const bannerText = 'Test Classification Banner'
   const bannerHeight = '32'
   const bannerTextColor = 'Orange'
@@ -108,10 +104,7 @@ test('sets a classification banner', async ({ page }) => {
 })
 
 test('changes the source url', async ({ page }) => {
-  await page.goto('/tools/admin/settings')
   await expect(page.locator('.v-app-bar')).toContainText('Administrator')
-  await page.locator('.v-app-bar__nav-icon').click()
-
   await page.locator('[data-test=source-url]').fill('https://openc3.com')
   await page.locator('[data-test=save-source-url]').click()
   await page.reload()

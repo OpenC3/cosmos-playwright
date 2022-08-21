@@ -18,16 +18,17 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './fixture';
 import { Utilities } from '../utilities'
 
-let utils
-test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/cmdsender')
-  await expect(page.locator('.v-app-bar')).toContainText('Command Sender')
-  await page.locator('.v-app-bar__nav-icon').click()
-  utils = new Utilities(page)
-})
+test.use({
+  toolPath: '/tools/cmdsender',
+});
+
+// let utils
+// test.beforeEach(async ({ page }) => {
+//   utils = new Utilities(page)
+// })
 
 // Helper function to select a parameter dropdown
 async function selectValue(page, param, value) {
@@ -60,7 +61,7 @@ async function checkHistory(page, value) {
 // Test the basic functionality of the application
 //
 test('selects a target and packet', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'ABORT')
+  await page.utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
   // Test the autocomplete by typing in a command
@@ -71,15 +72,15 @@ test('selects a target and packet', async ({ page }) => {
 
 test('displays INST COLLECT using the route', async ({ page }) => {
   await page.goto('/tools/cmdsender/INST/COLLECT')
-  await utils.inputValue(page, '[data-test=select-target] input', 'INST')
-  await utils.inputValue(page, '[data-test=select-packet] input', 'COLLECT')
+  await page.utils.inputValue(page, '[data-test=select-target] input', 'INST')
+  await page.utils.inputValue(page, '[data-test=select-packet] input', 'COLLECT')
   await expect(page.locator('main')).toContainText('Starts a collect')
   await expect(page.locator('main')).toContainText('Parameters')
   await expect(page.locator('main')).toContainText('DURATION')
 })
 
 test('displays state parameters with drop downs', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'SPECIAL')
   await checkValue(page, 'TYPE', '1')
   await selectValue(page, 'TYPE', 'NORMAL')
@@ -87,7 +88,7 @@ test('displays state parameters with drop downs', async ({ page }) => {
 })
 
 test('supports manually entered state values', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await setValue(page, 'TYPE', '3')
   // Typing in the state value should automatically switch the state
   await expect(page.locator('tr:has-text("TYPE")')).toContainText('MANUALLY ENTERED')
@@ -106,7 +107,7 @@ test('supports manually entered state values', async ({ page }) => {
 })
 
 test('warns for hazardous commands', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'CLEAR')
+  await page.utils.selectTargetPacketItem('INST', 'CLEAR')
   await expect(page.locator('main')).toContainText('Clears counters')
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("No")').click()
@@ -118,7 +119,7 @@ test('warns for hazardous commands', async ({ page }) => {
 })
 
 test('warns for required parameters', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await page.locator('button:has-text("Send")').click()
   // Break apart the checks so we have output flexibily in the future
   await expect(page.locator('.v-dialog')).toContainText('Error sending')
@@ -128,7 +129,7 @@ test('warns for required parameters', async ({ page }) => {
 })
 
 test('warns for hazardous parameters', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'SPECIAL')
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("No")').click()
@@ -142,7 +143,7 @@ test('warns for hazardous parameters', async ({ page }) => {
 })
 
 test('handles float values and scientific notation', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'FLTCMD')
+  await page.utils.selectTargetPacketItem('INST', 'FLTCMD')
   await setValue(page, 'FLOAT32', '123.456')
   await setValue(page, 'FLOAT64', '12e3')
   await page.locator('button:has-text("Send")').click()
@@ -153,7 +154,7 @@ test('handles float values and scientific notation', async ({ page }) => {
 })
 
 test('handles array values', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'ARYCMD')
+  await page.utils.selectTargetPacketItem('INST', 'ARYCMD')
   await setValue(page, 'ARRAY', '10')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('.v-dialog')).toContainText('must be an Array')
@@ -176,7 +177,7 @@ test('handles array values', async ({ page }) => {
 // })
 
 test('gets details with right click', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await page.locator('text=Collect type').click({ button: 'right' })
   await page.locator('text=Details').click()
   await expect(page.locator('.v-dialog')).toContainText('INST COLLECT TYPE')
@@ -185,7 +186,7 @@ test('gets details with right click', async ({ page }) => {
 })
 
 test('executes commands from history', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'CLEAR')
+  await page.utils.selectTargetPacketItem('INST', 'CLEAR')
   await page.locator('button:has-text("Send")').click()
   await page.locator('.v-dialog button:has-text("Yes")').click()
   await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent')
@@ -205,7 +206,7 @@ test('executes commands from history', async ({ page }) => {
   await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent. (3)')
 
   // Send a different command: INST SETPARAMS
-  await utils.selectTargetPacketItem('INST', 'SETPARAMS')
+  await page.utils.selectTargetPacketItem('INST', 'SETPARAMS')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
     'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent.'
@@ -253,7 +254,7 @@ test('executes commands from history', async ({ page }) => {
 // Test the Mode menu
 //
 test('ignores range checks', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'NORMAL') // Ensure TYPE is set since its required
   await setValue(page, 'TEMP', '100')
   await page.locator('button:has-text("Send")').click()
@@ -270,7 +271,7 @@ test('ignores range checks', async ({ page }) => {
 })
 
 test('displays state values in hex', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await page.utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'NORMAL') // Ensure TYPE is set since its required
   await checkValue(page, 'TYPE', '0')
   await page.locator('[data-test=command-sender-mode]').click()
@@ -279,7 +280,7 @@ test('displays state values in hex', async ({ page }) => {
 })
 
 test('shows ignored parameters', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'ABORT')
+  await page.utils.selectTargetPacketItem('INST', 'ABORT')
   // All the ABORT parameters are ignored so the table shouldn't appear
   await expect(page.locator('main')).not.toContainText('Parameters')
   await page.locator('[data-test=command-sender-mode]').click()
@@ -293,7 +294,7 @@ test('shows ignored parameters', async ({ page }) => {
 // check the raw buffer, then send it with parameter conversions disabled,
 // and re-check the raw buffer for a change.
 test('disable parameter conversions', async ({ page }) => {
-  await utils.selectTargetPacketItem('INST', 'SETPARAMS')
+  await page.utils.selectTargetPacketItem('INST', 'SETPARAMS')
   await page.locator('button:has-text("Send")').click()
   await page.locator('.v-app-bar__nav-icon').click()
 
@@ -313,7 +314,7 @@ test('disable parameter conversions', async ({ page }) => {
   await page.locator('[data-test=command-sender-mode]').click()
   await page.locator('text=Disable Parameter').click()
 
-  await utils.selectTargetPacketItem('INST', 'SETPARAMS')
+  await page.utils.selectTargetPacketItem('INST', 'SETPARAMS')
   await page.locator('button:has-text("Send")').click()
 
   await page.locator('text=Script Runner').click()

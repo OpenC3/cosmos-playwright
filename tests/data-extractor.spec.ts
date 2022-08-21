@@ -18,18 +18,17 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './fixture';
 import { Utilities } from '../utilities'
 import { format, add, sub } from 'date-fns'
 
+test.use({
+  toolPath: '/tools/dataextractor',
+});
+
 let utils
 test.beforeEach(async ({ page }) => {
-  await page.goto('/tools/dataextractor')
-  await expect(page.locator('.v-app-bar')).toContainText('Data Extractor')
-  await page.locator('.v-app-bar__nav-icon').click()
   utils = new Utilities(page)
-  await utils.saveStorageState()
-  await utils.sleep(100)
 })
 
 test('loads and saves the configuration', async ({ page }) => {

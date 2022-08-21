@@ -18,7 +18,7 @@
 */
 
 // @ts-check
-import { test, expect } from 'playwright-test-coverage'
+import { test, expect } from './../fixture';
 
 test('changes the limits set', async ({ page }) => {
   await page.goto('/tools/cmdtlmserver/status')
