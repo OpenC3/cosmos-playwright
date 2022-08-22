@@ -31,7 +31,6 @@ export const test = base.extend({
     if (process.env.ENTERPRISE === '1') {
       // Check to see if we redirect to authenticate
       if (page.url().includes('/auth/')) {
-        console.log('!!!Fixture Login!!!')
         await page.locator('input[name="username"]').fill('operator')
         await page.locator('input[name="password"]').fill('operator')
         await Promise.all([
@@ -46,6 +45,10 @@ export const test = base.extend({
     // This is like a yield in a Ruby block where we call back to the
     // test and execute the individual test code
     await use(page)
+    if (toolName !== 'Administrator') {
+      // Store off the updated token
+      await page.context().storageState({ path: 'storageState.json' })
+    }
   },
 })
 export { expect } from '@playwright/test'
