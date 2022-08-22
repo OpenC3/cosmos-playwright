@@ -34,21 +34,32 @@ test('displays the list of command', async ({ page }) => {
 })
 
 test('displays the command count', async ({ page }) => {
-  await expect(page.locator('text=INSTABORT')).toBeVisible()
   await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  await page
+    .locator(
+      'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
+    )
+    .fill('abort')
   const count = parseInt(
-    await page.locator('text=INSTABORT >> td >> nth=2').textContent()
+    await page
+      .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')
+      .textContent()
   )
   // Send an ABORT command
   await page.goto('/tools/cmdsender/INST/ABORT')
   await page.locator('[data-test=select-send]').click()
   await page.locator('text=cmd("INST ABORT") sent')
-  await page.utils.sleep(1000)
   await page.goto('/tools/cmdtlmserver/cmd-packets')
-  await expect(page.locator('text=INSTABORT')).toBeVisible()
+  await page
+    .locator(
+      'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
+    )
+    .fill('abort')
   await page.utils.sleep(1000) // Allow the telemetry to be fetched
   const count2 = parseInt(
-    await page.locator('text=INSTABORT >> td >> nth=2').textContent()
+    await page
+      .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')
+      .textContent()
   )
   expect(count2).toEqual(count + 1)
 })
