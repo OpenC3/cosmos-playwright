@@ -45,10 +45,6 @@ export const test = base.extend({
     // This is like a yield in a Ruby block where we call back to the
     // test and execute the individual test code
     await use(page)
-    if (toolName !== 'Administrator') {
-      // Store off the updated token
-      await page.context().storageState({ path: 'storageState.json' })
-    }
   },
 })
 export { expect } from '@playwright/test'

@@ -48,7 +48,9 @@ test('displays the command count', async ({ page }) => {
   // Send an ABORT command
   await page.goto('/tools/cmdsender/INST/ABORT')
   await page.locator('[data-test=select-send]').click()
-  await page.locator('text=cmd("INST ABORT") sent')
+  await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
+  expect(await page.inputValue('[data-test=sender-history]')).toMatch('cmd("INST ABORT")')
+
   await page.goto('/tools/cmdtlmserver/cmd-packets')
   await page
     .locator(
