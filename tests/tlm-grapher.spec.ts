@@ -30,33 +30,33 @@ test('add item start, pause, resume and stop', async ({ page }) => {
   await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  utils.sleep(3000) // Wait for graphing to occur
+  await page.utils.sleep(3000) // Wait for graphing to occur
   // Add another item while it is already graphing
   await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP2')
   // Use the graph buttons first
   await page.locator('[data-test=pause-graph]').click()
-  utils.sleep(1000) // Wait for graphing to pause
+  await page.utils.sleep(1000) // Wait for graphing to pause
   await page.locator('[data-test=start-graph]').click()
-  utils.sleep(1000) // Wait for graphing to resume
+  await page.utils.sleep(1000) // Wait for graphing to resume
   // Use the graph menu now
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Pause').click()
-  utils.sleep(1000) // Wait for graphing to pause
+  await page.utils.sleep(1000) // Wait for graphing to pause
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Start').click()
-  utils.sleep(1000) // Wait for graphing to resume
+  await page.utils.sleep(1000) // Wait for graphing to resume
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Stop').click()
-  utils.sleep(1000) // Wait for graphing to stop
+  await page.utils.sleep(1000) // Wait for graphing to stop
 })
 
 test('adds multiple graphs', async ({ page }) => {
   await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  utils.sleep(1000) // Wait for graphing to occur
+  await page.utils.sleep(1000) // Wait for graphing to occur
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Add Graph').click()
   await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
@@ -156,7 +156,7 @@ test('edits a graph', async ({ page }) => {
   await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  utils.sleep(3000) // Wait for graphing to occur
+  await page.utils.sleep(3000) // Wait for graphing to occur
   await page.locator('[data-test=edit-graph-icon]').click()
   await expect(page.locator('.v-dialog')).toContainText('Edit Graph')
   await page.locator('[data-test=edit-graph-title]').fill('Test Graph Title')
@@ -173,5 +173,5 @@ test('edits a graph', async ({ page }) => {
   await page.locator('button:has-text("Ok")').click()
   // Validate our settings, have to use gridItem0 because chart0 doesn't include title
   await expect(page.locator('#gridItem0')).toContainText('Test Graph Title')
-  utils.sleep(5000) // Allow data to flow
+  await page.utils.sleep(5000) // Allow data to flow
 })
