@@ -26,7 +26,7 @@ test.use({
   toolName: 'Limits Monitor'
 })
 
-test('saves and opens the configuration', async ({ page }) => {
+test('saves and opens the configuration', async ({ page, utils }) => {
   await expect
     .poll(
       () =>
@@ -70,7 +70,7 @@ test('saves and opens the configuration', async ({ page }) => {
   await page.locator('text=Open Configuration').click()
   await page.locator(`td:has-text("${config}")`).click()
   await page.locator('button:has-text("Ok")').click()
-  await page.utils.sleep(2000) // Let the page re-render .. not sure how else to wait
+  await utils.sleep(2000) // Let the page re-render .. not sure how else to wait
 
   await page.locator('[data-test=limits-monitor-file]').click()
   await page.locator('text=Show Ignored').click()

@@ -100,7 +100,7 @@ test('displays INST PARAMS', async ({ page }) => {
   await showScreen(page, 'INST', 'PARAMS')
 })
 
-test('displays INST SIMPLE', async ({ page }) => {
+test('displays INST SIMPLE', async ({ page, utils }) => {
   const text = 'TEST' + Math.floor(Math.random() * 10000)
   await showScreen(page, 'INST', 'SIMPLE', async function () {
     await expect(page.locator(`text=${text}`)).not.toBeVisible()
@@ -116,7 +116,7 @@ test('displays INST SIMPLE', async ({ page }) => {
     await expect(
       page.locator(`.v-system-bar:has-text("Edit Screen")`)
     ).toBeVisible()
-    await page.utils.download(
+    await utils.download(
       page,
       '[data-test=download-screen-icon]',
       function (contents) {
@@ -137,10 +137,10 @@ test('displays INST TABS', async ({ page }) => {
 
 // Create the screen name as upcase because OpenC3 upcases the name
 let screen = 'SCREEN' + Math.floor(Math.random() * 10000)
-test('creates new screen', async ({ page }) => {
+test('creates new screen', async ({ page, utils }) => {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
-  await page.utils.sleep(500)
+  await utils.sleep(500)
   await page.locator('button:has-text("New Screen")').click()
   await expect(
     page.locator(`.v-system-bar:has-text("New Screen")`)

@@ -26,40 +26,40 @@ test.use({
   toolName: 'Telemetry Grapher'
 })
 
-test('add item start, pause, resume and stop', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+test('add item start, pause, resume and stop', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  await page.utils.sleep(3000) // Wait for graphing to occur
+  await utils.sleep(3000) // Wait for graphing to occur
   // Add another item while it is already graphing
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP2')
   // Use the graph buttons first
   await page.locator('[data-test=pause-graph]').click()
-  await page.utils.sleep(1000) // Wait for graphing to pause
+  await utils.sleep(1000) // Wait for graphing to pause
   await page.locator('[data-test=start-graph]').click()
-  await page.utils.sleep(1000) // Wait for graphing to resume
+  await utils.sleep(1000) // Wait for graphing to resume
   // Use the graph menu now
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Pause').click()
-  await page.utils.sleep(1000) // Wait for graphing to pause
+  await utils.sleep(1000) // Wait for graphing to pause
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Start').click()
-  await page.utils.sleep(1000) // Wait for graphing to resume
+  await utils.sleep(1000) // Wait for graphing to resume
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Stop').click()
-  await page.utils.sleep(1000) // Wait for graphing to stop
+  await utils.sleep(1000) // Wait for graphing to stop
 })
 
-test('adds multiple graphs', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+test('adds multiple graphs', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  await page.utils.sleep(1000) // Wait for graphing to occur
+  await utils.sleep(1000) // Wait for graphing to occur
   await page.locator('[data-test=telemetry-grapher-graph]').click()
   await page.locator('text=Add Graph').click()
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart1')).toContainText('TEMP2')
   await expect(page.locator('#chart1')).not.toContainText('TEMP1')
@@ -72,8 +72,8 @@ test('adds multiple graphs', async ({ page }) => {
   await expect(page.locator('#chart1')).not.toBeVisible()
 })
 
-test('minimizes a graph', async ({ page }) => {
-  await page.utils.sleep(500) // Ensure chart is stable
+test('minimizes a graph', async ({ page, utils }) => {
+  await utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -89,8 +89,8 @@ test('minimizes a graph', async ({ page }) => {
   expect(maximizeBox.height).toBe(origBox.height)
 })
 
-test('shrinks and expands a graph width', async ({ page }) => {
-  await page.utils.sleep(500) // Ensure chart is stable
+test('shrinks and expands a graph width', async ({ page, utils }) => {
+  await utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -109,8 +109,8 @@ test('shrinks and expands a graph width', async ({ page }) => {
   expect(collapseWidthBox.height).toBe(origBox.height)
 })
 
-test('shrinks and expands a graph height', async ({ page }) => {
-  await page.utils.sleep(500) // Ensure chart is stable
+test('shrinks and expands a graph height', async ({ page, utils }) => {
+  await utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -128,8 +128,8 @@ test('shrinks and expands a graph height', async ({ page }) => {
   expect(expandHeightBox.height).toBe(origBox.height)
 })
 
-test('shrinks and expands both width and height', async ({ page }) => {
-  await page.utils.sleep(500) // Ensure chart is stable
+test('shrinks and expands both width and height', async ({ page, utils }) => {
+  await utils.sleep(500) // Ensure chart is stable
   // Get ElementHandle to the chart
   const chart = await page.$('#chart0')
   await chart.waitForElementState('stable')
@@ -152,11 +152,11 @@ test('shrinks and expands both width and height', async ({ page }) => {
   expect(minBox2.height).toBe(minBox.height)
 })
 
-test('edits a graph', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+test('edits a graph', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
   await page.locator('button:has-text("Add Item")').click()
   await expect(page.locator('#chart0')).toContainText('TEMP1')
-  await page.utils.sleep(3000) // Wait for graphing to occur
+  await utils.sleep(3000) // Wait for graphing to occur
   await page.locator('[data-test=edit-graph-icon]').click()
   await expect(page.locator('.v-dialog')).toContainText('Edit Graph')
   await page.locator('[data-test=edit-graph-title]').fill('Test Graph Title')
@@ -173,5 +173,5 @@ test('edits a graph', async ({ page }) => {
   await page.locator('button:has-text("Ok")').click()
   // Validate our settings, have to use gridItem0 because chart0 doesn't include title
   await expect(page.locator('#gridItem0')).toContainText('Test Graph Title')
-  await page.utils.sleep(5000) // Allow data to flow
+  await utils.sleep(5000) // Allow data to flow
 })

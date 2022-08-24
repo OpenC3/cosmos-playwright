@@ -36,9 +36,9 @@ test('displays the list of targets', async ({ page }) => {
   )
 })
 
-test('displays the command & telemetry count', async ({ page }) => {
+test('displays the command & telemetry count', async ({ page, utils }) => {
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST')
-  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  await utils.sleep(1000) // Allow the telemetry to be fetched
   expect(
     parseInt(
       await page.locator('tr:has-text("INST_INT") td >> nth=2').textContent()

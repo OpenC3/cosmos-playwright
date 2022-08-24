@@ -238,7 +238,7 @@ test('installs a new plugin', async ({ page }) => {
 test.describe(() => {
   // Must be the operator to modify files
   test.use({ storageState: 'storageState.json' })
-  test('modifies plugin files', async ({ page }) => {
+  test('modifies plugin files', async ({ page, utils }) => {
     // Check that there are no links (a) under the current plugin (no modified files)
     await expect(
       await page
@@ -272,7 +272,7 @@ test.describe(() => {
     await page.locator('.v-app-bar__nav-icon').click()
     await page.locator('div[role="button"]:has-text("Select Target")').click()
     await page.locator(`.v-list-item__title:text-is("PW_TEST")`).click()
-    await page.utils.sleep(500)
+    await utils.sleep(500)
     await page.locator('button:has-text("New Screen")').click()
     await expect(
       page.locator(`.v-system-bar:has-text("New Screen")`)
@@ -310,7 +310,7 @@ test.describe(() => {
     // Wait for the download process to complete
     const JSZip = require('jszip')
     const path = await download.path()
-    fs.readFile(path, function (err, data) {
+    fs.readFile(path!, function (err, data) {
       if (err) throw err
       JSZip.loadAsync(data).then(function (zip) {
         Object.keys(zip.files).forEach(function (filename) {
@@ -467,14 +467,14 @@ test('edits existing plugin', async ({ page }) => {
 test.describe(() => {
   // Must be the operator to modify files
   test.use({ storageState: 'storageState.json' })
-  test('creates new screen', async ({ page }) => {
+  test('creates new screen', async ({ page, utils }) => {
     // Create a new screen so we have modifications to delete
     await page.goto('/tools/tlmviewer')
     await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
     await page.locator('.v-app-bar__nav-icon').click()
     await page.locator('div[role="button"]:has-text("Select Target")').click()
     await page.locator(`.v-list-item__title:text-is("NEW_TGT")`).click()
-    await page.utils.sleep(500)
+    await utils.sleep(500)
     await page.locator('button:has-text("New Screen")').click()
     await expect(
       page.locator(`.v-system-bar:has-text("New Screen")`)

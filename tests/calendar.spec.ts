@@ -37,7 +37,7 @@ async function formatDate(date) {
 //
 // Test the basic functionality of the application
 //
-test('test top bar functionality', async ({ page }) => {
+test('test top bar functionality', async ({ page, utils }) => {
   // test the day calendar view
   await page.locator('[data-test=change-type]').click()
   await page.locator('[data-test=type-day]').click()
@@ -69,7 +69,7 @@ test('test top bar functionality', async ({ page }) => {
   await page.locator('[data-test=display-utc-time]').click()
   // download event list
   await page.locator('[data-test=settings]').click()
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=download-event-list]',
     function (contents) {

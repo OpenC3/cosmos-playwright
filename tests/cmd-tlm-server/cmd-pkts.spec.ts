@@ -33,8 +33,8 @@ test('displays the list of command', async ({ page }) => {
   await expect(page.locator('text=EXAMPLESTART')).toBeVisible()
 })
 
-test('displays the command count', async ({ page }) => {
-  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+test('displays the command count', async ({ page, utils }) => {
+  await utils.sleep(2000) // Allow the telemetry to be fetched
   await page
     .locator(
       'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
@@ -57,7 +57,7 @@ test('displays the command count', async ({ page }) => {
       'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
     )
     .fill('abort')
-  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  await utils.sleep(2000) // Allow the telemetry to be fetched
   const count2 = parseInt(
     await page
       .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')
@@ -66,7 +66,7 @@ test('displays the command count', async ({ page }) => {
   expect(count2).toEqual(count + 1)
 })
 
-test('displays a raw command', async ({ page }) => {
+test('displays a raw command', async ({ page, utils }) => {
   await expect(page.locator('text=INSTABORT')).toBeVisible()
   await page.locator('text=INSTABORT >> td >> nth=3').click()
   await expect(page.locator('.v-dialog')).toContainText(
@@ -77,7 +77,7 @@ test('displays a raw command', async ({ page }) => {
   expect(await page.inputValue('.v-dialog textarea')).toMatch('Address')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('00000000:')
 
-  await page.utils.download(page, '[data-test=download]', function (contents) {
+  await utils.download(page, '[data-test=download]', function (contents) {
     expect(contents).toMatch('Raw Command Packet: INST ABORT')
     expect(contents).toMatch('Received Time:')
     expect(contents).toMatch('Count:')

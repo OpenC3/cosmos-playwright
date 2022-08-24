@@ -21,8 +21,8 @@ test.use({
   toolName: 'Command Sender',
 })
 
-test('sends a command as operator but not as viewer', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'ABORT')
+test('sends a command as operator but not as viewer', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
 
@@ -41,7 +41,7 @@ test('sends a command as operator but not as viewer', async ({ page }) => {
     page.locator('input:has-text("Sign In")').click(),
   ])
 
-  await page.utils.selectTargetPacketItem('INST', 'ABORT')
+  await utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await page.locator(
     'span:has-text("Error sending INST ABORT due to OpenC3::AuthError")'

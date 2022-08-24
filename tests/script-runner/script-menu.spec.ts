@@ -20,7 +20,6 @@
 // @ts-check
 import { test, expect } from './../fixture'
 import { format } from 'date-fns'
-import { Utilities } from '../../utilities'
 
 test.use({
   toolPath: '/tools/scriptrunner',
@@ -32,8 +31,7 @@ test.beforeEach(async ({ page }) => {
   await page.locator('button:has-text("Close")').click()
 })
 
-test('view started scripts', async ({ page }) => {
-  const utils = new Utilities(page)
+test('view started scripts', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   await page.locator('textarea').fill(`
   puts "now we wait"
@@ -56,7 +54,7 @@ test('view started scripts', async ({ page }) => {
 
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text="View Started Scripts"').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   // Each section has a Refresh button so click the first one
   await page.locator('button:has-text("Refresh")').first().click()
   await expect(page.locator('[data-test=running-scripts]')).toContainText(
@@ -71,7 +69,7 @@ test('view started scripts', async ({ page }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text="View Started Scripts"').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   await page.locator('button:has-text("Refresh")').first().click()
   await expect(page.locator('[data-test=running-scripts]')).not.toContainText(
     filename
@@ -122,8 +120,7 @@ test('sets environment variables', async ({ page }) => {
   )
 })
 
-test('sets metadata', async ({ page }) => {
-  const utils = new Utilities(page)
+test('sets metadata', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   puts get_metadata()
   puts set_metadata({ 'setkey' => 1 })
@@ -142,7 +139,7 @@ test('sets metadata', async ({ page }) => {
   while (true) {
     if (await page.$('[data-test=delete-metadata-icon]')) {
       await page.locator('[data-test=delete-metadata-icon] >> nth=0').click()
-      await page.utils.sleep(300)
+      await utils.sleep(300)
     } else {
       break
     }

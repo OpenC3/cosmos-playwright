@@ -10,7 +10,7 @@ export class Utilities {
     await new Promise((resolve) => setTimeout(resolve, time))
   }
 
-  async selectTargetPacketItem(target: string, packet: string, item: string) {
+  async selectTargetPacketItem(target: string, packet?: string, item?: string) {
     await this.page.locator('[data-test=select-target] i').click()
     await this.page
       .locator(`div[role="option"] div:text-matches("^${target}$")`)
@@ -44,7 +44,7 @@ export class Utilities {
     }
   }
 
-  async addTargetPacketItem(target: string, packet: string, item: string) {
+  async addTargetPacketItem(target: string, packet?: string, item?: string) {
     await this.selectTargetPacketItem(target, packet, item)
     await this.page.locator('[data-test=select-send]').click()
   }

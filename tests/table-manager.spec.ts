@@ -28,11 +28,11 @@ test.use({
 //
 // Test the File menu
 //
-test('creates a single binary file', async ({ page }) => {
+test('creates a single binary file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=New').click()
   await page.locator('[data-test=file-open-save-search]').type('MCConfig')
-  await page.utils.sleep(500) // Allow file dialog to fully render
+  await utils.sleep(500) // Allow file dialog to fully render
   await page.locator('text=MCConfigurationTable >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
@@ -45,7 +45,7 @@ test('creates a single binary file', async ({ page }) => {
   )
 })
 
-test('edits a binary file', async ({ page }) => {
+test('edits a binary file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=New').click() // Create new since we're editing
   await page.locator('[data-test=file-open-save-search]').type('ConfigTables_')
@@ -63,7 +63,7 @@ test('edits a binary file', async ({ page }) => {
   )
 
   // Verify original contents
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=download-file-report]',
     function (contents) {
@@ -154,10 +154,10 @@ test('edits a binary file', async ({ page }) => {
 
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=Save File').click()
-  await page.utils.sleep(5000) // Saving takes some time
+  await utils.sleep(5000) // Saving takes some time
 
   // Check for new values
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=download-file-report]',
     function (contents) {
@@ -175,10 +175,10 @@ test('edits a binary file', async ({ page }) => {
   )
 })
 
-test('opens and searches file', async ({ page }) => {
+test('opens and searches file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(500) // Allow file dialog to fully render
+  await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-search]')
     .type('ConfigTables.bin')
@@ -215,24 +215,24 @@ test('opens and searches file', async ({ page }) => {
   await expect.poll(() => page.locator('tr').count()).toBe(12)
 })
 
-test('downloads binary, definition, report', async ({ page }) => {
+test('downloads binary, definition, report', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(500) // Allow file dialog to fully render
+  await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-search]')
     .type('ConfigTables.bin')
   await page.locator('text=ConfigTables >> nth=0').click()
   await page.locator('[data-test=file-open-save-submit-btn]').click()
-  await page.utils.download(page, '[data-test=download-file-binary]')
-  await page.utils.download(
+  await utils.download(page, '[data-test=download-file-binary]')
+  await utils.download(
     page,
     '[data-test=download-file-definition]',
     function (contents) {
       expect(contents).toContain('TABLEFILE')
     }
   )
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=download-file-report]',
     function (contents) {
@@ -240,7 +240,7 @@ test('downloads binary, definition, report', async ({ page }) => {
     }
   )
   await page.locator('text=PPS_SELECTION').click()
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test="PPS_SELECTION"] [data-test=download-table-binary]',
     function (contents) {
@@ -248,14 +248,14 @@ test('downloads binary, definition, report', async ({ page }) => {
     },
     'binary'
   )
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test="PPS_SELECTION"] [data-test=download-table-definition]',
     function (contents) {
       expect(contents).toContain('TABLE "PPS_Selection"')
     }
   )
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test="PPS_SELECTION"] [data-test=download-table-report]',
     function (contents) {
@@ -264,10 +264,10 @@ test('downloads binary, definition, report', async ({ page }) => {
   )
 })
 
-test('save as', async ({ page }) => {
+test('save as', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(500) // Allow file dialog to fully render
+  await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-search]')
     .type('ConfigTables.bin')
@@ -287,7 +287,7 @@ test('save as', async ({ page }) => {
     .locator('[data-test=file-open-save-filename]')
     .fill('INST/tables/bin/ConfigTables2.bin')
   await page.locator('[data-test=file-open-save-submit-btn]').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   expect(await page.locator('[data-test=filename]').inputValue()).toMatch(
     'INST/tables/bin/ConfigTables2.bin'
   )
@@ -296,10 +296,10 @@ test('save as', async ({ page }) => {
   ).toMatch('INST/tables/config/ConfigTables_def.txt')
 })
 
-test('delete', async ({ page }) => {
+test('delete', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(500) // Allow file dialog to fully render
+  await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-search]')
     .type('ConfigTables.bin')

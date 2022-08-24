@@ -32,9 +32,9 @@ test('displays the list of telemetry', async ({ page }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
 })
 
-test('displays the packet count', async ({ page }) => {
+test('displays the packet count', async ({ page, utils }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
-  await page.utils.sleep(1000) // Allow the telemetry to be fetched
+  await utils.sleep(1000) // Allow the telemetry to be fetched
   expect(
     parseInt(
       await page.locator('text=INSTHEALTH_STATUS >> td >> nth=2').textContent()
@@ -45,7 +45,7 @@ test('displays the packet count', async ({ page }) => {
   ).toBeGreaterThan(500)
 })
 
-test('displays a raw packet', async ({ page }) => {
+test('displays a raw packet', async ({ page, utils }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
   await page.locator('text=INSTHEALTH_STATUS >> td >> nth=3').click()
   await expect(page.locator('.v-dialog')).toContainText(
@@ -56,7 +56,7 @@ test('displays a raw packet', async ({ page }) => {
   expect(await page.inputValue('.v-dialog textarea')).toMatch('Address')
   expect(await page.inputValue('.v-dialog textarea')).toMatch('00000000:')
 
-  await page.utils.download(page, '[data-test=download]', function (contents) {
+  await utils.download(page, '[data-test=download]', function (contents) {
     expect(contents).toMatch('Raw Telemetry Packet: INST HEALTH_STATUS')
     expect(contents).toMatch('Received Time:')
     expect(contents).toMatch('Count:')

@@ -31,10 +31,10 @@ async function openPage(page, name) {
   await page.locator('.v-app-bar__nav-icon').click()
 }
 
-test('test overview page create trigger group', async ({ page }) => {
+test('test overview page create trigger group', async ({ page, utils }) => {
   await openPage(page, 'overview')
   // groups
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test="group-download"]',
     function (contents) {
@@ -52,7 +52,7 @@ test('test overview page create trigger group', async ({ page }) => {
   // events
   await page.locator('[data-test=events-clear]').click()
   await page.locator('[data-test=confirm-dialog-clear]').click()
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=events-download]',
     function (contents) {
@@ -61,10 +61,10 @@ test('test overview page create trigger group', async ({ page }) => {
   )
 })
 
-test('test trigger page', async ({ page }) => {
+test('test trigger page', async ({ page, utils }) => {
   await openPage(page, 'triggers')
   // download json of triggers
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=trigger-download]',
     function (contents) {
@@ -123,13 +123,13 @@ test('test trigger page', async ({ page }) => {
   await page.locator('[data-test="trigger-create-select-operator->"]').click()
   //
   await page.locator('[data-test=trigger-create-submit-btn]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
 })
 
-test('test reactions page', async ({ page }) => {
+test('test reactions page', async ({ page, utils }) => {
   await openPage(page, 'reactions')
   // download json of reactions
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=reaction-download]',
     function (contents) {
@@ -163,34 +163,34 @@ test('test reactions page', async ({ page }) => {
     .fill('INST CLEAR on Alpha Trigger')
   //
   await page.locator('[data-test=reaction-create-submit-btn]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
 })
 
-test('test reaction card actions', async ({ page }) => {
+test('test reaction card actions', async ({ page, utils }) => {
   await openPage(page, 'reactions')
   //
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=reaction-deactivate-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=reaction-activate-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=reaction-delete-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
 })
 
-test('test trigger card actions', async ({ page }) => {
+test('test trigger card actions', async ({ page, utils }) => {
   await openPage(page, 'triggers')
   //
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=trigger-deactivate-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=trigger-activate-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   await page.locator('[data-test=trigger-delete-icon-0]').click()
-  await page.utils.sleep(100)
+  await utils.sleep(100)
 })
 
-test('test overview page delete trigger group', async ({ page }) => {
+test('test overview page delete trigger group', async ({ page, utils }) => {
   await openPage(page, 'overview')
   // Delete trigger group and press cancel
   await page.locator('[data-test=delete-group-0]').click()
@@ -199,9 +199,9 @@ test('test overview page delete trigger group', async ({ page }) => {
   await page.locator('[data-test=delete-group-0]').click()
   await page.locator('[data-test=confirm-dialog-delete]').click()
   //
-  await page.utils.sleep(100)
+  await utils.sleep(100)
   // groups
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test="group-download"]',
     function (contents) {

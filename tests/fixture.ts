@@ -19,12 +19,14 @@ import { Utilities } from '../utilities'
 // Extend the page fixture to goto the OpenC3 tool and wait for potential
 // redirect to authentication login (Enterprise only).
 // Login and click the hamburger nav icon to close the navigation drawer
-export const test = base.extend({
+export const test = base.extend<{
+  utils: Utilities
+  toolPath: string
+  toolName: string
+}>({
   toolPath: '/tools/cmdtlmserver',
   toolName: 'CmdTlmServer',
-  page: async ({ baseURL, toolPath, toolName, page }, use) => {
-    // Object.getPrototypeOf(page).utils = new Utilities(page)
-    page['utils'] = new Utilities(page)
+  utils: async ({ baseURL, toolPath, toolName, page }, use) => {
     await page.goto(`${baseURL}${toolPath}`, {
       waitUntil: 'networkidle',
     })
@@ -40,11 +42,13 @@ export const test = base.extend({
         await page.context().storageState({ path: 'storageState.json' })
       }
     }
-    await expect(page.locator('.v-app-bar')).toContainText(toolName)
+    await expect(page.locator('.v-app-bar')).toContainText(toolName, {
+      timeout: 20000,
+    })
     await page.locator('.v-app-bar__nav-icon').click()
     // This is like a yield in a Ruby block where we call back to the
     // test and execute the individual test code
-    await use(page)
+    await use(new Utilities(page))
   },
 })
 export { expect } from '@playwright/test'

@@ -26,9 +26,9 @@ test.use({
   toolName: 'Data Extractor',
 })
 
-test('loads and saves the configuration', async ({ page }) => {
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+test('loads and saves the configuration', async ({ page, utils }) => {
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
   await page.locator('[data-test=data-extractor-file]').click()
@@ -88,28 +88,28 @@ test("won't start with 0 items", async ({ page }) => {
   await expect(page.locator('text=Process')).toBeDisabled()
 })
 
-test('warns with duplicate item', async ({ page }) => {
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+test('warns with duplicate item', async ({ page, utils }) => {
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('[data-test=select-send]').click() // Send again
   await expect(
     page.locator('text=This item has already been added')
   ).toBeVisible()
 })
 
-test('warns with no time delta', async ({ page }) => {
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+test('warns with no time delta', async ({ page, utils }) => {
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
   await page.locator('text=Process').click()
   await expect(
     page.locator('text=Start date/time is equal to end date/time')
   ).toBeVisible()
 })
 
-test('warns with no data', async ({ page }) => {
+test('warns with no data', async ({ page, utils }) => {
   const start = sub(new Date(), { seconds: 10 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await page.locator('label:has-text("Command")').click()
-  await page.utils.sleep(500) // Allow the command to switch
-  await page.utils.addTargetPacketItem(
+  await utils.sleep(500) // Allow the command to switch
+  await utils.addTargetPacketItem(
     'EXAMPLE',
     'START',
     'RECEIVED_TIMEFORMATTED'
@@ -118,34 +118,34 @@ test('warns with no data', async ({ page }) => {
   await expect(page.locator('text=No data found')).toBeVisible()
 })
 
-test('cancels a process', async ({ page }) => {
+test('cancels a process', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 2 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   let endTime = add(start, { hours: 1 })
   await page.locator('[data-test=end-time]').fill(format(endTime, 'HH:mm:ss'))
   // Set the end-date in case the day wrapped by adding a hour
   await page.locator('[data-test=end-date]').fill(format(endTime, 'yyyy-MM-dd'))
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSVER')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSVER')
   await page.locator('text=Process').click()
   await expect(
     page.locator('text=End date/time is greater than current date/time')
   ).toBeVisible()
-  await page.utils.sleep(5000)
-  await page.utils.download(page, 'text=Cancel')
+  await utils.sleep(5000)
+  await utils.download(page, 'text=Cancel')
   // Ensure the Cancel button goes back to Process
   await expect(page.locator('text=Process')).toBeVisible()
 })
 
-test('adds an entire target', async ({ page }) => {
-  await page.utils.addTargetPacketItem('INST')
+test('adds an entire target', async ({ page, utils }) => {
+  await utils.addTargetPacketItem('INST')
   // Since we're checking count() which is instant we need to poll
   await expect
     .poll(() => page.locator('[data-test=item-list] > div').count())
     .toBeGreaterThan(50)
 })
 
-test('adds an entire packet', async ({ page }) => {
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS')
+test('adds an entire packet', async ({ page, utils }) => {
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS')
   // Since we're checking count() which is instant we need to poll
   await expect
     .poll(() => page.locator('[data-test=item-list] > div').count())
@@ -156,12 +156,12 @@ test('adds an entire packet', async ({ page }) => {
     .toBeLessThan(50)
 })
 
-test('add, edits, deletes items', async ({ page }) => {
+test('add, edits, deletes items', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSVER')
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSTYPE')
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSHF')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSVER')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSTYPE')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSHF')
   await expect(page.locator('[data-test=item-list] > div')).toHaveCount(3)
   // Delete CCSDSVER by clicking Delete icon
   await page
@@ -182,7 +182,7 @@ test('add, edits, deletes items', async ({ page }) => {
     '[data-test=item-list] >> text=INST - ADCS - CCSDSSHF + (RAW)'
   )
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     const lines = contents.split('\n')
     expect(lines[0]).toContain('CCSDSSHF (RAW)')
     expect(lines[1]).not.toContain('FALSE')
@@ -190,10 +190,10 @@ test('add, edits, deletes items', async ({ page }) => {
   })
 })
 
-test('edit all items', async ({ page }) => {
+test('edit all items', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'ADCS')
+  await utils.addTargetPacketItem('INST', 'ADCS')
   expect(
     await page.locator('[data-test=item-list] > div').count()
   ).toBeGreaterThan(20)
@@ -210,12 +210,12 @@ test('edit all items', async ({ page }) => {
   await page.locator('[data-test=item-list] >> text=INST - ADCS - Q1 + (RAW)')
 })
 
-test('processes commands', async ({ page }) => {
+test('processes commands', async ({ page, utils }) => {
   // Preload an ABORT command
   await page.goto('/tools/cmdsender/INST/ABORT')
   await page.locator('[data-test=select-send]').click()
   await page.locator('text=cmd("INST ABORT") sent')
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   expect(await page.inputValue('[data-test=sender-history]')).toMatch(
     'cmd("INST ABORT")'
   )
@@ -225,28 +225,28 @@ test('processes commands', async ({ page }) => {
   await page.locator('.v-app-bar__nav-icon').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await page.locator('label:has-text("Command")').click()
-  await page.utils.sleep(500) // Allow the command to switch
-  await page.utils.addTargetPacketItem(
+  await utils.sleep(500) // Allow the command to switch
+  await utils.addTargetPacketItem(
     'INST',
     'ABORT',
     'RECEIVED_TIMEFORMATTED'
   )
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     const lines = contents.split('\n')
     expect(lines[1]).toContain('INST')
     expect(lines[1]).toContain('ABORT')
   })
 })
 
-test('creates CSV output', async ({ page }) => {
+test('creates CSV output', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 3 })
   await page.locator('[data-test=data-extractor-file]').click()
   await page.locator('text=Comma Delimited').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     expect(contents).toContain('NaN')
     expect(contents).toContain('Infinity')
     expect(contents).toContain('-Infinity')
@@ -258,15 +258,15 @@ test('creates CSV output', async ({ page }) => {
   })
 })
 
-test('creates tab delimited output', async ({ page }) => {
+test('creates tab delimited output', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 3 })
   await page.locator('[data-test=data-extractor-file]').click()
   await page.locator('text=Tab Delimited').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     var lines = contents.split('\n')
     expect(lines[0]).toContain('TEMP1')
     expect(lines[0]).toContain('TEMP2')
@@ -275,20 +275,20 @@ test('creates tab delimited output', async ({ page }) => {
   })
 })
 
-test('outputs full column names', async ({ page }) => {
+test('outputs full column names', async ({ page, utils }) => {
   let start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=data-extractor-mode]').click()
   await page.locator('text=Full Column Names').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     var lines = contents.split('\n')
     expect(lines[0]).toContain('INST HEALTH_STATUS TEMP1')
     expect(lines[0]).toContain('INST HEALTH_STATUS TEMP2')
   })
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
 
   // Switch back and verify
   await page.locator('[data-test=data-extractor-mode]').click()
@@ -296,21 +296,21 @@ test('outputs full column names', async ({ page }) => {
   // Create a new end time so we get a new filename
   start = sub(new Date(), { minutes: 2 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     expect(contents).toContain('TARGET,PACKET,TEMP1,TEMP2')
   })
 })
 
-test('fills values', async ({ page }) => {
+test('fills values', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=data-extractor-mode]').click()
   await page.locator('text=Fill Down').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   // Deliberately test with two different packets
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSEQCNT')
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSSEQCNT')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSEQCNT')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSSEQCNT')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     var lines = contents.split('\n')
     expect(lines[0]).toContain('CCSDSSEQCNT')
     var firstHS = -1
@@ -334,27 +334,27 @@ test('fills values', async ({ page }) => {
   })
 })
 
-test('adds Matlab headers', async ({ page }) => {
+test('adds Matlab headers', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=data-extractor-mode]').click()
   await page.locator('text=Matlab Header').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'Q1')
-  await page.utils.addTargetPacketItem('INST', 'ADCS', 'Q2')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'Q1')
+  await utils.addTargetPacketItem('INST', 'ADCS', 'Q2')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     expect(contents).toContain('% TARGET,PACKET,Q1,Q2') // % is matlab
   })
 })
 
-test('outputs unique values only', async ({ page }) => {
+test('outputs unique values only', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=data-extractor-mode]').click()
   await page.locator('text=Unique Only').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSVER')
+  await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSVER')
 
-  await page.utils.download(page, 'text=Process', function (contents) {
+  await utils.download(page, 'text=Process', function (contents) {
     var lines = contents.split('\n')
     expect(lines[0]).toContain('CCSDSVER')
     expect(lines.length).toEqual(2) // header and a single value

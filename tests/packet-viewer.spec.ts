@@ -35,11 +35,11 @@ async function matchItem(page, item, regex) {
     .toMatch(regex)
 }
 
-test('displays INST HEALTH_STATUS & polls the api', async ({ page }) => {
+test('displays INST HEALTH_STATUS & polls the api', async ({ page, utils }) => {
   // Verify we can hit it using the route
   await page.goto('/tools/packetviewer/INST/HEALTH_STATUS')
-  await page.utils.inputValue(page, '[data-test=select-target] input', 'INST')
-  await page.utils.inputValue(
+  await utils.inputValue(page, '[data-test=select-target] input', 'INST')
+  await utils.inputValue(
     page,
     '[data-test=select-packet] input',
     'HEALTH_STATUS'
@@ -54,21 +54,21 @@ test('displays INST HEALTH_STATUS & polls the api', async ({ page }) => {
   page.on('response', (response) => {
     expect(response.status()).toBe(200)
   })
-  await page.utils.sleep(2000)
+  await utils.sleep(2000)
 })
 
-test('selects a target and packet to display', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'IMAGE')
-  await page.utils.inputValue(page, '[data-test=select-target] input', 'INST')
-  await page.utils.inputValue(page, '[data-test=select-packet] input', 'IMAGE')
+test('selects a target and packet to display', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'IMAGE')
+  await utils.inputValue(page, '[data-test=select-target] input', 'INST')
+  await utils.inputValue(page, '[data-test=select-packet] input', 'IMAGE')
   await expect(page.locator('id=openc3-tool')).toContainText(
     'Packet with image data'
   )
   await expect(page.locator('id=openc3-tool')).toContainText('BYTES')
 })
 
-test('gets details with right click', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('gets details with right click', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page
     .locator('tr:has-text("CCSDSVER") td >> nth=2')
     .click({ button: 'right' })
@@ -78,32 +78,32 @@ test('gets details with right click', async ({ page }) => {
   )
 })
 
-test('stops posting to the api after closing', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'ADCS')
+test('stops posting to the api after closing', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'ADCS')
   let requestCount = 0
   page.on('request', () => {
     requestCount++
   })
-  await page.utils.sleep(2000)
+  await utils.sleep(2000)
   // Commenting out the next two lines causes the test to fail
   await page.goto('/tools/tablemanager') // No API requests
   await expect(page.locator('.v-app-bar')).toContainText('Table Manager')
   const count = requestCount
-  await page.utils.sleep(2000) // Allow potential API requests to happen
+  await utils.sleep(2000) // Allow potential API requests to happen
   expect(requestCount).toBe(count) // no change
 })
 
 // Changing the polling rate is fraught with danger because it's all
 // about waiting for changes and detecting changes
-test('changes the polling rate', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('changes the polling rate', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test=packet-viewer-file]').click()
   await page.locator('[data-test=packet-viewer-file-options]').click()
   await page.locator('.v-dialog input').fill('5000')
   await page.locator('.v-dialog input').press('Enter')
   await page.locator('.v-dialog').press('Escape')
   const received = await page.inputValue('tr:has-text("RECEIVED_COUNT") input')
-  await page.utils.sleep(7000)
+  await utils.sleep(7000)
   const received2 = await page.inputValue('tr:has-text("RECEIVED_COUNT") input')
   expect(received2 - received).toBeLessThanOrEqual(6) // Allow slop
   expect(received2 - received).toBeGreaterThanOrEqual(4) // Allow slop
@@ -118,15 +118,15 @@ test('changes the polling rate', async ({ page }) => {
 //
 // Test the View menu
 //
-test('displays formatted items with units by default', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays formatted items with units by default', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   // Check for exactly 3 decimal points followed by units
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{3}\s\S$/)
 })
 
-test('displays formatted items with units', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays formatted items with units', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=packet-viewer-view]').click()
   await page.locator('text=Formatted Items with Units').click()
@@ -134,8 +134,8 @@ test('displays formatted items with units', async ({ page }) => {
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{3}\s\S$/)
 })
 
-test('displays raw items', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays raw items', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=packet-viewer-view]').click()
   await page.locator('text=Raw').click()
@@ -143,8 +143,8 @@ test('displays raw items', async ({ page }) => {
   await matchItem(page, 'TEMP1', /^\d{1,5}$/)
 })
 
-test('displays converted items', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays converted items', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=packet-viewer-view]').click()
   await page.locator('text=Converted').click()
@@ -152,8 +152,8 @@ test('displays converted items', async ({ page }) => {
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{4,}$/)
 })
 
-test('displays formatted items', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays formatted items', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=packet-viewer-view]').click()
   // Use text-is because we have to match exactly since there is
@@ -163,8 +163,8 @@ test('displays formatted items', async ({ page }) => {
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{3}$/)
 })
 
-test('hides ignored items', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('hides ignored items', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await expect(page.locator('text=CCSDSVER')).toBeVisible()
   await page.locator('[data-test=packet-viewer-view]').click()
   await page.locator('text=Hide Ignored').click()
@@ -174,8 +174,8 @@ test('hides ignored items', async ({ page }) => {
   await expect(page.locator('text=CCSDSVER')).toBeVisible()
 })
 
-test('displays derived last', async ({ page }) => {
-  await page.utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+test('displays derived last', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   // First row is the header: Index, Name, Value so grab second (1)
   await expect(page.locator('tr').nth(1)).toContainText('PACKET_TIMESECONDS')
   await page.locator('[data-test=packet-viewer-view]').click()

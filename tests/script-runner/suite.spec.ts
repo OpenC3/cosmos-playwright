@@ -19,7 +19,6 @@
 
 // @ts-check
 import { test, expect } from './../fixture'
-import { Utilities } from '../../utilities'
 
 test.use({
   toolPath: '/tools/scriptrunner',
@@ -55,6 +54,7 @@ async function deleteFile(page) {
 // and finally click OK to close the dialog
 async function runAndCheckResults(
   page,
+  utils,
   startLocator,
   validator,
   download = false
@@ -69,7 +69,7 @@ async function runAndCheckResults(
 
   // Downloading the report is additional processing so we make it optional
   if (download) {
-    await page.utils.download(
+    await utils.download(
       page,
       'button:has-text("Download")',
       function (contents) {
@@ -81,13 +81,13 @@ async function runAndCheckResults(
   await page.locator('button:has-text("Ok")').click()
 }
 
-test('loads Suite controls when opening a suite', async ({ page }) => {
+test('loads Suite controls when opening a suite', async ({ page, utils }) => {
   // Open the file
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   await page.locator('[data-test=file-open-save-search]').type('my_script_')
-  await page.utils.sleep(500)
+  await utils.sleep(500)
   await page.locator('[data-test=file-open-save-search]').type('suite')
   await page.locator('text=script_suite >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
@@ -121,9 +121,9 @@ test('loads Suite controls when opening a suite', async ({ page }) => {
   // Verify Suite controls go away when loading a normal script
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   await page.locator('[data-test=file-open-save-search]').type('dis')
-  await page.utils.sleep(500)
+  await utils.sleep(500)
   await page.locator('[data-test=file-open-save-search]').type('connect')
   await page.locator('text=disconnect >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
@@ -174,7 +174,7 @@ test('disables all suite buttons when running', async ({ page }) => {
   await deleteFile(page)
 })
 
-test('starts a suite', async ({ page }) => {
+test('starts a suite', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group
@@ -196,6 +196,7 @@ test('starts a suite', async ({ page }) => {
   await expect(page.locator('[data-test=teardown-suite]')).toBeEnabled()
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=setup-suite]',
     function (textarea) {
       expect(textarea).toMatch('setup:PASS')
@@ -207,6 +208,7 @@ test('starts a suite', async ({ page }) => {
   // Run suite teardown
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=teardown-suite]',
     function (textarea) {
       expect(textarea).toMatch('teardown:PASS')
@@ -218,6 +220,7 @@ test('starts a suite', async ({ page }) => {
   // Run suite
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=start-suite]',
     function (textarea) {
       expect(textarea).toMatch('setup:PASS')
@@ -260,7 +263,7 @@ test('starts a suite', async ({ page }) => {
   await deleteFile(page)
 })
 
-test('starts a group', async ({ page }) => {
+test('starts a group', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
   class TestGroup1 < OpenC3::Group
@@ -286,6 +289,7 @@ test('starts a group', async ({ page }) => {
   await expect(page.locator('[data-test=teardown-group]')).toBeEnabled()
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=setup-group]',
     function (textarea) {
       expect(textarea).toMatch('setup:PASS')
@@ -297,6 +301,7 @@ test('starts a group', async ({ page }) => {
   // Run group teardown
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=teardown-group]',
     function (textarea) {
       expect(textarea).toMatch('teardown:PASS')
@@ -308,6 +313,7 @@ test('starts a group', async ({ page }) => {
   // Run group
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=start-group]',
     function (textarea) {
       expect(textarea).toMatch('setup:PASS')
@@ -353,7 +359,7 @@ test('starts a group', async ({ page }) => {
   await deleteFile(page)
 })
 
-test('starts a script', async ({ page }) => {
+test('starts a script', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group
@@ -371,6 +377,7 @@ test('starts a script', async ({ page }) => {
   // Run script
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=start-script]',
     function (textarea) {
       expect(textarea).toMatch('test1')
@@ -381,7 +388,7 @@ test('starts a script', async ({ page }) => {
   await deleteFile(page)
 })
 
-test('handles manual mode', async ({ page }) => {
+test('handles manual mode', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group
@@ -400,6 +407,7 @@ test('handles manual mode', async ({ page }) => {
   // Run group
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=start-group]',
     function (textarea) {
       expect(textarea).toMatch('Manual = true')
@@ -413,6 +421,7 @@ test('handles manual mode', async ({ page }) => {
   // Run group
   await runAndCheckResults(
     page,
+    utils,
     '[data-test=start-group]',
     function (textarea) {
       expect(textarea).toMatch('Manual = false')

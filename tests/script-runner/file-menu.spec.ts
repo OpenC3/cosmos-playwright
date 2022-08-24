@@ -19,7 +19,6 @@
 
 // @ts-check
 import { test, expect } from './../fixture'
-import { Utilities } from '../../utilities'
 
 test.use({
   toolPath: '/tools/scriptrunner',
@@ -41,12 +40,12 @@ test('clears the editor on File->New', async ({ page }) => {
   await expect(page.locator('#editor')).not.toContainText('this is a test')
 })
 
-test('open a file', async ({ page }) => {
+test('open a file', async ({ page, utils }) => {
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Open File').click()
-  await page.utils.sleep(1000)
+  await utils.sleep(1000)
   await page.locator('[data-test=file-open-save-search]').type('dis')
-  await page.utils.sleep(500)
+  await utils.sleep(500)
   await page.locator('[data-test=file-open-save-search]').type('connect')
   await page.locator('text=disconnect >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
@@ -127,7 +126,7 @@ test('handles File Save overwrite', async ({ page }) => {
   await page.locator('button:has-text("Delete")').click()
 })
 
-test('handles Download', async ({ page }) => {
+test('handles Download', async ({ page, utils }) => {
   await page.locator('textarea').fill('download this')
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Save File').click()
@@ -136,7 +135,7 @@ test('handles Download', async ({ page }) => {
   expect(await page.locator('#sr-controls')).toContainText('INST/download.txt')
   // Download the file
   await page.locator('[data-test=script-runner-file]').click()
-  await page.utils.download(
+  await utils.download(
     page,
     '[data-test=script-runner-file-download]',
     function (contents) {
