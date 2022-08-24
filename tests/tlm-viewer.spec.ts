@@ -37,7 +37,6 @@ async function showScreen(page, target, screen, callback = null) {
   await page.locator(`.v-list-item__title:text-is("${target}")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
-  await page.locator('[data-test=show-screen]').click()
   await expect(
     page.locator(`.v-system-bar:has-text("${target} ${screen}")`)
   ).toBeVisible()
@@ -135,6 +134,23 @@ test('displays INST TABS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'TABS')
 })
 
+test('displays the same screen twice', async ({ page, utils }) => {
+  await page.locator('div[role="button"]:has-text("Select Target")').click()
+  await page.locator('.v-list-item__title:text-is("INST")').click()
+  await page.locator('div[role="button"]:has-text("Select Screen")').click()
+  await page.locator('.v-list-item__title:text-is("ADCS")').click()
+  // Mostly we're checking that the Show button works
+  await page.locator('[data-test=show-screen]').click()
+  await expect
+  .poll(() => page.locator('.v-system-bar:has-text("INST ADCS")').count())
+  .toBe(2)
+  await page.locator('[data-test=close-screen-icon] >> nth=0').click()
+  await page.locator('[data-test=close-screen-icon]').click()
+  await expect(
+    page.locator(`.v-system-bar:has-text("INST ADCS")`)
+  ).not.toBeVisible()
+})
+
 // Create the screen name as upcase because OpenC3 upcases the name
 let screen = 'SCREEN' + Math.floor(Math.random() * 10000)
 test('creates new screen', async ({ page, utils }) => {
@@ -168,7 +184,6 @@ test('deletes new screen', async ({ page, utils }) => {
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
-  await page.locator('[data-test=show-screen]').click()
   await expect(
     page.locator(`.v-system-bar:has-text("INST ${screen}")`)
   ).toBeVisible()
