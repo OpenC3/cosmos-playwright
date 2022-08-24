@@ -26,7 +26,7 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
@@ -80,7 +80,7 @@ test('view started scripts', async ({ page, utils }) => {
   )
 })
 
-test('sets environment variables', async ({ page }) => {
+test('sets environment variables', async ({ page, utils }) => {
   await page.locator('textarea').fill(`puts "ENV:#{ENV['KEY']}"`)
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=Show Environment').click()
@@ -180,7 +180,7 @@ test('sets metadata', async ({ page, utils }) => {
   )
 })
 
-test('ruby syntax check', async ({ page }) => {
+test('ruby syntax check', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "TEST"')
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=Ruby Syntax Check').click()
@@ -198,7 +198,7 @@ test('ruby syntax check', async ({ page }) => {
   await page.locator('.v-dialog >> button').click()
 })
 
-test('mnemonic check', async ({ page }) => {
+test('mnemonic check', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   cmd("INST ABORT")
   `)
@@ -224,7 +224,7 @@ test('mnemonic check', async ({ page }) => {
   await page.locator('button:has-text("Ok")').click()
 })
 
-test('view instrumented script', async ({ page }) => {
+test('view instrumented script', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "HI"')
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=View Instrumented Script').click()

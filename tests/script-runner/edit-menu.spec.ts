@@ -25,12 +25,12 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
 
-test('finds text on page', async ({ page }) => {
+test('finds text on page', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   var string = `openc3 is a command and control system
 openc3 can send commands and execute scripts

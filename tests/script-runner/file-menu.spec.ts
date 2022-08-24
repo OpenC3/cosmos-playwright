@@ -25,12 +25,12 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
 
-test('clears the editor on File->New', async ({ page }) => {
+test('clears the editor on File->New', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   await page.locator('textarea').fill('this is a test')
   // But can't check on the textarea because it has an input
@@ -54,7 +54,7 @@ test('open a file', async ({ page, utils }) => {
   )
 })
 
-test('handles File->Save new file', async ({ page }) => {
+test('handles File->Save new file', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "File Save new File"')
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Save File').click()
@@ -82,7 +82,7 @@ test('handles File->Save new file', async ({ page }) => {
   await page.locator('button:has-text("Delete")').click()
 })
 
-test('handles File Save overwrite', async ({ page }) => {
+test('handles File Save overwrite', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "File Save overwrite"')
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Save File').click()

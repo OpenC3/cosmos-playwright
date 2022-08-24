@@ -93,7 +93,7 @@ test('saves and opens the configuration', async ({ page, utils }) => {
 //
 // Test the Limits Tab
 //
-test('temporarily hides items', async ({ page }) => {
+test('temporarily hides items', async ({ page, utils }) => {
   // Since we're checking count() which is instant we need to poll
   await expect
     .poll(
@@ -124,7 +124,7 @@ test('temporarily hides items', async ({ page }) => {
     .toBe(2)
 })
 
-test('ignores items', async ({ page }) => {
+test('ignores items', async ({ page, utils }) => {
   await expect
     .poll(
       () => page.locator('[data-test=limits-row]:has-text("TEMP2")').count(),
@@ -172,7 +172,7 @@ test('ignores items', async ({ page }) => {
     .toBe(2)
 })
 
-test('ignores entire packets', async ({ page }) => {
+test('ignores entire packets', async ({ page, utils }) => {
   // The INST and INST2 targets both have VALUE2 & VALUE4 as red
   expect(
     await page.locator('[data-test=limits-row]:has-text("VALUE2")').count()
@@ -223,7 +223,7 @@ test('ignores entire packets', async ({ page }) => {
 //
 // Test the log tab
 //
-test('displays the limits log', async ({ page }) => {
+test('displays the limits log', async ({ page, utils }) => {
   await page.locator('div[role="tab"]:has-text("Log")').click()
   await expect(page.locator('#app')).toContainText('Limits Events')
   // Just verify we see dates and the various red, yellow, green states

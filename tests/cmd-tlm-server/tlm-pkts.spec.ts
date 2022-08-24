@@ -25,7 +25,7 @@ test.use({
   toolName: 'CmdTlmServer',
 })
 
-test('displays the list of telemetry', async ({ page }) => {
+test('displays the list of telemetry', async ({ page, utils }) => {
   // When we ask for just text there are no spaces
   await expect(page.locator('text=EXAMPLESTATUS')).toBeVisible()
   await expect(page.locator('text=INSTADCS')).toBeVisible()
@@ -67,7 +67,7 @@ test('displays a raw packet', async ({ page, utils }) => {
   await expect(page.locator('.v-dialog')).not.toBeVisible()
 })
 
-test('links to packet viewer', async ({ page }) => {
+test('links to packet viewer', async ({ page, utils }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
   const [newPage] = await Promise.all([
     page.context().waitForEvent('page'),

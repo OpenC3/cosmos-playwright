@@ -26,7 +26,7 @@ test.use({
   storageState: 'adminStorageState.json',
 })
 
-test('resets clock sync warning suppression', async ({ page }) => {
+test('resets clock sync warning suppression', async ({ page, utils }) => {
   await page.evaluate(
     `window.localStorage['suppresswarning__clock_out_of_sync_with_server'] = true`
   )
@@ -41,7 +41,7 @@ test('resets clock sync warning suppression', async ({ page }) => {
   )
 })
 
-test('clears recent configs', async ({ page }) => {
+test('clears recent configs', async ({ page, utils }) => {
   await page.goto('/tools/dataviewer')
   let config = 'spec' + Math.floor(Math.random() * 10000)
   await page.locator('[data-test=data-viewer-file]').click()
@@ -64,7 +64,7 @@ test('clears recent configs', async ({ page }) => {
   expect(localStorage['lastconfig__data_viewer']).toBe(undefined)
 })
 
-test('sets a classification banner', async ({ page }) => {
+test('sets a classification banner', async ({ page, utils }) => {
   const bannerText = 'Test Classification Banner'
   const bannerHeight = '32'
   const bannerTextColor = 'Orange'
@@ -102,7 +102,7 @@ test('sets a classification banner', async ({ page }) => {
   )
 })
 
-test('changes the source url', async ({ page }) => {
+test('changes the source url', async ({ page, utils }) => {
   await page.locator('[data-test=source-url]').fill('https://openc3.com')
   await page.locator('[data-test=save-source-url]').click()
   await page.reload()

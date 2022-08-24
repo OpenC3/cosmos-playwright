@@ -25,12 +25,12 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
 
-test('keeps a debug command history', async ({ page }) => {
+test('keeps a debug command history', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   x = 12345
   wait
@@ -99,7 +99,7 @@ test('keeps a debug command history', async ({ page }) => {
   await expect(page.locator('[data-test=debug-text]')).not.toBeVisible()
 })
 
-test('retries failed checks', async ({ page }) => {
+test('retries failed checks', async ({ page, utils }) => {
   await page.locator('textarea').fill('check_expression("1 == 2")')
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('error', {
@@ -119,7 +119,7 @@ test('retries failed checks', async ({ page }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
 })
 
-test('displays the call stack', async ({ page }) => {
+test('displays the call stack', async ({ page, utils }) => {
   // Show Call Stack is disabled unless a script is running
   await page.locator('[data-test=script-runner-script]').click()
   // NOTE: This doesn't work in playwright 1.21.0 due to unexpected value "false"
@@ -161,7 +161,7 @@ test('displays the call stack', async ({ page }) => {
   ).toHaveAttribute('aria-disabled', 'true')
 })
 
-test('displays disconnect icon', async ({ page }) => {
+test('displays disconnect icon', async ({ page, utils }) => {
   await page.locator('[data-test=script-runner-script]').click()
   await page.locator('text=Toggle Disconnect').click()
 

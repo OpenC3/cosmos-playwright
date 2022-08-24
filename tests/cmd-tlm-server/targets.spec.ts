@@ -25,7 +25,7 @@ test.use({
   toolName: 'CmdTlmServer',
 })
 
-test('displays the list of targets', async ({ page }) => {
+test('displays the list of targets', async ({ page, utils }) => {
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST')
   await expect(page.locator('[data-test=targets-table]')).toContainText('INST2')
   await expect(page.locator('[data-test=targets-table]')).toContainText(

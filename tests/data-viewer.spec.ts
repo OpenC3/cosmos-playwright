@@ -139,7 +139,7 @@ test('adds a decom packet to a new tab', async ({ page, utils }) => {
   await expect(page.locator('.v-window-item > div')).toHaveCount(2)
 })
 
-test('renames a tab', async ({ page }) => {
+test('renames a tab', async ({ page, utils }) => {
   await page.locator('[data-test=new-tab]').click()
   await page.locator('[data-test=tab]').click({ button: 'right' })
   await page.locator('[data-test=context-menu-rename] > div').click()
@@ -268,7 +268,7 @@ test('downloads a file', async ({ page, utils }) => {
   )
 })
 
-test('validates start and end time inputs', async ({ page }) => {
+test('validates start and end time inputs', async ({ page, utils }) => {
   // validate start date
   await page.locator('[data-test=start-date]').fill('')
   await expect(page.locator('.container')).toContainText('Required')
@@ -288,7 +288,7 @@ test('validates start and end time inputs', async ({ page }) => {
   await expect(page.locator('.container')).not.toContainText('Invalid')
 })
 
-test('validates start and end time values', async ({ page }) => {
+test('validates start and end time values', async ({ page, utils }) => {
   // validate future start date
   await page.locator('[data-test=start-date]').fill('4000-01-01') // If this version of OpenC3 is still used 2000 years from now, this test will need to be updated
   await page.locator('[data-test=start-time]').fill('12:15:15')

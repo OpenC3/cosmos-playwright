@@ -25,7 +25,7 @@ test.use({
   toolName: 'CmdTlmServer',
 })
 
-test('displays the list of command', async ({ page }) => {
+test('displays the list of command', async ({ page, utils }) => {
   // When we ask for just text there are no spaces
   await expect(page.locator('text=INSTABORT')).toBeVisible()
   await expect(page.locator('text=INSTCLEAR')).toBeVisible()
@@ -88,7 +88,7 @@ test('displays a raw command', async ({ page, utils }) => {
   await expect(page.locator('.v-dialog')).not.toBeVisible()
 })
 
-test('links to command sender', async ({ page }) => {
+test('links to command sender', async ({ page, utils }) => {
   await expect(page.locator('text=INSTCOLLECT')).toBeVisible()
   const [newPage] = await Promise.all([
     page.context().waitForEvent('page'),

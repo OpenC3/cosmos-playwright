@@ -25,7 +25,7 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
@@ -139,7 +139,7 @@ test('loads Suite controls when opening a suite', async ({ page, utils }) => {
   await expect(page.locator('[data-test=teardown-group]')).not.toBeVisible()
 })
 
-test('disables all suite buttons when running', async ({ page }) => {
+test('disables all suite buttons when running', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   require "openc3/script/suite.rb"
   class TestGroup < OpenC3::Group

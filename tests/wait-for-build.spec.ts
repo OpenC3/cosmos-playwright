@@ -20,7 +20,7 @@
 // @ts-check
 import { test, expect } from './fixture'
 
-test('waits for the services to deploy and connect', async ({ page }) => {
+test('waits for the services to deploy and connect', async ({ page, utils }) => {
   await page.goto('/tools/cmdtlmserver')
   // Check the 3rd column (nth starts at 0) on the row containing INST_INT says CONNECTED
   await expect(

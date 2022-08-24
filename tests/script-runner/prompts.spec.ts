@@ -25,12 +25,12 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Close the dialog that says how many running scripts there are
   await page.locator('button:has-text("Close")').click()
 })
 
-test('prompts for hazardous commands', async ({ page }) => {
+test('prompts for hazardous commands', async ({ page, utils }) => {
   await page.locator('textarea').fill('cmd("INST CLEAR")')
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('.v-dialog')).toContainText('Hazardous Command')
@@ -61,7 +61,7 @@ test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', asyn
   })
 })
 
-test('errors for out of range command parameters', async ({ page }) => {
+test('errors for out of range command parameters', async ({ page, utils }) => {
   await page
     .locator('textarea')
     .fill(`cmd("INST COLLECT with DURATION 11, TYPE 'NORMAL'")`)
@@ -89,7 +89,7 @@ test('does not out of range error for cmd_no_range_check, cmd_no_checks', async 
   })
 })
 
-test('ask accepts default, password, and required', async ({ page }) => {
+test('ask accepts default, password, and required', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   value = ask("Enter password:")
   puts value
@@ -150,7 +150,7 @@ test('ask accepts default, password, and required', async ({ page }) => {
   )
 })
 
-test('converts value for ask but not ask_string', async ({ page }) => {
+test('converts value for ask but not ask_string', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   value = ask("Enter integer:")
   puts "int:#{value} #{value.class}"
@@ -211,7 +211,7 @@ test('opens a dialog with buttons for message_box, vertical_message_box', async 
   )
 })
 
-test('opens a dialog with dropdowns for combo_box', async ({ page }) => {
+test('opens a dialog with dropdowns for combo_box', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   value = combo_box("Select value from combo", "abc123", "def456")
   puts value
@@ -238,7 +238,7 @@ test('opens a dialog with dropdowns for combo_box', async ({ page }) => {
   )
 })
 
-test('opens a dialog for prompt', async ({ page }) => {
+test('opens a dialog for prompt', async ({ page, utils }) => {
   // Default choices for prompt is Ok and Cancel
   await page.locator('textarea').fill(`
   value = prompt("Continue?")
@@ -264,7 +264,7 @@ test('opens a dialog for prompt', async ({ page }) => {
 })
 
 // Opening a file dialog might not be possible in a Github action?
-test.skip('opens a file dialog', async ({ page }) => {
+test.skip('opens a file dialog', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   file = open_file_dialog("Open a single file", "Choose something interesting")
   puts file.read

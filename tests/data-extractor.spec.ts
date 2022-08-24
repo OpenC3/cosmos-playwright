@@ -60,7 +60,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('[data-test=open-config-cancel-btn]').click()
 })
 
-test('validates dates and times', async ({ page }) => {
+test('validates dates and times', async ({ page, utils }) => {
   // Date validation
   const d = new Date()
   await expect(page.locator('text=Required')).not.toBeVisible()
@@ -84,7 +84,7 @@ test('validates dates and times', async ({ page }) => {
   await expect(page.locator('text=Required')).not.toBeVisible()
 })
 
-test("won't start with 0 items", async ({ page }) => {
+test("won't start with 0 items", async ({ page, utils }) => {
   await expect(page.locator('text=Process')).toBeDisabled()
 })
 

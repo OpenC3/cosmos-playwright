@@ -25,7 +25,7 @@ test.use({
   toolName: 'CmdTlmServer',
 })
 
-test('changes the limits set', async ({ page }) => {
+test('changes the limits set', async ({ page, utils }) => {
   await page.locator('[data-test=limits-set]').click()
   await page.locator(`.v-list-item__title:text-is("TVAC")`).click()
   await page.locator('[data-test=limits-set]').click()

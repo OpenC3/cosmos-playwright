@@ -23,7 +23,7 @@ test.use({
   storageState: 'adminStorageState.json',
 })
 
-test('shows and hides built-in tools', async ({ page }) => {
+test('shows and hides built-in tools', async ({ page, utils }) => {
   await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
   if (process.env.ENTERPRISE === '1') {
     await expect(page.locator('id=openc3-tool')).not.toContainText(
@@ -138,7 +138,7 @@ test('shows and hides built-in tools', async ({ page }) => {
   )
 })
 
-test('shows targets associated with plugins', async ({ page }) => {
+test('shows targets associated with plugins', async ({ page, utils }) => {
   // Check that the openc3-demo contains the following targets:
   await expect(
     page.locator(
@@ -175,7 +175,7 @@ let plugin = 'openc3-pw-test'
 let pluginGem = 'openc3-pw-test-1.0.0.gem'
 let pluginGem1 = 'openc3-pw-test-1.0.1.gem'
 
-test('installs a new plugin', async ({ page }) => {
+test('installs a new plugin', async ({ page, utils }) => {
   // Note that Promise.all prevents a race condition
   // between clicking and waiting for the file chooser.
   const [fileChooser] = await Promise.all([
@@ -331,7 +331,7 @@ test.describe(() => {
   })
 })
 
-test('upgrades existing plugin', async ({ page }) => {
+test('upgrades existing plugin', async ({ page, utils }) => {
   // Note that Promise.all prevents a race condition
   // between clicking and waiting for the file chooser.
   const [fileChooser] = await Promise.all([
@@ -387,7 +387,7 @@ test('upgrades existing plugin', async ({ page }) => {
   ).toEqual(0)
 })
 
-test('edits existing plugin', async ({ page }) => {
+test('edits existing plugin', async ({ page, utils }) => {
   // Edit then cancel
   await page
     .locator(
@@ -487,7 +487,7 @@ test.describe(() => {
   })
 })
 
-test('deletes a plugin', async ({ page }) => {
+test('deletes a plugin', async ({ page, utils }) => {
   await page
     .locator(
       `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> [data-test=delete-plugin]`

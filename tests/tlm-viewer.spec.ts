@@ -25,7 +25,7 @@ test.use({
   toolName: 'Telemetry Viewer'
 })
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, utils }) => {
   // Throw exceptions on any pageerror events
   page.on('pageerror', (exception) => {
     throw exception
@@ -50,30 +50,30 @@ async function showScreen(page, target, screen, callback = null) {
   ).not.toBeVisible()
 }
 
-test('displays INST ADCS', async ({ page }) => {
+test('displays INST ADCS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'ADCS')
 })
 
-test('displays INST ARRAY', async ({ page }) => {
+test('displays INST ARRAY', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'ARRAY')
 })
 
-test('displays INST BLOCK', async ({ page }) => {
+test('displays INST BLOCK', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'BLOCK')
 })
-test('displays INST COMMANDING', async ({ page }) => {
+test('displays INST COMMANDING', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'COMMANDING')
 })
 
-test('displays INST GRAPHS', async ({ page }) => {
+test('displays INST GRAPHS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'GRAPHS')
 })
 
-test('displays INST GROUND', async ({ page }) => {
+test('displays INST GROUND', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'GROUND')
 })
 
-test('displays INST HS', async ({ page }) => {
+test('displays INST HS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'HS', async function () {
     await expect(page.locator('text=Health and Status')).toBeVisible()
     await page.locator('[data-test=minimize-screen-icon]').click()
@@ -83,20 +83,20 @@ test('displays INST HS', async ({ page }) => {
   })
 })
 
-test('displays INST LATEST', async ({ page }) => {
+test('displays INST LATEST', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'LATEST')
 })
 
-test('displays INST LIMITS', async ({ page }) => {
+test('displays INST LIMITS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'LIMITS')
 })
 
 // OTHER not fully implemented
-// test("displays INST OTHER", async ({ page }) => {
+// test("displays INST OTHER", async ({ page, utils }) => {
 //   await showScreen(page, "INST", "OTHER");
 // });
 
-test('displays INST PARAMS', async ({ page }) => {
+test('displays INST PARAMS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'PARAMS')
 })
 
@@ -131,7 +131,7 @@ test('displays INST SIMPLE', async ({ page, utils }) => {
   })
 })
 
-test('displays INST TABS', async ({ page }) => {
+test('displays INST TABS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'TABS')
 })
 
@@ -163,7 +163,7 @@ test('creates new screen', async ({ page, utils }) => {
   ).toBeVisible()
 })
 
-test('deletes new screen', async ({ page }) => {
+test('deletes new screen', async ({ page, utils }) => {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()

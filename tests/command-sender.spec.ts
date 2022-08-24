@@ -187,7 +187,7 @@ test('handles array values', async ({ page, utils }) => {
 })
 
 // // TODO: This needs work
-// it.skip('handles string values', async ({ page }) => {
+// it.skip('handles string values', async ({ page, utils }) => {
 //   cy.vistest('/tools/cmdsender/INST/ASCIICMD')
 //   cy.hideNav()
 //   cy.wait(1000)

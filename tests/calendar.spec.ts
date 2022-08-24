@@ -78,7 +78,7 @@ test('test top bar functionality', async ({ page, utils }) => {
   )
 })
 
-test('test create note functionality', async ({ page }) => {
+test('test create note functionality', async ({ page, utils }) => {
   //
   const stopDateTime = add(new Date(), { minutes: 30 })
   const stopDate = await formatDate(stopDateTime)
@@ -108,7 +108,7 @@ test('test create note functionality', async ({ page }) => {
   await page.locator('[data-test=create-note-submit-btn]').click()
 })
 
-test('test create metadata functionality', async ({ page }) => {
+test('test create metadata functionality', async ({ page, utils }) => {
   //
   const startDateTime = sub(new Date(), { minutes: 30 })
   const startDate = await formatDate(startDateTime)
@@ -145,7 +145,7 @@ test('test create metadata functionality', async ({ page }) => {
   await page.locator('[data-test=create-metadata-submit-btn]').click()
 })
 
-test('test create timeline functionality', async ({ page }) => {
+test('test create timeline functionality', async ({ page, utils }) => {
   //
   await page.locator('[data-test=create-timeline]').click()
   await page.locator('[data-test=input-timeline-name]').fill('Alpha')
@@ -156,7 +156,7 @@ test('test create timeline functionality', async ({ page }) => {
   await page.locator('[data-test=create-timeline-submit-btn]').click()
 })
 
-test('test create activity functionality', async ({ page }) => {
+test('test create activity functionality', async ({ page, utils }) => {
   //
   const startDateTime = add(new Date(), { minutes: 90 })
   const startDate = await formatDate(startDateTime)
@@ -229,7 +229,7 @@ test('test timeline select and activity delete functionality', async ({
   await page.locator('button:has-text("Delete")').click()
 })
 
-test('test delete timeline functionality', async ({ page }) => {
+test('test delete timeline functionality', async ({ page, utils }) => {
   await page.locator('[data-test=Alpha-options]').click()
   await page.locator('[data-test=Alpha-delete]').click()
   await page.locator('[data-test=confirm-dialog-cancel]').click()

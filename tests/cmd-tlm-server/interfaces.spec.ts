@@ -25,7 +25,7 @@ test.use({
   toolName: 'CmdTlmServer',
 })
 
-test('disconnects & connects an interface', async ({ page }) => {
+test('disconnects & connects an interface', async ({ page, utils }) => {
   await expect(
     page.locator('tr:has-text("INST_INT") td >> nth=2')
   ).toContainText('CONNECTED')
