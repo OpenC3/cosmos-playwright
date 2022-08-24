@@ -141,7 +141,7 @@ test('creates new screen', async ({ page, utils }) => {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await utils.sleep(500)
-  await page.locator('button:has-text("New Screen")').click()
+  await page.locator('[data-test=new-screen]').click()
   await expect(
     page.locator(`.v-system-bar:has-text("New Screen")`)
   ).toBeVisible()
