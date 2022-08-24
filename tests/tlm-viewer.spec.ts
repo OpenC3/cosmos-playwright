@@ -22,7 +22,7 @@ import { test, expect } from './fixture'
 
 test.use({
   toolPath: '/tools/tlmviewer',
-  toolName: 'Telemetry Viewer'
+  toolName: 'Telemetry Viewer',
 })
 
 test.beforeEach(async ({ page, utils }) => {
@@ -37,7 +37,7 @@ async function showScreen(page, target, screen, callback = null) {
   await page.locator(`.v-list-item__title:text-is("${target}")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
-  await page.locator('button:has-text("Show Screen")').click()
+  await page.locator('[data-test=show-screen]').click()
   await expect(
     page.locator(`.v-system-bar:has-text("${target} ${screen}")`)
   ).toBeVisible()
@@ -168,7 +168,7 @@ test('deletes new screen', async ({ page, utils }) => {
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
   await page.locator(`.v-list-item__title:text-is("${screen}")`).click()
-  await page.locator('button:has-text("Show Screen")').click()
+  await page.locator('[data-test=show-screen]').click()
   await expect(
     page.locator(`.v-system-bar:has-text("INST ${screen}")`)
   ).toBeVisible()

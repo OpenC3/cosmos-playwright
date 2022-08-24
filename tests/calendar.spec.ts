@@ -37,7 +37,7 @@ async function formatDate(date) {
 //
 // Test the basic functionality of the application
 //
-test('test top bar functionality', async ({ page, utils }) => {
+test('test top bar', async ({ page, utils }) => {
   // test the day calendar view
   await page.locator('[data-test=change-type]').click()
   await page.locator('[data-test=type-day]').click()
@@ -78,7 +78,7 @@ test('test top bar functionality', async ({ page, utils }) => {
   )
 })
 
-test('test create note functionality', async ({ page, utils }) => {
+test('test create note', async ({ page, utils }) => {
   //
   const stopDateTime = add(new Date(), { minutes: 30 })
   const stopDate = await formatDate(stopDateTime)
@@ -108,7 +108,7 @@ test('test create note functionality', async ({ page, utils }) => {
   await page.locator('[data-test=create-note-submit-btn]').click()
 })
 
-test('test create metadata functionality', async ({ page, utils }) => {
+test('test create metadata', async ({ page, utils }) => {
   //
   const startDateTime = sub(new Date(), { minutes: 30 })
   const startDate = await formatDate(startDateTime)
@@ -145,23 +145,19 @@ test('test create metadata functionality', async ({ page, utils }) => {
   await page.locator('[data-test=create-metadata-submit-btn]').click()
 })
 
-test('test create timeline functionality', async ({ page, utils }) => {
-  //
+test('test create timeline', async ({ page, utils }) => {
   await page.locator('[data-test=create-timeline]').click()
   await page.locator('[data-test=input-timeline-name]').fill('Alpha')
   await page.locator('[data-test=create-timeline-cancel-btn]').click()
-  //
   await page.locator('[data-test=create-timeline]').click()
   await page.locator('[data-test=input-timeline-name]').fill('Alpha')
   await page.locator('[data-test=create-timeline-submit-btn]').click()
 })
 
-test('test create activity functionality', async ({ page, utils }) => {
-  //
+test('test create activity', async ({ page, utils }) => {
   const startDateTime = add(new Date(), { minutes: 90 })
   const startDate = await formatDate(startDateTime)
   const startTime = await formatTime(startDateTime)
-  //
   const stopDateTime = add(new Date(), { minutes: 95 })
   const stopDate = await formatDate(stopDateTime)
   const stopTime = await formatTime(stopDateTime)
@@ -210,9 +206,7 @@ test('test create activity functionality', async ({ page, utils }) => {
   await page.locator('[data-test=create-activity-submit-btn]').click()
 })
 
-test('test timeline select and activity delete functionality', async ({
-  page,
-}) => {
+test('test timeline select and activity delete', async ({ page, utils }) => {
   // Delete the metadata, it shows something like 'Metadata, HH:MM AM - HH:MM AM'
   // So we use the comma to avoid selecting the other Metadata text on page
   await page.locator('text=Metadata,').click()
@@ -229,7 +223,7 @@ test('test timeline select and activity delete functionality', async ({
   await page.locator('button:has-text("Delete")').click()
 })
 
-test('test delete timeline functionality', async ({ page, utils }) => {
+test('test delete timeline', async ({ page, utils }) => {
   await page.locator('[data-test=Alpha-options]').click()
   await page.locator('[data-test=Alpha-delete]').click()
   await page.locator('[data-test=confirm-dialog-cancel]').click()

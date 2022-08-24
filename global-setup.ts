@@ -17,6 +17,12 @@ async function globalSetup(config: FullConfig) {
     // Save signed-in state to 'storageState.json'.
     await page.context().storageState({ path: 'storageState.json' })
 
+    // On the initial load you might get the Clock out of sync dialog
+    if (await page.$('text=Clock out of sync')) {
+      await page.locator("text=Don't show this again").click()
+      await page.locator('button:has-text("Dismiss")').click()
+    }
+
     const adminPage = await browser.newPage()
     await adminPage.goto(`${baseURL}/tools/cmdtlmserver`)
     await adminPage.locator('input[name="username"]').fill('admin')
@@ -50,12 +56,12 @@ async function globalSetup(config: FullConfig) {
     // Save signed-in state to 'storageState.json' and adminStorageState to match Enterprise
     await page.context().storageState({ path: 'storageState.json' })
     await page.context().storageState({ path: 'adminStorageState.json' })
-  }
 
-  // On the initial load you might get the Clock out of sync dialog
-  if (await page.$('text=Clock out of sync')) {
-    await page.locator("text=Don't show this again").click()
-    await page.locator('button:has-text("Dismiss")').click()
+    // On the initial load you might get the Clock out of sync dialog
+    if (await page.$('text=Clock out of sync')) {
+      await page.locator("text=Don't show this again").click()
+      await page.locator('button:has-text("Dismiss")').click()
+    }
   }
 
   await browser.close()
