@@ -104,7 +104,7 @@ test('displays INST SIMPLE', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'SIMPLE', async function () {
     await expect(page.locator(`text=${text}`)).not.toBeVisible()
     await page.locator('[data-test=edit-screen-icon]').click()
-    await page.locator('[data-test=screen-text-input]').fill(`
+    await page.locator('textarea').fill(`
     SCREEN AUTO AUTO 0.5
     LABEL ${text}
     BIG INST HEALTH_STATUS TEMP2
