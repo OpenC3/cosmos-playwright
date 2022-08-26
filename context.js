@@ -18,7 +18,8 @@ function defaultSourceLookup(filePath) {
     filePath = filePath.replace('C:', '')
     filePath = filePath.replace(
       '/openc3',
-      process.cwd().split(path.sep).join(path.posix.sep) + '/../openc3-init'
+      // This assumes you've checked out playwright at the same level as the openc3 project
+      process.cwd().split(path.sep).join(path.posix.sep) + '/../openc3/openc3-init'
     )
     // For some reason we get duplicate path portions like:
     // /openc3-init/plugins/openc3-tool-base/src/src/AppNav.vue
