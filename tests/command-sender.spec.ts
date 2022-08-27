@@ -30,7 +30,8 @@ async function selectValue(page, param, value) {
   await page
     .locator(`tr:has-text("${param}") [data-test=cmd-param-select]`)
     .click()
-  await page.locator(`text=${value}`).click()
+  // Adding quotes to text='MaTcH' means case sensitve ... otherwise insensitive
+  await page.locator(`text='${value}'`).click()
   await expect(page.locator('tr:has-text("TYPE")')).toContainText(value)
 }
 
@@ -146,12 +147,13 @@ test('warns for hazardous parameters', async ({ page, utils }) => {
   await expect(page.locator('main')).toContainText('Hazardous command not sent')
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("Yes")').click()
+  // Ensure the state is used, e.g. 'SPECIAL' and not the value
   await expect(page.locator('main')).toContainText(
-    '("INST COLLECT with TYPE 1, DURATION 1, OPCODE 171, TEMP 0") sent'
+    '("INST COLLECT with TYPE SPECIAL, DURATION 1, OPCODE 171, TEMP 0") sent'
   )
   await checkHistory(
     page,
-    'cmd("INST COLLECT with TYPE 1, DURATION 1, OPCODE 171, TEMP 0")'
+    'cmd("INST COLLECT with TYPE SPECIAL, DURATION 1, OPCODE 171, TEMP 0")'
   )
 })
 
