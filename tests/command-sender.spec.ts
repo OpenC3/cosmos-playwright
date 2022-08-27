@@ -32,7 +32,7 @@ async function selectValue(page, param, value) {
     .click()
   // Adding quotes to text='MaTcH' means case sensitve ... otherwise insensitive
   await page.locator(`text='${value}'`).click()
-  await expect(page.locator('tr:has-text("TYPE")')).toContainText(value)
+  // await expect(page.locator(`tr:text("${param}")`)).toContainText(value)
 }
 
 // Helper function to set parameter value
@@ -188,14 +188,24 @@ test('handles array values', async ({ page, utils }) => {
   )
 })
 
-// // TODO: This needs work
-// it.skip('handles string values', async ({ page, utils }) => {
-//   cy.vistest('/tools/cmdsender/INST/ASCIICMD')
-//   cy.hideNav()
-//   cy.wait(1000)
-//   await expect(page.locator('main')).toContainText('ASCII command')
-//   await page.locator('button:has-text("Send")').click();
-// })
+test('handles string values', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'ASCIICMD')
+  await expect(page.locator('main')).toContainText('ASCII command')
+  await selectValue(page, 'STRING', 'NOOP')
+  await checkValue(page, 'STRING', 'NOOP')
+  await page.locator('button:has-text("Send")').click();
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST ASCIICMD with STRING \'NOOP\''
+  )
+  await selectValue(page, 'STRING', 'ARM LASER')
+  await checkValue(page, 'STRING', 'ARM LASER')
+  await page.locator('button:has-text("Send")').click();
+  // ARM LASER is hazardous so ack
+  await page.locator('button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST ASCIICMD with STRING \'ARM LASER\''
+  )
+})
 
 test('gets details with right click', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'COLLECT')
