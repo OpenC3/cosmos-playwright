@@ -39,10 +39,12 @@ async function selectValue(page, param, value) {
 async function setValue(page, param, value) {
   await page
     .locator(`tr:has-text("${param}") [data-test=cmd-param-value]`)
+    .first()
     .fill(value)
   // Trigger the update handler that sets the drop down by pressing Enter
   await page
     .locator(`tr:has-text("${param}") [data-test=cmd-param-value]`)
+    .first()
     .press('Enter')
   await checkValue(page, param, value)
 }
@@ -75,11 +77,7 @@ test('selects a target and packet', async ({ page, utils }) => {
 test('displays INST COLLECT using the route', async ({ page, utils }) => {
   await page.goto('/tools/cmdsender/INST/COLLECT')
   await utils.inputValue(page, '[data-test=select-target] input', 'INST')
-  await utils.inputValue(
-    page,
-    '[data-test=select-packet] input',
-    'COLLECT'
-  )
+  await utils.inputValue(page, '[data-test=select-packet] input', 'COLLECT')
   await expect(page.locator('main')).toContainText('Starts a collect')
   await expect(page.locator('main')).toContainText('Parameters')
   await expect(page.locator('main')).toContainText('DURATION')
@@ -157,7 +155,10 @@ test('warns for hazardous parameters', async ({ page, utils }) => {
   )
 })
 
-test('handles float values and scientific notation', async ({ page, utils }) => {
+test('handles float values and scientific notation', async ({
+  page,
+  utils,
+}) => {
   await utils.selectTargetPacketItem('INST', 'FLTCMD')
   await setValue(page, 'FLOAT32', '123.456')
   await setValue(page, 'FLOAT64', '12e3')
@@ -193,17 +194,27 @@ test('handles string values', async ({ page, utils }) => {
   await expect(page.locator('main')).toContainText('ASCII command')
   await selectValue(page, 'STRING', 'NOOP')
   await checkValue(page, 'STRING', 'NOOP')
-  await page.locator('button:has-text("Send")').click();
+  await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
-    'cmd("INST ASCIICMD with STRING \'NOOP\''
+    "cmd(\"INST ASCIICMD with STRING 'NOOP'"
   )
   await selectValue(page, 'STRING', 'ARM LASER')
   await checkValue(page, 'STRING', 'ARM LASER')
-  await page.locator('button:has-text("Send")').click();
+  await page.locator('button:has-text("Send")').click()
   // ARM LASER is hazardous so ack
   await page.locator('button:has-text("Yes")').click()
   await expect(page.locator('main')).toContainText(
-    'cmd("INST ASCIICMD with STRING \'ARM LASER\''
+    "cmd(\"INST ASCIICMD with STRING 'ARM LASER'"
+  )
+  // Enter a custom string with quotes
+  await setValue(page, 'STRING', '"MY VAL"')
+  // Typing in the state value should automatically switch the state
+  await expect(page.locator('tr:has-text("STRING")').first()).toContainText(
+    'MANUALLY ENTERED'
+  )
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    "cmd(\"INST ASCIICMD with STRING 'MY VAL'"
   )
 })
 
@@ -288,7 +299,7 @@ test('executes commands from history', async ({ page, utils }) => {
 //
 // Test the Mode menu
 //
-test('ignores range checks', async ({ page, utils }) => {
+test('ignores normal range checks', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'NORMAL') // Ensure TYPE is set since its required
   await setValue(page, 'TEMP', '100')
@@ -302,6 +313,25 @@ test('ignores range checks', async ({ page, utils }) => {
   await page.locator('[data-test=command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText('TEMP 100") sent')
+})
+
+test('ignores hazardous range checks', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  await selectValue(page, 'TYPE', 'SPECIAL') // Special is hazardous
+  await setValue(page, 'TEMP', '100')
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('button:has-text("Yes")').click() // Hazardous confirm
+  // Dialog should pop up with error
+  await expect(page.locator('.v-dialog:has-text("Error")')).toContainText('not in valid range')
+  await page.locator('button:has-text("Ok")').click()
+
+  // Status should also show error
+  await expect(page.locator('main')).toContainText('not in valid range')
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Ignore Range Checks').click()
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('button:has-text("Yes")').click() // Hazardous confirm
   await expect(page.locator('main')).toContainText('TEMP 100") sent')
 })
 
