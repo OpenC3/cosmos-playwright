@@ -107,7 +107,7 @@ test('supports manually entered state values', async ({ page, utils }) => {
   await setValue(page, 'TYPE', '3')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
-    'Status: cmd("INST COLLECT with TYPE 3, DURATION 1, OPCODE 171, TEMP 0") sent'
+    'cmd("INST COLLECT with TYPE 3, DURATION 1, OPCODE 171, TEMP 0") sent'
   )
   await checkHistory(
     page,
@@ -123,8 +123,21 @@ test('warns for hazardous commands', async ({ page, utils }) => {
   await expect(page.locator('main')).toContainText('Hazardous command not sent')
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("Yes")').click()
-  await expect(page.locator('main')).toContainText('("INST CLEAR") sent')
-  await checkHistory(page, 'cmd("INST CLEAR")')
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_hazardous_check("INST CLEAR") sent'
+  )
+  await checkHistory(page, 'cmd_no_hazardous_check("INST CLEAR")')
+
+  // Disable range checks to confirm history output
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Ignore Range Checks').click()
+
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_checks("INST CLEAR") sent'
+  )
+  await checkHistory(page, 'cmd_no_checks("INST CLEAR")')
 })
 
 test('warns for required parameters', async ({ page, utils }) => {
@@ -147,11 +160,11 @@ test('warns for hazardous parameters', async ({ page, utils }) => {
   await page.locator('button:has-text("Yes")').click()
   // Ensure the state is used, e.g. 'SPECIAL' and not the value
   await expect(page.locator('main')).toContainText(
-    '("INST COLLECT with TYPE SPECIAL, DURATION 1, OPCODE 171, TEMP 0") sent'
+    'cmd_no_hazardous_check("INST COLLECT with TYPE \'SPECIAL\', DURATION 1, OPCODE 171, TEMP 0") sent'
   )
   await checkHistory(
     page,
-    'cmd("INST COLLECT with TYPE SPECIAL, DURATION 1, OPCODE 171, TEMP 0")'
+    'cmd_no_hazardous_check("INST COLLECT with TYPE \'SPECIAL\', DURATION 1, OPCODE 171, TEMP 0")'
   )
 })
 
@@ -164,11 +177,44 @@ test('handles float values and scientific notation', async ({
   await setValue(page, 'FLOAT64', '12e3')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
-    '("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000") sent'
+    'cmd("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000") sent'
   )
   await checkHistory(
     page,
     'cmd("INST FLTCMD with FLOAT32 123.456, FLOAT64 12000")'
+  )
+})
+
+test('handles NaN and Infinite values', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'FLTCMD')
+  await setValue(page, 'FLOAT32', 'NAN')
+  await setValue(page, 'FLOAT64', 'nan')
+  await page.locator('button:has-text("Send")').click()
+  // Dialog should pop up with error
+  await expect(page.locator('.v-dialog')).toContainText('not in valid range')
+  await page.locator('button:has-text("Ok")').click()
+  // Disable range checks
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Ignore Range Checks').click()
+  await page.locator('button:has-text("Send")').click()
+
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_range_check("INST FLTCMD with FLOAT32 NaN, FLOAT64 NaN") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_no_range_check("INST FLTCMD with FLOAT32 NaN, FLOAT64 NaN")'
+  )
+
+  await setValue(page, 'FLOAT32', 'INFINITY')
+  await setValue(page, 'FLOAT64', '-infinity')
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_range_check("INST FLTCMD with FLOAT32 Infinity, FLOAT64 -Infinity") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_no_range_check("INST FLTCMD with FLOAT32 Infinity, FLOAT64 -Infinity")'
   )
 })
 
@@ -204,7 +250,7 @@ test('handles string values', async ({ page, utils }) => {
   // ARM LASER is hazardous so ack
   await page.locator('button:has-text("Yes")').click()
   await expect(page.locator('main')).toContainText(
-    "cmd(\"INST ASCIICMD with STRING 'ARM LASER'"
+    "cmd_no_hazardous_check(\"INST ASCIICMD with STRING 'ARM LASER'"
   )
   // Enter a custom string with quotes
   await setValue(page, 'STRING', '"MY VAL"')
@@ -231,8 +277,10 @@ test('executes commands from history', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'CLEAR')
   await page.locator('button:has-text("Send")').click()
   await page.locator('.v-dialog button:has-text("Yes")').click()
-  await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent')
-  await checkHistory(page, 'cmd("INST CLEAR")')
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_hazardous_check("INST CLEAR") sent'
+  )
+  await checkHistory(page, 'cmd_no_hazardous_check("INST CLEAR")')
   // Re-execute the command from the history
   await page.locator('[data-test=sender-history]').click()
   await page.locator('[data-test=sender-history]').press('ArrowUp')
@@ -240,7 +288,7 @@ test('executes commands from history', async ({ page, utils }) => {
   await page.locator('.v-dialog button:has-text("Yes")').click()
   // Now history says it was sent twice (2)
   await expect(page.locator('main')).toContainText(
-    'cmd("INST CLEAR") sent. (2)'
+    'cmd_no_hazardous_check("INST CLEAR") sent. (2)'
   )
   await page.locator('[data-test=sender-history]').click()
   await page.locator('[data-test=sender-history]').press('ArrowUp')
@@ -248,7 +296,7 @@ test('executes commands from history', async ({ page, utils }) => {
   await page.locator('.v-dialog button:has-text("Yes")').click()
   // Now history says it was sent three times (3)
   await expect(page.locator('main')).toContainText(
-    'cmd("INST CLEAR") sent. (3)'
+    'cmd_no_hazardous_check("INST CLEAR") sent. (3)'
   )
 
   // Send a different command: INST SETPARAMS
@@ -258,7 +306,7 @@ test('executes commands from history', async ({ page, utils }) => {
     'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent.'
   )
   // History should now contain both commands
-  await checkHistory(page, 'cmd("INST CLEAR")')
+  await checkHistory(page, 'cmd_no_hazardous_check("INST CLEAR")')
   await checkHistory(
     page,
     'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1")'
@@ -285,7 +333,7 @@ test('executes commands from history', async ({ page, utils }) => {
     'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 5") sent.'
   )
   // History should now contain CLEAR and both SETPARAMS commands
-  await checkHistory(page, 'cmd("INST CLEAR")')
+  await checkHistory(page, 'cmd_no_hazardous_check("INST CLEAR")')
   await checkHistory(
     page,
     'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1")'
@@ -307,13 +355,17 @@ test('ignores normal range checks', async ({ page, utils }) => {
   // Dialog should pop up with error
   await expect(page.locator('.v-dialog')).toContainText('not in valid range')
   await page.locator('button:has-text("Ok")').click()
-
-  // Status should also show error
-  await expect(page.locator('main')).toContainText('not in valid range')
+  // Disable range checks
   await page.locator('[data-test=command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
-  await expect(page.locator('main')).toContainText('TEMP 100") sent')
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_range_check("INST COLLECT with TYPE \'NORMAL\', DURATION 1, OPCODE 171, TEMP 100") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_no_range_check("INST COLLECT with TYPE \'NORMAL\', DURATION 1, OPCODE 171, TEMP 100")'
+  )
 })
 
 test('ignores hazardous range checks', async ({ page, utils }) => {
@@ -323,16 +375,22 @@ test('ignores hazardous range checks', async ({ page, utils }) => {
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("Yes")').click() // Hazardous confirm
   // Dialog should pop up with error
-  await expect(page.locator('.v-dialog:has-text("Error")')).toContainText('not in valid range')
+  await expect(page.locator('.v-dialog:has-text("Error")')).toContainText(
+    'not in valid range'
+  )
   await page.locator('button:has-text("Ok")').click()
-
-  // Status should also show error
-  await expect(page.locator('main')).toContainText('not in valid range')
+  // Disable range checks
   await page.locator('[data-test=command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("Yes")').click() // Hazardous confirm
-  await expect(page.locator('main')).toContainText('TEMP 100") sent')
+  await expect(page.locator('main')).toContainText(
+    'cmd_no_checks("INST COLLECT with TYPE \'SPECIAL\', DURATION 1, OPCODE 171, TEMP 100") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_no_checks("INST COLLECT with TYPE \'SPECIAL\', DURATION 1, OPCODE 171, TEMP 100")'
+  )
 })
 
 test('displays state values in hex', async ({ page, utils }) => {
@@ -383,6 +441,24 @@ test('disable parameter conversions', async ({ page, utils }) => {
 
   await utils.selectTargetPacketItem('INST', 'SETPARAMS')
   await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_raw("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_raw("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1")'
+  )
+  // Disable range checks just to verify the command history 'cmd_raw_no_range_check'
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Ignore Range Checks').click()
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_raw_no_range_check("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent'
+  )
+  await checkHistory(
+    page,
+    'cmd_raw_no_range_check("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1")'
+  )
 
   await page.locator('text=Script Runner').click()
   await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
