@@ -138,6 +138,28 @@ test('warns for hazardous commands', async ({ page, utils }) => {
     'cmd_no_checks("INST CLEAR") sent'
   )
   await checkHistory(page, 'cmd_no_checks("INST CLEAR")')
+
+  // Disable parameter conversions to confirm history output
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Disable Parameter').click()
+
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_raw_no_checks("INST CLEAR") sent'
+  )
+  await checkHistory(page, 'cmd_raw_no_checks("INST CLEAR")')
+
+  // Enable range checks to confirm history output
+  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('text=Ignore Range Checks').click()
+
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd_raw_no_hazardous_check("INST CLEAR") sent'
+  )
+  await checkHistory(page, 'cmd_raw_no_hazardous_check("INST CLEAR")')
 })
 
 test('warns for required parameters', async ({ page, utils }) => {
