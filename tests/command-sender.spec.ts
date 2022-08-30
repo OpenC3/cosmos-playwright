@@ -102,6 +102,8 @@ test('supports manually entered state values', async ({ page, utils }) => {
   // Manually typing in an existing state value should change the state drop down
   await setValue(page, 'TYPE', '0x0')
   await expect(page.locator('tr:has-text("TYPE")')).toContainText('NORMAL')
+  await setValue(page, 'TYPE', '1')
+  await expect(page.locator('tr:has-text("TYPE")')).toContainText('SPECIAL')
   // Switch back to MANUALLY ENTERED
   await selectValue(page, 'TYPE', 'MANUALLY ENTERED')
   await setValue(page, 'TYPE', '3')
@@ -264,7 +266,7 @@ test('handles string values', async ({ page, utils }) => {
   await checkValue(page, 'STRING', 'NOOP')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
-    "cmd(\"INST ASCIICMD with STRING 'NOOP'"
+    "cmd(\"INST ASCIICMD with STRING 'NOOP', BINARY 0xDEADBEEF, ASCII '0xDEADBEEF'\")"
   )
   await selectValue(page, 'STRING', 'ARM LASER')
   await checkValue(page, 'STRING', 'ARM LASER')
@@ -272,18 +274,25 @@ test('handles string values', async ({ page, utils }) => {
   // ARM LASER is hazardous so ack
   await page.locator('button:has-text("Yes")').click()
   await expect(page.locator('main')).toContainText(
-    "cmd_no_hazardous_check(\"INST ASCIICMD with STRING 'ARM LASER'"
+    "cmd_no_hazardous_check(\"INST ASCIICMD with STRING 'ARM LASER', BINARY 0xDEADBEEF, ASCII '0xDEADBEEF'\")"
   )
-  // Enter a custom string with quotes
-  await setValue(page, 'STRING', '"MY VAL"')
+  // Enter a custom string
+  await setValue(page, 'STRING', 'MY VAL')
+  // Enter a custom binary value
+  await setValue(page, 'BINARY', '0xBA5EBA11')
   // Typing in the state value should automatically switch the state
   await expect(page.locator('tr:has-text("STRING")').first()).toContainText(
     'MANUALLY ENTERED'
   )
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
-    "cmd(\"INST ASCIICMD with STRING 'MY VAL'"
+    "cmd(\"INST ASCIICMD with STRING 'MY VAL', BINARY 0xBA5EBA11, ASCII '0xDEADBEEF'\")"
   )
+  // Manually typing in an existing state value should change the state drop down
+  await setValue(page, 'STRING', 'FIRE LASER')
+  await expect(
+    page.locator('div[role=combobox]:has-text("FIRE LASER")')
+  ).toBeVisible()
 })
 
 test('gets details with right click', async ({ page, utils }) => {
