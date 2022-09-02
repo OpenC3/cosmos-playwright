@@ -50,7 +50,11 @@ openc3 is everything I thought it could be`
   await page.locator('[placeholder="Replace with"]').fill('OpenC3')
   await page.locator('text=All').nth(1).click() // Replace All
   await page.locator('textarea').press('Escape')
-  await page.locator('textarea').press('Control+f')
+  if (process.platform === 'darwin') {
+    await page.locator('textarea').press('Meta+F') // Ctrl-S save
+  } else {
+    await page.locator('textarea').press('Control+F') // Ctrl-S save
+  }
   await page.locator('[placeholder="Search for"]').fill('openc3')
   await page.locator('text=3 of 3')
   await page.locator('text=Aa').click()
