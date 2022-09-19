@@ -34,12 +34,12 @@ test('displays the list of command', async ({ page, utils }) => {
 })
 
 test('displays the command count', async ({ page, utils }) => {
-  await utils.sleep(2000) // Allow the telemetry to be fetched
   await page
     .locator(
       'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
     )
     .fill('abort')
+  await utils.sleep(2000) // Allow the telemetry to be fetched
   const count = parseInt(
     await page
       .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')
@@ -49,7 +49,9 @@ test('displays the command count', async ({ page, utils }) => {
   await page.goto('/tools/cmdsender/INST/ABORT')
   await page.locator('[data-test=select-send]').click()
   await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
-  expect(await page.inputValue('[data-test=sender-history]')).toMatch('cmd("INST ABORT")')
+  expect(await page.inputValue('[data-test=sender-history]')).toMatch(
+    'cmd("INST ABORT")'
+  )
 
   await page.goto('/tools/cmdtlmserver/cmd-packets')
   await page

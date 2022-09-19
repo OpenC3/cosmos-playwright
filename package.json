@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@playwright/test": "^1.25.0",
-    "date-fns": "2.29.1",
+    "date-fns": "^2.29.0",
+    "jszip": "^3.10.0",
     "nyc": "^15.1.0",
-    "prettier": "2.7.1",
-    "jszip": "3.10.1"
+    "prettier": "^2.7.0"
   },
   "nyc": {
     "excludeAfterRemap": false,
