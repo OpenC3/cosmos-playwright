@@ -105,7 +105,12 @@ test('handles File Save overwrite', async ({ page, utils }) => {
   await page.locator('textarea').fill('# comment2')
   // TODO: Check for * by filename ... not currently implemented
   // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb *')
-  await page.locator('textarea').press('Control+s') // Ctrl-S save
+  if (process.platform === 'darwin') {
+    await page.locator('textarea').press('Meta+S') // Ctrl-S save
+  } else {
+    await page.locator('textarea').press('Control+S') // Ctrl-S save
+  }
+
   // TODO: Check that * by filename goes away ... not currently implemented
   // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb')
   // expect(await page.locator('[data-test=filename]')).not.toContainText('*')

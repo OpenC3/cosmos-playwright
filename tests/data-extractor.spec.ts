@@ -306,6 +306,8 @@ test('fills values', async ({ page, utils }) => {
   await page.locator('[data-test=data-extractor-mode]').click()
   await page.locator('text=Fill Down').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
+  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('text=Full Column Names').click()
   // Deliberately test with two different packets
   await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSEQCNT')
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSSEQCNT')
@@ -313,22 +315,42 @@ test('fills values', async ({ page, utils }) => {
   await utils.download(page, 'text=Process', function (contents) {
     var lines = contents.split('\n')
     expect(lines[0]).toContain('CCSDSSEQCNT')
-    var firstHS = -1
+    var [header1, header2, header3, header4] = lines[0].split(',')
+    var adcsFirst = false
+    if (header3 === 'INST ADCS CCSDSSEQCNT') {
+      adcsFirst = true
+    }
+    var firstHS = -2
     for (let i = 1; i < lines.length; i++) {
-      if (firstHS !== -1) {
-        var [tgt1, pkt1, hs1, adcs1] = lines[firstHS].split(',')
-        var [tgt2, pkt2, hs2, adcs2] = lines[i].split(',')
-        expect(tgt1).toEqual(tgt2) // Both INST
-        expect(pkt1).toEqual('HEALTH_STATUS')
-        expect(pkt2).toEqual('ADCS')
-        expect(parseInt(adcs1) + 1).toEqual(parseInt(adcs2)) // ADCS goes up by one each time
-        expect(parseInt(hs1)).toBeGreaterThan(1) // Double check for a value
-        expect(hs1).toEqual(hs2) // HEALTH_STATUS should be the same
+      if (firstHS > 0) {
+        if (adcsFirst) {
+          var [tgt1, pkt1, adcs1, hs1] = lines[firstHS].split(',')
+          var [tgt2, pkt2, adcs2, hs2] = lines[i].split(',')
+          expect(tgt1).toEqual(tgt2) // Both INST
+          expect(pkt1).toEqual('HEALTH_STATUS')
+          expect(pkt2).toEqual('ADCS')
+          expect(parseInt(adcs1) + 1).toEqual(parseInt(adcs2)) // ADCS goes up by one each time
+          expect(parseInt(hs1)).toBeGreaterThan(1) // Double check for a value
+          expect(hs1).toEqual(hs2) // HEALTH_STATUS should be the same
+        } else {
+          var [tgt1, pkt1, hs1, adcs1] = lines[firstHS].split(',')
+          var [tgt2, pkt2, hs2, adcs2] = lines[i].split(',')
+          expect(tgt1).toEqual(tgt2) // Both INST
+          expect(pkt1).toEqual('HEALTH_STATUS')
+          expect(pkt2).toEqual('ADCS')
+          expect(parseInt(adcs1) + 1).toEqual(parseInt(adcs2)) // ADCS goes up by one each time
+          expect(parseInt(hs1)).toBeGreaterThan(1) // Double check for a value
+          expect(hs1).toEqual(hs2) // HEALTH_STATUS should be the same
+        }
         break
       } else if (lines[i].includes('HEALTH_STATUS')) {
-        // Look for the first line containing HEALTH_STATUS
+        // Look for the second line containing HEALTH_STATUS
         // console.log("Found first HEALTH_STATUS on line " + i);
-        firstHS = i
+        if (firstHS === -2) {
+          firstHS = -1
+        } else {
+          firstHS = i
+        }
       }
     }
   })

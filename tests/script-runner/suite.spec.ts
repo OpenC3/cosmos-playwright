@@ -37,6 +37,15 @@ async function saveAs(page, filename: string) {
     .locator('[data-test=file-open-save-filename]')
     .fill(`INST/procedures/${filename}`)
   await page.locator('[data-test=file-open-save-submit-btn]').click()
+
+  // Handle Overwrite
+  await page.waitForTimeout(1000); // hard wait for 1000ms
+  // If we see overwrite, handle it
+  if (await page.$('text=Are you sure you want to overwrite')) {
+    await page.locator('text=Are you sure you want to overwrite').click()
+    await page.locator('button:has-text("Overwrite")').click()
+  }
+
   await expect(page.locator('[data-test=start-suite]')).toBeVisible()
   expect(await page.locator('#sr-controls')).toContainText(
     `INST/procedures/${filename}`
@@ -61,7 +70,7 @@ async function runAndCheckResults(
 ) {
   await page.locator(startLocator).click()
   // Wait for the results ... allow for additional time
-  await expect(page.locator('.v-dialog')).toContainText('Script Results', {
+  await expect(page.locator('.v-dialog.v-dialog--active')).toContainText('Script Results', {
     timeout: 30000,
   })
   // Allow the caller to validate the results
@@ -254,7 +263,11 @@ test('starts a suite', async ({ page, utils }) => {
   // Verify filename is marked as edited
   // TODO: Not implemented currently
   // expect(await page.locator('[data-test=filename]')).toContainText('*')
-  await page.keyboard.press('Control+S')
+  if (process.platform === 'darwin') {
+    await page.keyboard.press('Meta+S')
+  } else {
+    await page.keyboard.press('Control+S')
+  }
 
   // Verify the suite startup, teardown buttons are disabled
   await expect(page.locator('[data-test=setup-suite]')).toBeDisabled()
@@ -350,7 +363,11 @@ test('starts a group', async ({ page, utils }) => {
   // Verify filename is marked as edited
   // TODO: Not implemented currently
   // expect(await page.locator('[data-test=filename]')).toContainText('*')
-  await page.keyboard.press('Control+S')
+  if (process.platform === 'darwin') {
+    await page.keyboard.press('Meta+S')
+  } else {
+    await page.keyboard.press('Control+S')
+  }
 
   // Verify the group startup, teardown buttons are disabled
   await expect(page.locator('[data-test=setup-group]')).toBeDisabled()
