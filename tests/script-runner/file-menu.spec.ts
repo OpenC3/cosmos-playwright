@@ -95,25 +95,14 @@ test('handles File Save overwrite', async ({ page, utils }) => {
   )
 
   await page.locator('textarea').fill('# comment1')
-  // TODO: Check for * by filename ... not currently implemented
-  // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb *')
   await page.locator('[data-test=script-runner-file]').click()
   await page.locator('text=Save File').click()
-  // TODO: Check that * by filename goes away ... not currently implemented
-  // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb')
-  // expect(await page.locator('[data-test=filename]')).not.toContainText('*')
   await page.locator('textarea').fill('# comment2')
-  // TODO: Check for * by filename ... not currently implemented
-  // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb *')
   if (process.platform === 'darwin') {
     await page.locator('textarea').press('Meta+S') // Ctrl-S save
   } else {
     await page.locator('textarea').press('Control+S') // Ctrl-S save
   }
-
-  // TODO: Check that * by filename goes away ... not currently implemented
-  // expect(await page.locator('[data-test=filename]')).toContainText('INST/procedures/temp.rb')
-  // expect(await page.locator('[data-test=filename]')).not.toContainText('*')
 
   // File->Save As
   await page.locator('[data-test=script-runner-file]').click()
@@ -153,4 +142,62 @@ test('handles Download', async ({ page, utils }) => {
   await page.locator('text=Delete File').click()
   await page.locator('text=Permanently delete file')
   await page.locator('button:has-text("Delete")').click()
+})
+
+test('can delete all temp files', async ({ page, utils }) => {
+  // Create new file which when run will become a TEMP file
+  await page.locator('textarea').fill('puts "temp11111111"')
+  await page.locator('[data-test=start-button]').click()
+  // Runs without stopping
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+  await expect(page.locator('#sr-controls')).toContainText(
+    /__TEMP__\/\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_\d{3}_temp.rb/
+  )
+  // Weird selector but it's how vuetify works
+  let tempFile1 = await page
+    .locator('#sr-controls >> input[type=hidden]')
+    .inputValue()
+  tempFile1 = tempFile1.split('/')[1]
+
+  // New file
+  await page.locator('[data-test=script-runner-file]').click()
+  await page.locator('text=New File').click()
+  await expect(page.locator('#sr-controls')).toContainText('<Untitled>')
+  await page.locator('textarea').fill('puts "temp22222222"')
+  await page.locator('[data-test=start-button]').click()
+  // Runs without stopping
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+  await expect(page.locator('#sr-controls')).toContainText(
+    /__TEMP__\/\d{4}_\d{2}_\d{2}_\d{2}_\d{2}_\d{2}_\d{3}_temp.rb/
+  )
+  let tempFile2 = await page
+    .locator('#sr-controls >> input[type=hidden]')
+    .inputValue()
+  tempFile2 = tempFile2.split('/')[1]
+  expect(tempFile1).not.toEqual(tempFile2)
+
+  // Open file
+  await page.locator('[data-test=script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await page.locator('.v-dialog >> text=__TEMP__').click()
+  await expect(page.locator(`.v-dialog >> text=${tempFile1}`)).toBeVisible()
+  await expect(page.locator(`.v-dialog >> text=${tempFile2}`)).toBeVisible()
+
+  // await page.locator('.v-treeview-node__append > .v-btn').click();
+  await page
+    .locator('.v-dialog >> .v-treeview-node:has-text("__TEMP__") >> .v-btn')
+    .click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await page.locator('[data-test="file-open-save-cancel-btn"]').click()
+
+  // Open file
+  await page.locator('[data-test=script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await expect(page.locator('.v-dialog--active')).toContainText('INST')
+  await expect(page.locator('.v-dialog--active')).not.toContainText('__TEMP__')
+  await page.locator('[data-test="file-open-save-cancel-btn"]').click()
 })
