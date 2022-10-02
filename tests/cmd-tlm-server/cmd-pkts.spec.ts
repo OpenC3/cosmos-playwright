@@ -39,7 +39,7 @@ test('displays the command count', async ({ page, utils }) => {
       'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
     )
     .fill('abort')
-  await utils.sleep(5000) // Allow the table to filtered and telemetry settle
+  await utils.sleep(2000) // Allow the table to filtered and telemetry settle
   const count = parseInt(
     await page
       .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')
@@ -59,7 +59,7 @@ test('displays the command count', async ({ page, utils }) => {
       'div.v-card__title:has-text("Command Packets") >> input[type="text"]'
     )
     .fill('abort')
-  await utils.sleep(5000) // Allow the table to filtered and telemetry settle
+  await utils.sleep(2000) // Allow the table to filtered and telemetry settle
   const count2 = parseInt(
     await page
       .locator('[data-test=cmd-packets-table] >> tr td >> nth=2')

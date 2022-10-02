@@ -34,7 +34,7 @@ test('displays the list of telemetry', async ({ page, utils }) => {
 
 test('displays the packet count', async ({ page, utils }) => {
   await expect(page.locator('text=INSTHEALTH_STATUS')).toBeVisible()
-  await utils.sleep(5000) // Allow the telemetry to be fetched
+  await utils.sleep(2000) // Allow the telemetry to be fetched
   expect(
     parseInt(
       await page.locator('text=INSTHEALTH_STATUS >> td >> nth=2').textContent()
