@@ -22,7 +22,7 @@ import { test, expect } from './fixture'
 
 test.use({
   toolPath: '/tools/packetviewer',
-  toolName: 'Packet Viewer'
+  toolName: 'Packet Viewer',
 })
 
 // Checks the ITEM value against a regular expression.
@@ -99,8 +99,8 @@ test('changes the polling rate', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test=packet-viewer-file]').click()
   await page.locator('[data-test=packet-viewer-file-options]').click()
-  await page.locator('.v-dialog input').fill('5000')
-  await page.locator('.v-dialog input').press('Enter')
+  await page.locator('.v-dialog [data-test=refresh-interval]').fill('5000')
+  await page.locator('.v-dialog [data-test=refresh-interval]').press('Enter')
   await page.locator('.v-dialog').press('Escape')
   const received = await page.inputValue('tr:has-text("RECEIVED_COUNT") input')
   await utils.sleep(7000)
@@ -110,15 +110,18 @@ test('changes the polling rate', async ({ page, utils }) => {
   // Set it back
   await page.locator('[data-test=packet-viewer-file]').click()
   await page.locator('[data-test=packet-viewer-file-options]').click()
-  await page.locator('.v-dialog input').fill('1000')
-  await page.locator('.v-dialog input').press('Enter')
+  await page.locator('.v-dialog [data-test=refresh-interval]').fill('1000')
+  await page.locator('.v-dialog [data-test=refresh-interval]').press('Enter')
   await page.locator('.v-dialog').press('Escape')
 })
 
 //
 // Test the View menu
 //
-test('displays formatted items with units by default', async ({ page, utils }) => {
+test('displays formatted items with units by default', async ({
+  page,
+  utils,
+}) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[aria-label="Next page"]').click()
   // Check for exactly 3 decimal points followed by units
