@@ -142,8 +142,8 @@ test('displays the same screen twice', async ({ page, utils }) => {
   // Mostly we're checking that the Show button works
   await page.locator('[data-test=show-screen]').click()
   await expect
-  .poll(() => page.locator('.v-system-bar:has-text("INST ADCS")').count())
-  .toBe(2)
+    .poll(() => page.locator('.v-system-bar:has-text("INST ADCS")').count())
+    .toBe(2)
   await page.locator('[data-test=close-screen-icon] >> nth=0').click()
   await page.locator('[data-test=close-screen-icon]').click()
   await expect(
@@ -153,7 +153,7 @@ test('displays the same screen twice', async ({ page, utils }) => {
 
 // Create the screen name as upcase because OpenC3 upcases the name
 let screen = 'SCREEN' + Math.floor(Math.random() * 10000)
-test('creates new screen', async ({ page, utils }) => {
+test('creates new blank screen', async ({ page, utils }) => {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await utils.sleep(500)
@@ -179,7 +179,33 @@ test('creates new screen', async ({ page, utils }) => {
   ).toBeVisible()
 })
 
-test('deletes new screen', async ({ page, utils }) => {
+test('creates new screen based on packet', async ({ page, utils }) => {
+  await page.locator('div[role="button"]:has-text("Select Target")').click()
+  await page.locator(`.v-list-item__title:text-is("INST")`).click()
+  await utils.sleep(500)
+  await page.locator('[data-test=new-screen]').click()
+  await expect(
+    page.locator(`.v-system-bar:has-text("New Screen")`)
+  ).toBeVisible()
+  await page.locator('.v-dialog [data-test=new-screen-packet]').click()
+  await page
+    .locator(`div[role="option"] div:text-matches("HEALTH_STATUS")`)
+    .click()
+  expect(await page.inputValue('[data-test=new-screen-name]')).toMatch(
+    'health_status'
+  )
+  await page.locator('button:has-text("Ok")').click()
+  await expect(
+    page.locator(`.v-system-bar:has-text("INST HEALTH_STATUS")`)
+  ).toBeVisible()
+})
+
+test('deletes new screens', async ({ page, utils }) => {
+  await deleteScreen(page, screen)
+  await deleteScreen(page, 'HEALTH_STATUS')
+})
+
+async function deleteScreen(page, screen) {
   await page.locator('div[role="button"]:has-text("Select Target")').click()
   await page.locator(`.v-list-item__title:text-is("INST")`).click()
   await page.locator('div[role="button"]:has-text("Select Screen")').click()
@@ -194,4 +220,4 @@ test('deletes new screen', async ({ page, utils }) => {
   await expect(
     page.locator(`.v-list-item__title:text-is("${screen}")`)
   ).not.toBeVisible()
-})
+}
