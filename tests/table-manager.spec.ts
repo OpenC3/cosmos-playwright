@@ -34,7 +34,7 @@ test('creates a single binary file', async ({ page, utils }) => {
   await expect(page.locator('.v-dialog')).toBeVisible()
   await utils.sleep(500) // Allow file dialog to fully render
   await page.locator('[data-test="file-open-save-search"]').fill('MCConfig')
-  await page.getByText('MCConfigurationTable.bin').click()
+  await page.locator('text=MCConfig >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test="file-open-save-submit-btn"]').click()
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
   expect(await page.locator('.v-tab').count()).toBe(1)
@@ -49,6 +49,8 @@ test('creates a single binary file', async ({ page, utils }) => {
 test('edits a binary file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=New').click() // Create new since we're editing
+  await expect(page.locator('.v-dialog')).toBeVisible()
+  await utils.sleep(500) // Allow file dialog to fully render
   await page.locator('[data-test=file-open-save-search]').type('ConfigTables_')
   await page.locator('text=ConfigTables_ >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
@@ -99,10 +101,8 @@ test('edits a binary file', async ({ page, utils }) => {
     )
     .fill('2')
   await page
-    .locator(
-      '[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(4) [data-test=table-item-select]'
-    )
-    .first()
+    .locator('[data-test=TLM_MONITORING] tr:nth-child(1)')
+    .getByRole('button', { name: 'BITS' })
     .click()
   await page.locator('text=BYTE').click()
   await expect(
@@ -119,30 +119,24 @@ test('edits a binary file', async ({ page, utils }) => {
     )
     .fill('4')
   await page
-    .locator(
-      '[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(7) [data-test=table-item-select]'
-    )
-    .first()
+    .locator('[data-test=TLM_MONITORING] tr:nth-child(1)')
+    .getByRole('button', { name: 'LESS_THAN' })
     .click()
   await page.locator('text=GREATER_THAN').click()
   await expect(
     page.locator('[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(7)')
   ).toContainText('GREATER_THAN')
   await page
-    .locator(
-      '[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(8) [data-test=table-item-select]'
-    )
-    .first()
+    .locator('[data-test=TLM_MONITORING] tr:nth-child(1)')
+    .getByRole('button', { name: 'NO_ACTION_REQUIRED' })
     .click()
   await page.locator('text=INITIATE_RESET').click()
   await expect(
     page.locator('[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(8)')
   ).toContainText('INITIATE_RESET')
   await page
-    .locator(
-      '[data-test=TLM_MONITORING] tr:nth-child(1) td:nth-child(9) [data-test=table-item-select]'
-    )
-    .first()
+    .locator('[data-test=TLM_MONITORING] tr:nth-child(1)')
+    .getByRole('button', { name: 'ALL_MODES' })
     .click()
   await page.locator('text=SAFE_MODE').click()
   await expect(
