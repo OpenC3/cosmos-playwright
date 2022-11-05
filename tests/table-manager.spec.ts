@@ -28,7 +28,7 @@ test.use({
 //
 // Test the File menu
 //
-test.only('creates a single binary file', async ({ page, utils }) => {
+test('creates a single binary file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=New').click()
   await expect(page.locator('.v-dialog')).toBeVisible()
