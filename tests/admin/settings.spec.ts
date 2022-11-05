@@ -74,12 +74,12 @@ test('sets a classification banner', async ({ page, utils }) => {
   await page
     .locator('[data-test=classification-banner-top-height]')
     .fill(bannerHeight)
-  await page.locator('data-test=classification-banner-background-color').click()
-  await page.locator('.v-list-item:has-text("Custom")').click()
+  await page.getByRole('button', { name: /Background color/ }).click()
+  await page.getByRole('option', { name: 'Custom' }).click()
   await page
     .locator('[data-test=classification-banner-custom-background-color]')
     .fill(bannerBackgroundColor)
-  await page.locator('data-test=classification-banner-font-color').click()
+  await page.getByRole('button', { name: /Font color/ }).click()
   await page
     .locator(`.v-list-item:has-text("${bannerTextColor}") >> nth=1`)
     .click()

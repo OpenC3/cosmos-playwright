@@ -228,7 +228,7 @@ test('opens a dialog with dropdowns for combo_box', async ({ page, utils }) => {
 
   // Clicking go re-launches the dialog
   await page.locator('[data-test=go-button]').click()
-  await page.locator('[data-test=prompt-select]').click()
+  await page.getByRole('button', { name: /Select/ }).click()
   await expect(page.locator('[data-test=state]')).toHaveValue('waiting')
   await page.locator('div[role="listbox"] >> text=def456').click()
   await page.locator('.v-dialog >> button:has-text("Ok")').click()

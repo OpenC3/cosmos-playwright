@@ -26,8 +26,8 @@ test.use({
 })
 
 test('changes the limits set', async ({ page, utils }) => {
-  await page.locator('[data-test=limits-set]').click()
+  await page.getByRole('button', { name: /Limits Set/ }).click()
   await page.locator(`.v-list-item__title:text-is("TVAC")`).click()
-  await page.locator('[data-test=limits-set]').click()
+  await page.getByRole('button', { name: /Limits Set/ }).click()
   await page.locator(`.v-list-item__title:text-is("DEFAULT")`).click()
 })

@@ -23,7 +23,7 @@ import { format } from 'date-fns'
 
 test.use({
   toolPath: '/tools/limitsmonitor',
-  toolName: 'Limits Monitor'
+  toolName: 'Limits Monitor',
 })
 
 test('saves and opens the configuration', async ({ page, utils }) => {

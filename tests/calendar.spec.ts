@@ -165,7 +165,7 @@ test('test create activity', async ({ page, utils }) => {
   await page.locator('[data-test=create-event]').click()
   await page.locator('[data-test=activity]').click()
   // v-select timeline
-  await page.locator('[data-test=activity-select-timeline]').click()
+  await page.getByRole('button', { name: /Timeline/ }).click()
   await page.locator('[data-test=activity-select-timeline-Alpha]').click()
   // Fill
   await page.locator('[data-test=activity-start-date]').fill(startDate)
@@ -175,13 +175,13 @@ test('test create activity', async ({ page, utils }) => {
   // step two
   await page.locator('[data-test=create-activity-step-two-btn]').click()
   // select reserve
-  await page.locator('[data-test=activity-select-type]').click()
+  await page.getByRole('button', { name: /Activity Type/ }).click()
   await page.locator('[data-test=activity-select-type-RESERVE]').click()
   // select script
-  await page.locator('[data-test=activity-select-type]').click()
+  await page.getByRole('button', { name: /Activity Type/ }).click()
   await page.locator('[data-test=activity-select-type-SCRIPT]').click()
   // input command
-  await page.locator('[data-test=activity-select-type]').click()
+  await page.getByRole('button', { name: /Activity Type/ }).click()
   await page.locator('[data-test=activity-select-type-COMMAND]').click()
   await page.locator('[data-test=activity-cmd]').fill('FOO CLEAR')
   await page.locator('[data-test=create-activity-cancel-btn]').click()
@@ -190,7 +190,7 @@ test('test create activity', async ({ page, utils }) => {
   await page.locator('[data-test=create-event]').click()
   await page.locator('[data-test=activity]').click()
   // v-select timeline
-  await page.locator('[data-test=activity-select-timeline]').click()
+  await page.getByRole('button', { name: /Timeline/ }).click()
   await page.locator('[data-test=activity-select-timeline-Alpha]').click()
   // Fill
   await page.locator('[data-test=activity-start-date]').fill(startDate)
@@ -200,7 +200,7 @@ test('test create activity', async ({ page, utils }) => {
   // step two
   await page.locator('[data-test=create-activity-step-two-btn]').click()
   // input command
-  await page.locator('[data-test=activity-select-type]').click()
+  await page.getByRole('button', { name: /Activity Type/ }).click()
   await page.locator('[data-test=activity-select-type-COMMAND]').click()
   await page.locator('[data-test=activity-cmd]').fill('INST CLEAR')
   await page.locator('[data-test=create-activity-submit-btn]').click()

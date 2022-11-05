@@ -74,7 +74,10 @@ test('test trigger page', async ({ page, utils }) => {
   // Open dialog and cancel and do not create the trigger
   await page.locator('[data-test=new-trigger]').click()
   // select FLOAT as operand
-  await page.locator('[data-test=trigger-operand-left-type]').click()
+  await page
+    .getByRole('button', { name: /Operand Type/ })
+    .nth(0)
+    .click()
   await page
     .locator(
       '[data-test=trigger-operand-left-type-FLOAT] div:has-text("FLOAT")'
@@ -85,7 +88,10 @@ test('test trigger page', async ({ page, utils }) => {
   // reset
   await page.locator('[data-test=trigger-create-reset-icon]').click()
   // select STRING as operand
-  await page.locator('[data-test=trigger-operand-left-type]').click()
+  await page
+    .getByRole('button', { name: /Operand Type/ })
+    .nth(0)
+    .click()
   await page.locator('[data-test=trigger-operand-left-type-STRING]').click()
   await page
     .locator('[data-test=trigger-operand-left-string]')
@@ -93,21 +99,36 @@ test('test trigger page', async ({ page, utils }) => {
   // reset
   await page.locator('[data-test=trigger-create-reset-icon]').click()
   // select LIMIT as operand
-  await page.locator('[data-test=trigger-operand-left-type]').click()
-  await page.locator('[data-test=trigger-operand-left-type-LIMIT]').click()
-  await page.locator('[data-test=trigger-operand-left-color]').click()
-  await page.locator('[data-test=trigger-operand-left-color-YELLOW]').click()
-  await page.locator('[data-test=trigger-operand-left-limit]').click()
-  await page.locator('[data-test=trigger-operand-left-limit-LOW]').click()
-  // reset
-  await page.locator('[data-test=trigger-create-reset-icon]').click()
+  // await page
+  //   .getByRole('button', { name: /Operand Type/ })
+  //   .nth(0)
+  //   .click()
+  // await page.locator('[data-test=trigger-operand-left-type-LIMIT]').click()
+  // await page
+  //   .getByRole('button', { name: /Operand Type/ })
+  //   .nth(0)
+  //   .click()
+  // await page.locator('[data-test=trigger-operand-left-color-YELLOW]').click()
+  // await page
+  //   .getByRole('button', { name: /Operand Type/ })
+  //   .nth(0)
+  //   .click()
+  // await page.locator('[data-test=trigger-operand-left-limit-LOW]').click()
+  // // reset
+  // await page.locator('[data-test=trigger-create-reset-icon]').click()
   // select ITEM as operand
-  await page.locator('[data-test=trigger-operand-left-type]').click()
+  await page
+    .getByRole('button', { name: /Operand Type/ })
+    .nth(0)
+    .click()
   await page.locator('[data-test=trigger-operand-left-type-ITEM]').click()
   // STEP 2
   await page.locator('[data-test=trigger-create-step-two-btn]').click()
   // select FLOAT as right operand
-  await page.locator('[data-test=trigger-operand-right-type]').click()
+  await page
+    .getByRole('button', { name: /Operand Type/ })
+    .nth(1)
+    .click()
   await page
     .locator(
       '[data-test=trigger-operand-right-type-FLOAT] div:has-text("FLOAT")'
@@ -118,7 +139,7 @@ test('test trigger page', async ({ page, utils }) => {
   // STEP 3
   await page.locator('[data-test=trigger-create-step-three-btn]').click()
   //
-  await page.locator('[data-test=trigger-create-select-operator]').click()
+  await page.getByRole('button', { name: /Operator/ }).click()
   // QUOTES REQUIRED else the ">" will not be selected
   await page.locator('[data-test="trigger-create-select-operator->"]').click()
   //
@@ -138,7 +159,7 @@ test('test reactions page', async ({ page, utils }) => {
   )
   //
   await page.locator('[data-test=new-reaction]').click()
-  await page.locator('[data-test=reaction-select-triggers]').click()
+  await page.getByRole('button', { name: /Select Triggers/ }).click()
   await page.locator('[data-test=reaction-select-trigger-0]').click()
   //
   await page.locator('[data-test=reaction-create-step-two-btn]').click()

@@ -22,19 +22,20 @@ import { test, expect } from './fixture'
 
 test.use({
   toolPath: '/tools/tablemanager',
-  toolName: 'Table Manager'
+  toolName: 'Table Manager',
 })
 
 //
 // Test the File menu
 //
-test('creates a single binary file', async ({ page, utils }) => {
+test.only('creates a single binary file', async ({ page, utils }) => {
   await page.locator('[data-test=table-manager-file]').click()
   await page.locator('text=New').click()
-  await page.locator('[data-test=file-open-save-search]').type('MCConfig')
+  await expect(page.locator('.v-dialog')).toBeVisible()
   await utils.sleep(500) // Allow file dialog to fully render
-  await page.locator('text=MCConfigurationTable >> nth=0').click() // nth=0 because INST, INST2
-  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await page.locator('[data-test="file-open-save-search"]').fill('MCConfig')
+  await page.getByText('MCConfigurationTable.bin').click()
+  await page.locator('[data-test="file-open-save-submit-btn"]').click()
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
   expect(await page.locator('.v-tab').count()).toBe(1)
   expect(await page.inputValue('[data-test=definition-filename]')).toMatch(
