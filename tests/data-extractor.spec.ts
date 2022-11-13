@@ -31,7 +31,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP2')
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
-  await page.locator('[data-test=data-extractor-file]').click()
+  await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Save Configuration').click()
   await page.locator('[data-test=name-input-save-config-dialog]').fill(config)
   await page.locator('button:has-text("Ok")').click()
@@ -44,7 +44,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('[data-test=delete-all]').click()
   await expect(page.locator('[data-test=item-list] > div')).toHaveCount(0)
 
-  await page.locator('[data-test=data-extractor-file]').click()
+  await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`td:has-text("${config}")`).click()
   await page.locator('button:has-text("Ok")').click()
@@ -53,7 +53,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await expect(page.locator('[data-test=item-list] > div')).toHaveCount(2)
 
   // Delete this test configuation
-  await page.locator('[data-test=data-extractor-file]').click()
+  await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`tr:has-text("${config}") [data-test=item-delete]`).click()
   await page.locator('button:has-text("Delete")').click()
@@ -232,7 +232,7 @@ test('processes commands', async ({ page, utils }) => {
 
 test('creates CSV output', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 3 })
-  await page.locator('[data-test=data-extractor-file]').click()
+  await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Comma Delimited').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
@@ -252,7 +252,7 @@ test('creates CSV output', async ({ page, utils }) => {
 
 test('creates tab delimited output', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 3 })
-  await page.locator('[data-test=data-extractor-file]').click()
+  await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Tab Delimited').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
@@ -269,7 +269,7 @@ test('creates tab delimited output', async ({ page, utils }) => {
 
 test('outputs full column names', async ({ page, utils }) => {
   let start = sub(new Date(), { minutes: 1 })
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Full Column Names').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'TEMP1')
@@ -283,7 +283,7 @@ test('outputs full column names', async ({ page, utils }) => {
   await utils.sleep(1000)
 
   // Switch back and verify
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Normal Columns').click()
   // Create a new end time so we get a new filename
   start = sub(new Date(), { minutes: 2 })
@@ -295,10 +295,10 @@ test('outputs full column names', async ({ page, utils }) => {
 
 test('fills values', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Fill Down').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Full Column Names').click()
   // Deliberately test with two different packets
   await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSEQCNT')
@@ -350,7 +350,7 @@ test('fills values', async ({ page, utils }) => {
 
 test('adds Matlab headers', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Matlab Header').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'ADCS', 'Q1')
@@ -363,7 +363,7 @@ test('adds Matlab headers', async ({ page, utils }) => {
 
 test('outputs unique values only', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
-  await page.locator('[data-test=data-extractor-mode]').click()
+  await page.locator('[data-test=cosmos-data-extractor-mode]').click()
   await page.locator('text=Unique Only').click()
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS', 'CCSDSVER')

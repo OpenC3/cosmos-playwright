@@ -59,20 +59,20 @@ test('saves and opens the configuration', async ({ page, utils }) => {
     .click()
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Save Configuration').click()
   await page.locator('[data-test=name-input-save-config-dialog]').fill(config)
   await page.locator('button:has-text("Ok")').click()
 
   // Reload page
   await page.reload()
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`td:has-text("${config}")`).click()
   await page.locator('button:has-text("Ok")').click()
   await utils.sleep(2000) // Let the page re-render .. not sure how else to wait
 
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Show Ignored').click()
   await expect(
     page.locator('div[role="dialog"]:has-text("Ignored Items")')
@@ -83,7 +83,7 @@ test('saves and opens the configuration', async ({ page, utils }) => {
   await page.locator('button:has-text("Ok")').click()
 
   // Delete this test configuation
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`tr:has-text("${config}") [data-test=item-delete]`).click()
   await page.locator('button:has-text("Delete")').click()
@@ -149,7 +149,7 @@ test('ignores items', async ({ page, utils }) => {
   )
 
   // Check the menu
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Show Ignored').click()
   await expect(page.locator('.v-dialog')).toContainText('TEMP2')
   // Find the items and delete them to restore them
@@ -157,7 +157,7 @@ test('ignores items', async ({ page, utils }) => {
   await page.locator('[data-test=remove-ignore-0]').click()
   await page.locator('button:has-text("Ok")').click()
 
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Show Ignored').click()
   await expect(page.locator('.v-dialog')).not.toContainText('TEMP2')
   await page.locator('button:has-text("Ok")').click()
@@ -193,7 +193,7 @@ test('ignores entire packets', async ({ page, utils }) => {
   ).toBe(1)
 
   // Check the menu
-  await page.locator('[data-test=limits-monitor-file]').click()
+  await page.locator('[data-test=cosmos-limits-monitor-file]').click()
   await page.locator('text=Show Ignored').click()
   await expect(page.locator('.v-dialog')).toContainText('PARAMS') // INST[2] PARAMS
   // Find the items and delete them to restore them

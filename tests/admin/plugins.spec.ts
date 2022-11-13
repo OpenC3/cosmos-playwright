@@ -24,117 +24,117 @@ test.use({
 })
 
 test('shows and hides built-in tools', async ({ page, utils }) => {
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
+  await expect(page.locator('id=openc3-tool')).toContainText('openc3-cosmos-demo')
   if (process.env.ENTERPRISE === '1') {
     await expect(page.locator('id=openc3-tool')).not.toContainText(
-      'openc3-enterprise-tool-admin'
+      'openc3-cosmos-enterprise-tool-admin'
     )
     await expect(page.locator('id=openc3-tool')).not.toContainText(
       'openc3-enterprise-tool-base'
     )
   } else {
     await expect(page.locator('id=openc3-tool')).not.toContainText(
-      'openc3-tool-admin'
+      'openc3-cosmos-tool-admin'
     )
     await expect(page.locator('id=openc3-tool')).not.toContainText(
       'openc3-tool-base'
     )
   }
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-autonomic'
+    'openc3-cosmos-tool-autonomic'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-calendar'
+    'openc3-cosmos-tool-calendar'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-cmdsender'
+    'openc3-cosmos-tool-cmdsender'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-cmdtlmserver'
+    'openc3-cosmos-tool-cmdtlmserver'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-dataextractor'
+    'openc3-cosmos-tool-dataextractor'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-dataviewer'
+    'openc3-cosmos-tool-dataviewer'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-handbooks'
+    'openc3-cosmos-tool-handbooks'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-limitsmonitor'
+    'openc3-cosmos-tool-limitsmonitor'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-packetviewer'
+    'openc3-cosmos-tool-packetviewer'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-scriptrunner'
+    'openc3-cosmos-tool-scriptrunner'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-tablemanager'
+    'openc3-cosmos-tool-tablemanager'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-tlmgrapher'
+    'openc3-cosmos-tool-tlmgrapher'
   )
   await expect(page.locator('id=openc3-tool')).not.toContainText(
-    'openc3-tool-tlmviewer'
+    'openc3-cosmos-tool-tlmviewer'
   )
 
   await page.locator('text=Show Default Tools').click()
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-demo')
+  await expect(page.locator('id=openc3-tool')).toContainText('openc3-cosmos-demo')
   if (process.env.ENTERPRISE === '1') {
     await expect(page.locator('id=openc3-tool')).toContainText(
-      'openc3-enterprise-tool-admin'
+      'openc3-cosmos-enterprise-tool-admin'
     )
     await expect(page.locator('id=openc3-tool')).toContainText(
       'openc3-enterprise-tool-base'
     )
   } else {
     await expect(page.locator('id=openc3-tool')).toContainText(
-      'openc3-tool-admin'
+      'openc3-cosmos-tool-admin'
     )
     await expect(page.locator('id=openc3-tool')).toContainText(
       'openc3-tool-base'
     )
   }
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-autonomic'
+    'openc3-cosmos-tool-autonomic'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-calendar'
+    'openc3-cosmos-tool-calendar'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-cmdsender'
+    'openc3-cosmos-tool-cmdsender'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-cmdtlmserver'
+    'openc3-cosmos-tool-cmdtlmserver'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-dataextractor'
+    'openc3-cosmos-tool-dataextractor'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-dataviewer'
+    'openc3-cosmos-tool-dataviewer'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-handbooks'
+    'openc3-cosmos-tool-handbooks'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-limitsmonitor'
+    'openc3-cosmos-tool-limitsmonitor'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-packetviewer'
+    'openc3-cosmos-tool-packetviewer'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-scriptrunner'
+    'openc3-cosmos-tool-scriptrunner'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-tablemanager'
+    'openc3-cosmos-tool-tablemanager'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-tlmgrapher'
+    'openc3-cosmos-tool-tlmgrapher'
   )
   await expect(page.locator('id=openc3-tool')).toContainText(
-    'openc3-tool-tlmviewer'
+    'openc3-cosmos-tool-tlmviewer'
   )
 })
 
@@ -142,27 +142,27 @@ test('shows targets associated with plugins', async ({ page, utils }) => {
   // Check that the openc3-demo contains the following targets:
   await expect(
     page.locator(
-      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-cosmos-demo")'
     )
   ).toContainText('EXAMPLE')
   await expect(
     page.locator(
-      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-cosmos-demo")'
     )
   ).toContainText('INST')
   await expect(
     page.locator(
-      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-cosmos-demo")'
     )
   ).toContainText('INST2')
   await expect(
     page.locator(
-      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-cosmos-demo")'
     )
   ).toContainText('SYSTEM')
   await expect(
     page.locator(
-      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-demo")'
+      '[data-test=plugin-list] div[role=listitem]:has-text("openc3-cosmos-demo")'
     )
   ).toContainText('TEMPLATED')
 })
@@ -171,9 +171,9 @@ test('shows targets associated with plugins', async ({ page, utils }) => {
 
 // This is generated by the playwright github workflow via .github/workflows/playwright.yml
 // Follow the steps there to generate a local copy for test
-let plugin = 'openc3-pw-test'
-let pluginGem = 'openc3-pw-test-1.0.0.gem'
-let pluginGem1 = 'openc3-pw-test-1.0.1.gem'
+let plugin = 'openc3-cosmos-pw-test'
+let pluginGem = 'openc3-cosmos-pw-test-1.0.0.gem'
+let pluginGem1 = 'openc3-cosmos-pw-test-1.0.1.gem'
 
 test('installs a new plugin', async ({ page, utils }) => {
   // Note that Promise.all prevents a race condition
@@ -254,7 +254,7 @@ test.describe(() => {
     await page.locator('.v-app-bar__nav-icon').click()
     await page.locator('button:has-text("Close")').click()
     await page.locator('textarea').fill('puts "modify the PW_TEST"')
-    await page.locator('[data-test=script-runner-file]').click()
+    await page.locator('[data-test=cosmos-script-runner-file]').click()
     await page.locator('text=Save File').click()
     await page.locator('text=File Save As')
     await page.locator('.v-treeview-node:has-text("PW_TEST") >> button').click()

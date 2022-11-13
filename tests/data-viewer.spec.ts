@@ -53,7 +53,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('[data-test="add-packet-button"]').click()
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
-  await page.locator('[data-test="data-viewer-file"]').click()
+  await page.locator('[data-test="cosmos-data-viewer-file"]').click()
   await page.locator('text=Save Configuration').click()
   await page.locator('[data-test="name-input-save-config-dialog"]').fill(config)
   await page.locator('button:has-text("Ok")').click()
@@ -76,7 +76,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   })
   await page.locator('[data-test="context-menu-delete"]').click()
 
-  await page.locator('[data-test="data-viewer-file"]').click()
+  await page.locator('[data-test="cosmos-data-viewer-file"]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`td:has-text("${config}")`).click()
   await page.locator('button:has-text("Ok")').click()
@@ -88,7 +88,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await expect(page.locator('text=INST HEALTH_STATUS')).toBeVisible()
 
   // Delete this test configuation
-  await page.locator('[data-test="data-viewer-file"]').click()
+  await page.locator('[data-test="cosmos-data-viewer-file"]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`tr:has-text("${config}") [data-test=item-delete]`).click()
   await page.locator('button:has-text("Delete")').click()
