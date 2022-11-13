@@ -131,7 +131,7 @@ test('warns for hazardous commands', async ({ page, utils }) => {
   await checkHistory(page, 'cmd_no_hazardous_check("INST CLEAR")')
 
   // Disable range checks to confirm history output
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
 
   await page.locator('button:has-text("Send")').click()
@@ -142,7 +142,7 @@ test('warns for hazardous commands', async ({ page, utils }) => {
   await checkHistory(page, 'cmd_no_checks("INST CLEAR")')
 
   // Disable parameter conversions to confirm history output
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Disable Parameter').click()
 
   await page.locator('button:has-text("Send")').click()
@@ -153,7 +153,7 @@ test('warns for hazardous commands', async ({ page, utils }) => {
   await checkHistory(page, 'cmd_raw_no_checks("INST CLEAR")')
 
   // Enable range checks to confirm history output
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
 
   await page.locator('button:has-text("Send")').click()
@@ -218,7 +218,7 @@ test('handles NaN and Infinite values', async ({ page, utils }) => {
   await expect(page.locator('.v-dialog')).toContainText('not in valid range')
   await page.locator('button:has-text("Ok")').click()
   // Disable range checks
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
 
@@ -387,7 +387,7 @@ test('ignores normal range checks', async ({ page, utils }) => {
   await expect(page.locator('.v-dialog')).toContainText('not in valid range')
   await page.locator('button:has-text("Ok")').click()
   // Disable range checks
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
@@ -411,7 +411,7 @@ test('ignores hazardous range checks', async ({ page, utils }) => {
   )
   await page.locator('button:has-text("Ok")').click()
   // Disable range checks
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
   await page.locator('button:has-text("Yes")').click() // Hazardous confirm
@@ -428,7 +428,7 @@ test('displays state values in hex', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'COLLECT')
   await selectValue(page, 'TYPE', 'NORMAL') // Ensure TYPE is set since its required
   await checkValue(page, 'TYPE', '0')
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Display State').click()
   await checkValue(page, 'TYPE', '0x0')
 })
@@ -437,7 +437,7 @@ test('shows ignored parameters', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'ABORT')
   // All the ABORT parameters are ignored so the table shouldn't appear
   await expect(page.locator('main')).not.toContainText('Parameters')
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Show Ignored').click()
   await expect(page.locator('main')).toContainText('Parameters') // Now the parameters table is shown
   await expect(page.locator('main')).toContainText('CCSDSVER') // CCSDSVER is one of the parameters
@@ -467,7 +467,7 @@ test('disable parameter conversions', async ({ page, utils }) => {
 
   await page.locator('text=Command Sender').click()
   await expect(page.locator('.v-app-bar')).toContainText('Command Sender')
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Disable Parameter').click()
 
   await utils.selectTargetPacketItem('INST', 'SETPARAMS')
@@ -480,7 +480,7 @@ test('disable parameter conversions', async ({ page, utils }) => {
     'cmd_raw("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1")'
   )
   // Disable range checks just to verify the command history 'cmd_raw_no_range_check'
-  await page.locator('[data-test=command-sender-mode]').click()
+  await page.locator('[data-test=cosmos-command-sender-mode]').click()
   await page.locator('text=Ignore Range Checks').click()
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
