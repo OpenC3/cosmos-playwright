@@ -52,7 +52,7 @@ test('view started scripts', async ({ page, utils }) => {
     .locator('xpath=../div')
     .textContent()
 
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text="View Started Scripts"').click()
   await utils.sleep(1000)
   // Each section has a Refresh button so click the first one
@@ -67,7 +67,7 @@ test('view started scripts', async ({ page, utils }) => {
     .click({ force: true })
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text="View Started Scripts"').click()
   await utils.sleep(1000)
   await page.locator('button:has-text("Refresh")').first().click()
@@ -82,7 +82,7 @@ test('view started scripts', async ({ page, utils }) => {
 
 test('sets environment variables', async ({ page, utils }) => {
   await page.locator('textarea').fill(`puts "ENV:#{ENV['KEY']}"`)
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Show Environment').click()
   await page.locator('[data-test=env-key]').fill('KEY')
   await page.locator('[data-test=env-value]').fill('VALUE')
@@ -132,7 +132,7 @@ test('sets metadata', async ({ page, utils }) => {
   input_metadata()
   puts get_metadata()
   `)
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Show Metadata').click()
   await expect(page.locator('.v-dialog')).toBeVisible()
   // Delete any existing metadata so we start fresh
@@ -182,7 +182,7 @@ test('sets metadata', async ({ page, utils }) => {
 
 test('ruby syntax check', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "TEST"')
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Ruby Syntax Check').click()
   await expect(page.locator('.v-dialog')).toContainText('Syntax OK')
   await page.locator('.v-dialog >> button').click()
@@ -192,7 +192,7 @@ test('ruby syntax check', async ({ page, utils }) => {
   if true
   puts "TRUE"
   `)
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Ruby Syntax Check').click()
   await expect(page.locator('.v-dialog')).toContainText('syntax error')
   await page.locator('.v-dialog >> button').click()
@@ -202,7 +202,7 @@ test('mnemonic check', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   cmd("INST ABORT")
   `)
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Mnemonic Check').click()
   await expect(page.locator('.v-dialog')).toContainText(
     'Everything looks good!'
@@ -213,7 +213,7 @@ test('mnemonic check', async ({ page, utils }) => {
   cmd("BLAH ABORT")
   cmd("INST ABORT with ANGER")
   `)
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Mnemonic Check').click()
   await expect(page.locator('.v-dialog')).toContainText(
     'Target "BLAH" does not exist'
@@ -226,10 +226,10 @@ test('mnemonic check', async ({ page, utils }) => {
 
 test('view instrumented script', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "HI"')
-  await page.locator('[data-test=script-runner-script]').click()
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=View Instrumented Script').click()
   await expect(page.locator('.v-dialog')).toContainText('binding')
   await page.locator('button:has-text("Ok")').click()
 })
 
-// Remaining menu items tested in other script-runner tests
+// Remaining menu items tested in other cosmos-script-runner tests
