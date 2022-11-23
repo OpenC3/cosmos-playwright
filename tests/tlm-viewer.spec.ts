@@ -49,6 +49,14 @@ async function showScreen(page, target, screen, callback = null) {
   ).not.toBeVisible()
 }
 
+test('changes targets', async ({ page, utils }) => {
+  await page.locator('div[role="button"]:has-text("Select Target")').click()
+  await page.locator(`.v-list-item__title:text-is("SYSTEM")`).click()
+  await page.locator('div[role="button"]:has-text("Select Screen")').click()
+  await expect(page.getByRole('listbox')).toHaveText('STATUS')
+  await expect(page.getByRole('listbox')).not.toHaveText('ADCS')
+})
+
 test('displays INST ADCS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'ADCS')
 })
@@ -88,6 +96,43 @@ test('displays INST LATEST', async ({ page, utils }) => {
 
 test('displays INST LIMITS', async ({ page, utils }) => {
   await showScreen(page, 'INST', 'LIMITS')
+})
+
+test('displays INST LAUNCHER', async ({ page, utils }) => {
+  await page.locator('div[role="button"]:has-text("Select Target")').click()
+  await page.locator(`.v-list-item__title:text-is("INST")`).click()
+  await page.locator('div[role="button"]:has-text("Select Screen")').click()
+  await page.locator(`.v-list-item__title:text-is("LAUNCHER")`).click()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST LAUNCHER")')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'HS' }).click()
+  await expect(page.locator('.v-system-bar:has-text("INST HS")')).toBeVisible()
+  await page.getByRole('button', { name: 'CMD' }).click()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST COMMANDING")')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'GROUND' }).click()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST GROUND")')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Close HS & CMD' }).click()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST HS")')
+  ).not.toBeVisible()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST COMMANDING")')
+  ).not.toBeVisible()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST GROUND")')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Close All' }).click()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST GROUND")')
+  ).not.toBeVisible()
+  await expect(
+    page.locator('.v-system-bar:has-text("INST LAUNCHER")')
+  ).not.toBeVisible()
 })
 
 test('displays INST OTHER', async ({ page, utils }) => {
@@ -148,9 +193,8 @@ test('creates new blank screen', async ({ page, utils }) => {
   await expect(page.locator(`.v-dialog:has-text("HS")`)).toBeVisible()
   await expect(page.locator(`.v-dialog:has-text("GROUND")`)).toBeVisible()
   await expect(page.locator(`.v-dialog:has-text("SIMPLE")`)).toBeVisible()
-  await expect(page.locator(`.v-dialog:has-text("SIMPLE")`)).toBeVisible()
   // Check trying to create an existing screen
-  await page.locator('[data-test=new-screen-name]').fill('ADCS')
+  await page.locator('[data-test=new-screen-name]').type('ADCS')
   await expect(page.locator('.v-dialog')).toContainText(
     'Screen ADCS already exists!'
   )
