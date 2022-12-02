@@ -120,18 +120,33 @@ test('sets environment variables', async ({ page, utils }) => {
   )
 })
 
+test('sets and gets stash', async ({ page, utils }) => {
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await utils.sleep(1000)
+  await page.locator('[data-test=file-open-save-search]').type('st')
+  await utils.sleep(500)
+  await page.locator('[data-test=file-open-save-search]').type('ash')
+  await page.locator('text=stash >> nth=0').click() // nth=0 because INST, INST2
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+})
+
+// Note: For local testing you can clear metadata
+// Go to the Admin / Redis tab and enter the following:
+//   Persistent: zremrangebyscore DEFAULT__METADATA -inf +inf
 test('sets metadata', async ({ page, utils }) => {
-  await page.locator('textarea').fill(`
-  puts get_metadata()
-  puts set_metadata({ 'setkey' => 1 })
-  puts get_metadata()
-  puts update_metadata({ 'setkey' => 2, 'updatekey' => 3 })
-  puts get_metadata()
-  puts update_metadata({ 'setkey' => 4 }) # Ensure updatekey stays
-  puts get_metadata()
-  input_metadata()
-  puts get_metadata()
-  `)
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await utils.sleep(1000)
+  await page.locator('[data-test=file-open-save-search]').type('meta')
+  await utils.sleep(500)
+  await page.locator('[data-test=file-open-save-search]').type('data')
+  await page.locator('text=metadata >> nth=0').click() // nth=0 because INST, INST2
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
   await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Show Metadata').click()
   await expect(page.locator('.v-dialog')).toBeVisible()
