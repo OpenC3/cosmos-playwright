@@ -21,14 +21,15 @@ test.use({
   toolName: 'Command Sender',
 })
 
-test('sends a command as operator but not as viewer', async ({ page, utils }) => {
+test('sends a command as operator but not as viewer', async ({
+  page,
+  utils,
+}) => {
   await utils.selectTargetPacketItem('INST', 'ABORT')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
 
-  // TODO: Replace button[role="button"] with next line once base released
-  // await page.locator('[data-test=user-menu]').click()
-  await page.locator('button[role="button"]').nth(3).click()
+  await page.locator('[data-test=user-menu]').click()
   await Promise.all([
     page.waitForNavigation(),
     page.locator('button:has-text("Logout")').click(),
