@@ -369,6 +369,61 @@ test('executes commands from history', async ({ page, utils }) => {
   )
 })
 
+test('send vs history', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'ABORT')
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
+  await checkHistory(page, 'cmd("INST ABORT")')
+  // Send a different command: INST SETPARAMS
+  await utils.selectTargetPacketItem('INST', 'SETPARAMS')
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent.'
+  )
+  // Re-execute command
+  await page.locator('[data-test=sender-history]').click()
+  await page.locator('[data-test=sender-history]').press('ArrowUp')
+  await page.locator('[data-test=sender-history]').press('ArrowUp')
+  await page.locator('[data-test=sender-history]').press('Enter')
+  await expect(page.locator('main')).toContainText('cmd("INST ABORT") sent')
+  // Send command vs Send button
+  await page.locator('button:has-text("Send")').click()
+  await expect(page.locator('main')).toContainText(
+    'cmd("INST SETPARAMS with VALUE1 1, VALUE2 1, VALUE3 1, VALUE4 1, VALUE5 1") sent.'
+  )
+})
+
+test('hazardous commands from history', async ({ page, utils }) => {
+  await utils.selectTargetPacketItem('INST', 'CLEAR')
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('.v-dialog button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent')
+  await checkHistory(page, 'cmd("INST CLEAR")')
+  // Send a different command: INST ASCIICMD
+  await utils.selectTargetPacketItem('INST', 'ASCIICMD')
+  await selectValue(page, 'STRING', 'ARM LASER')
+  await checkValue(page, 'STRING', 'ARM LASER')
+  await page.locator('button:has-text("Send")').click()
+  await page.locator('.v-dialog button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    "cmd(\"INST ASCIICMD with STRING 'ARM LASER', BINARY 0xDEADBEEF, ASCII '0xDEADBEEF'\")"
+  )
+  // Re-execute commands from history
+  await page.locator('[data-test=sender-history]').click()
+  await page.locator('[data-test=sender-history]').press('ArrowUp')
+  await page.locator('[data-test=sender-history]').press('ArrowUp')
+  await page.locator('[data-test=sender-history]').press('Enter')
+  await page.locator('.v-dialog button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText('cmd("INST CLEAR") sent')
+  await page.locator('[data-test=sender-history]').click()
+  await page.locator('[data-test=sender-history]').press('ArrowUp')
+  await page.locator('[data-test=sender-history]').press('Enter')
+  await page.locator('.v-dialog button:has-text("Yes")').click()
+  await expect(page.locator('main')).toContainText(
+    "cmd(\"INST ASCIICMD with STRING 'ARM LASER', BINARY 0xDEADBEEF, ASCII '0xDEADBEEF'\")"
+  )
+})
+
 //
 // Test the Mode menu
 //
