@@ -227,4 +227,5 @@ test('delete role and scope', async ({ page, utils }) => {
   // Check for Complete
   await expect(page.locator('[data-test=process-list]')).toContainText(
     'Processing scope_uninstall: TEST - Complete'
+  )
 })
