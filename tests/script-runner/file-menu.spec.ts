@@ -25,11 +25,6 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page, utils }) => {
-  // Close the dialog that says how many running scripts there are
-  await page.locator('button:has-text("Close")').click()
-})
-
 test('clears the editor on File->New', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   await page.locator('textarea').fill('this is a test')

@@ -25,11 +25,6 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page, utils }) => {
-  // Close the dialog that says how many running scripts there are
-  await page.locator('button:has-text("Close")').click()
-})
-
 async function saveAs(page, filename: string) {
   await page.locator('[data-test=cosmos-script-runner-file]').click()
   await page.locator('text=Save As...').click()
@@ -39,7 +34,7 @@ async function saveAs(page, filename: string) {
   await page.locator('[data-test=file-open-save-submit-btn]').click()
 
   // Handle Overwrite
-  await page.waitForTimeout(1000); // hard wait for 1000ms
+  await page.waitForTimeout(1000) // hard wait for 1000ms
   // If we see overwrite, handle it
   if (await page.$('text=Are you sure you want to overwrite')) {
     await page.locator('text=Are you sure you want to overwrite').click()
@@ -70,9 +65,12 @@ async function runAndCheckResults(
 ) {
   await page.locator(startLocator).click()
   // Wait for the results ... allow for additional time
-  await expect(page.locator('.v-dialog.v-dialog--active')).toContainText('Script Results', {
-    timeout: 30000,
-  })
+  await expect(page.locator('.v-dialog.v-dialog--active')).toContainText(
+    'Script Results',
+    {
+      timeout: 30000,
+    }
+  )
   // Allow the caller to validate the results
   validator(await page.inputValue('.v-dialog >> textarea'))
 

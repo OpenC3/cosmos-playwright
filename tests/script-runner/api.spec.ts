@@ -25,11 +25,6 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test.beforeEach(async ({ page, utils }) => {
-  // Close the dialog that says how many running scripts there are
-  await page.locator('button:has-text("Close")').click()
-})
-
 test('opens a target file', async ({ page, utils }) => {
   await page.locator('textarea').fill(`
   put_target_file("INST/test.txt", "file contents")

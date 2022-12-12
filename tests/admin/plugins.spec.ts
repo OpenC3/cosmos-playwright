@@ -24,7 +24,9 @@ test.use({
 })
 
 test('shows and hides built-in tools', async ({ page, utils }) => {
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-cosmos-demo')
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-cosmos-demo'
+  )
   if (process.env.ENTERPRISE === '1') {
     await expect(page.locator('id=openc3-tool')).not.toContainText(
       'openc3-cosmos-enterprise-tool-admin'
@@ -81,7 +83,9 @@ test('shows and hides built-in tools', async ({ page, utils }) => {
   )
 
   await page.locator('text=Show Default Tools').click()
-  await expect(page.locator('id=openc3-tool')).toContainText('openc3-cosmos-demo')
+  await expect(page.locator('id=openc3-tool')).toContainText(
+    'openc3-cosmos-demo'
+  )
   if (process.env.ENTERPRISE === '1') {
     await expect(page.locator('id=openc3-tool')).toContainText(
       'openc3-cosmos-enterprise-tool-admin'
@@ -252,7 +256,6 @@ test.describe(() => {
     await page.goto('/tools/scriptrunner')
     await expect(page.locator('.v-app-bar')).toContainText('Script Runner')
     await page.locator('.v-app-bar__nav-icon').click()
-    await page.locator('button:has-text("Close")').click()
     await page.locator('textarea').fill('puts "modify the PW_TEST"')
     await page.locator('[data-test=cosmos-script-runner-file]').click()
     await page.locator('text=Save File').click()
