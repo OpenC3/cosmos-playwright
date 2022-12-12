@@ -45,6 +45,7 @@ test('prompts for hazardous commands', async ({ page, utils }) => {
 
 test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', async ({
   page,
+  utils,
 }) => {
   await page.locator('textarea').fill(`
   cmd_no_hazardous_check("INST CLEAR")
@@ -73,6 +74,7 @@ test('errors for out of range command parameters', async ({ page, utils }) => {
 
 test('does not out of range error for cmd_no_range_check, cmd_no_checks', async ({
   page,
+  utils,
 }) => {
   await page.locator('textarea').fill(`
   cmd_no_range_check("INST COLLECT with DURATION 11, TYPE 'NORMAL'")
@@ -178,6 +180,7 @@ test('converts value for ask but not ask_string', async ({ page, utils }) => {
 
 test('opens a dialog with buttons for message_box, vertical_message_box', async ({
   page,
+  utils,
 }) => {
   await page.locator('textarea').fill(`
   value = message_box("Select", "ONE", "TWO", "THREE")
