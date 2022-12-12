@@ -225,6 +225,7 @@ test('ignores entire packets', async ({ page, utils }) => {
 //
 test('displays the limits log', async ({ page, utils }) => {
   await page.locator('div[role="tab"]:has-text("Log")').click()
+  await utils.sleep(500) // Allow the tab to change
   await expect(page.locator('#app')).toContainText('Limits Events')
   // Just verify we see dates and the various red, yellow, green states
   await expect(page.locator('[data-test=limits-events]')).toContainText(
