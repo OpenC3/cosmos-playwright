@@ -50,9 +50,11 @@ async function showScreen(page, target, screen, callback = null) {
 }
 
 test('changes targets', async ({ page, utils }) => {
-  await page.locator('div[role="button"]:has-text("Select Target")').click()
-  await page.locator(`.v-list-item__title:text-is("SYSTEM")`).click()
-  await page.locator('div[role="button"]:has-text("Select Screen")').click()
+  // Must use regex for name because INST is auto selected
+  await page.getByRole('button', { name: /Select Target/ }).click()
+  await page.getByText('SYSTEM').click()
+  await expect(page.getByRole('listbox')).not.toBeVisible()
+  await page.getByRole('button', { name: 'Select Screen' }).click()
   await expect(page.getByRole('listbox')).toHaveText('STATUS')
   await expect(page.getByRole('listbox')).not.toHaveText('ADCS')
 })
