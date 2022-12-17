@@ -223,10 +223,9 @@ test('ignores entire packets', async ({ page, utils }) => {
 //
 // Test the log tab
 //
-test('displays the limits log', async ({ page, utils }) => {
-  await page.locator('div[role="tab"]:has-text("Log")').click()
-  await utils.sleep(500) // Allow the tab to change
-  await expect(page.locator('#app')).toContainText('Limits Events')
+test.only('displays the limits log', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Log' }).click()
+  await expect(page.getByText('Limits Events')).toBeVisible()
   // Just verify we see dates and the various red, yellow, green states
   await expect(page.locator('[data-test=limits-events]')).toContainText(
     format(new Date(), 'yyyy-MM-dd')
@@ -236,4 +235,7 @@ test('displays the limits log', async ({ page, utils }) => {
     'YELLOW'
   )
   await expect(page.locator('[data-test=limits-events]')).toContainText('GREEN')
+  // Switch back to the main tab
+  await page.getByRole('tab', { name: 'Limits' }).click()
+  await expect(page.getByText('Overall Limits State')).toBeVisible()
 })
