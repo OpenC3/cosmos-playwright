@@ -223,7 +223,7 @@ test('ignores entire packets', async ({ page, utils }) => {
 //
 // Test the log tab
 //
-test.only('displays the limits log', async ({ page, utils }) => {
+test('displays the limits log', async ({ page, utils }) => {
   await page.getByRole('tab', { name: 'Log' }).click()
   await expect(page.getByText('Limits Events')).toBeVisible()
   // Just verify we see dates and the various red, yellow, green states
