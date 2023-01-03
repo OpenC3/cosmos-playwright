@@ -49,7 +49,12 @@ export class Utilities {
     await this.page.locator('[data-test=select-send]').click()
   }
 
-  async download(page, locator, validator = null, encoding = 'utf-8') {
+  async download(
+    page: any,
+    locator: any,
+    validator?: { (contents: any) },
+    encoding: string = 'utf-8'
+  ) {
     const [download] = await Promise.all([
       // Start waiting for the download
       page.waitForEvent('download'),

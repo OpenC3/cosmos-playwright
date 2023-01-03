@@ -300,7 +300,7 @@ test.describe(() => {
         .count()
     ).toEqual(1)
 
-    const [download] = await Promise.all([
+    const [download1] = await Promise.all([
       // Start waiting for the download
       page.waitForEvent('download'),
       // Download the modified plugin
@@ -312,8 +312,45 @@ test.describe(() => {
     ])
     // Wait for the download process to complete
     const JSZip = require('jszip')
-    const path = await download.path()
-    fs.readFile(path!, function (err, data) {
+    const path1 = await download1.path()
+    fs.readFile(path1!, function (err, data) {
+      if (err) throw err
+      JSZip.loadAsync(data).then(function (zip) {
+        Object.keys(zip.files).forEach(function (filename) {
+          zip.files[filename].async('string').then(function (fileData) {
+            // Check the zip file contents
+            // We should have the new script:
+            if (filename.includes('save_new.rb')) {
+              expect(fileData).toBe('puts "modify the PW_TEST"')
+            }
+            // We should have the new screen:
+            if (filename.includes('new_screen.txt')) {
+              expect(fileData).toContain('SCREEN')
+            }
+          })
+        })
+      })
+    })
+
+    // Download the changes from the targets tab
+    await page.goto('/tools/admin/targets')
+    await expect(page.locator('.v-app-bar')).toContainText('Administrator')
+    await page.locator('.v-app-bar__nav-icon').click()
+
+    const [download2] = await Promise.all([
+      // Start waiting for the download
+      page.waitForEvent('download'),
+      // Initiate the download
+      page
+        .getByRole('listitem')
+        .filter({ hasText: 'PW_TEST' })
+        .getByRole('button')
+        .nth(0)
+        .click(),
+    ])
+    // Wait for the download process to complete
+    const path2 = await download2.path()
+    fs.readFile(path2!, function (err, data) {
       if (err) throw err
       JSZip.loadAsync(data).then(function (zip) {
         Object.keys(zip.files).forEach(function (filename) {
