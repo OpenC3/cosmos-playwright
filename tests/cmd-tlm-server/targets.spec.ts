@@ -36,17 +36,17 @@ test('displays the list of targets', async ({ page, utils }) => {
   )
 })
 
-test('displays the command & telemetry count', async ({ page, utils }) => {
-  await expect(page.locator('[data-test=targets-table]')).toContainText('INST')
-  await utils.sleep(1000) // Allow the telemetry to be fetched
-  expect(
-    parseInt(
-      await page.locator('tr:has-text("INST_INT") td >> nth=2').textContent()
-    )
-  ).toBeGreaterThan(1)
-  expect(
-    parseInt(
-      await page.locator('tr:has-text("INST_INT") td >> nth=3').textContent()
-    )
-  ).toBeGreaterThan(50)
+test('displays the interfaces', async ({ page, utils }) => {
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'INST_INT'
+  )
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'INST2_INT'
+  )
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'EXAMPLE_INT'
+  )
+  await expect(page.locator('[data-test=targets-table]')).toContainText(
+    'TEMPLATED_INT'
+  )
 })
