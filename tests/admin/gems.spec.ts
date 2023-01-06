@@ -27,7 +27,7 @@ test('displays gem names', async ({ page, utils }) => {
     /openc3-cosmos-demo-\d\.\d\.\d.*\.gem/
   )
   expect(await page.getByRole('list')).toContainText(
-    /openc3-tool-base-\d\.\d\.\d.*\.gem/
+    /openc3-cosmos-tool-cmdsender-\d\.\d\.\d.*\.gem/
   )
 })
 
