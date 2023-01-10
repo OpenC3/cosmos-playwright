@@ -70,11 +70,11 @@ test('selects a target and packet to display', async ({ page, utils }) => {
 test('gets details with right click', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page
-    .locator('tr:has-text("CCSDSVER") td >> nth=2')
+    .locator('tr:has-text("TEMP1") td >> nth=2')
     .click({ button: 'right' })
   await page.locator('text=Details').click()
   await expect(page.locator('.v-dialog')).toContainText(
-    'INST HEALTH_STATUS CCSDSVER'
+    'INST HEALTH_STATUS TEMP1'
   )
 })
 
@@ -96,6 +96,8 @@ test('stops posting to the api after closing', async ({ page, utils }) => {
 // Changing the polling rate is fraught with danger because it's all
 // about waiting for changes and detecting changes
 test('changes the polling rate', async ({ page, utils }) => {
+  await page.locator('[data-test=cosmos-packet-viewer-view]').click()
+  await page.locator('text=Display Derived').click()
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test=cosmos-packet-viewer-file]').click()
   await page.locator('[data-test=cosmos-packet-viewer-file-options]').click()
@@ -123,14 +125,12 @@ test('displays formatted items with units by default', async ({
   utils,
 }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[aria-label="Next page"]').click()
   // Check for exactly 3 decimal points followed by units
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{3}\s\S$/)
 })
 
 test('displays formatted items with units', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Formatted Items with Units').click()
   // Check for exactly 3 decimal points followed by units
@@ -139,7 +139,6 @@ test('displays formatted items with units', async ({ page, utils }) => {
 
 test('displays raw items', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Raw').click()
   // // Check for a raw number 1 to 99999
@@ -148,7 +147,6 @@ test('displays raw items', async ({ page, utils }) => {
 
 test('displays converted items', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Converted').click()
   // Check for unformatted decimal points (4+)
@@ -157,7 +155,6 @@ test('displays converted items', async ({ page, utils }) => {
 
 test('displays formatted items', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[aria-label="Next page"]').click()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   // Use text-is because we have to match exactly since there is
   // also a 'Formatted Items with Units' option
@@ -166,22 +163,22 @@ test('displays formatted items', async ({ page, utils }) => {
   await matchItem(page, 'TEMP1', /^-?\d+\.\d{3}$/)
 })
 
-test('hides ignored items', async ({ page, utils }) => {
+test('shows ignored items', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await expect(page.locator('text=CCSDSVER')).toBeVisible()
-  await page.locator('[data-test=cosmos-packet-viewer-view]').click()
-  await page.locator('text=Hide Ignored').click()
   await expect(page.locator('text=CCSDSVER')).not.toBeVisible()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
-  await page.locator('text=Hide Ignored').click()
+  await page.locator('text=Show Ignored').click()
+  await expect(page.locator('text=CCSDSVER')).toBeVisible()
+  await page.locator('[data-test=cosmos-packet-viewer-view]').click()
+  await page.locator('text=Show Ignored').click()
   await expect(page.locator('text=CCSDSVER')).toBeVisible()
 })
 
-test('displays derived last', async ({ page, utils }) => {
+test('displays derived first', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   // First row is the header: Index, Name, Value so grab second (1)
-  await expect(page.locator('tr').nth(1)).toContainText('PACKET_TIMESECONDS')
+  await expect(page.locator('tr').nth(1)).toContainText('TIMESEC')
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Display Derived').click()
-  await expect(page.locator('tr').nth(1)).toContainText('CCSDSVER')
+  await expect(page.locator('tr').nth(1)).toContainText('PACKET_TIMESECONDS')
 })
