@@ -27,12 +27,9 @@ test.use({
 
 // Helper function to select a parameter dropdown
 async function selectValue(page, param, value) {
-  await page
-    .locator(`tr:has-text("${param}") [data-test=cmd-param-select]`)
-    .click()
-  // Adding quotes to text='MaTcH' means case sensitve ... otherwise insensitive
-  await page.locator(`text='${value}'`).click()
-  // await expect(page.locator(`tr:text("${param}")`)).toContainText(value)
+  let row = page.locator(`tr:has-text("${param}")`)
+  await row.getByRole('combobox').click()
+  await page.getByRole('option', { name: value }).click()
 }
 
 // Helper function to set parameter value
@@ -89,6 +86,17 @@ test('displays state parameters with drop downs', async ({ page, utils }) => {
   await checkValue(page, 'TYPE', '1')
   await selectValue(page, 'TYPE', 'NORMAL')
   await checkValue(page, 'TYPE', '0')
+})
+
+test('displays parameter units, ranges and description', async ({
+  page,
+  utils,
+}) => {
+  await utils.selectTargetPacketItem('INST', 'COLLECT')
+  let row = page.locator('tr:has-text("TEMP")')
+  await expect(row.locator('td >> nth=2')).toContainText('C')
+  await expect(row.locator('td >> nth=3')).toContainText('0..25')
+  await expect(row.locator('td >> nth=4')).toContainText('Collect temperature')
 })
 
 test('supports manually entered state values', async ({ page, utils }) => {
@@ -258,7 +266,9 @@ test('handles array values', async ({ page, utils }) => {
 test('handles string values', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'ASCIICMD')
   await expect(page.locator('main')).toContainText('ASCII command')
-  await selectValue(page, 'STRING', 'NOOP')
+  // The default text 'NOOP' should be selected
+  let row = page.locator(`tr:has-text("STRING")`)
+  await expect(row.getByRole('combobox')).toContainText('NOOP')
   await checkValue(page, 'STRING', 'NOOP')
   await page.locator('button:has-text("Send")').click()
   await expect(page.locator('main')).toContainText(
