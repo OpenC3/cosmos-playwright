@@ -96,8 +96,6 @@ test('stops posting to the api after closing', async ({ page, utils }) => {
 // Changing the polling rate is fraught with danger because it's all
 // about waiting for changes and detecting changes
 test('changes the polling rate', async ({ page, utils }) => {
-  await page.locator('[data-test=cosmos-packet-viewer-view]').click()
-  await page.locator('text=Display Derived').click()
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page.locator('[data-test=cosmos-packet-viewer-file]').click()
   await page.locator('[data-test=cosmos-packet-viewer-file-options]').click()
