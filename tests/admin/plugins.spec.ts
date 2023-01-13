@@ -260,7 +260,11 @@ test.describe(() => {
     await page.locator('[data-test=cosmos-script-runner-file]').click()
     await page.locator('text=Save File').click()
     await page.locator('text=File Save As')
-    await page.getByText('PW_TEST').click()
+    await page
+      .locator(
+        '.v-dialog >> .v-treeview-node__root:has-text("PW_TEST") > button'
+      )
+      .click()
     await page.locator('text=procedures').click()
     await page.locator('[data-test=file-open-save-filename]').click()
     await page.type('[data-test=file-open-save-filename]', '/save_new.rb')
