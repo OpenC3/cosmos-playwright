@@ -38,11 +38,11 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   // Clear the success toast
   await page.locator('button:has-text("Dismiss")').click()
 
-  // This also works but it relies on a Vuetify attribute
-  // await expect(page.locator('[role=listitem]')).toHaveCount(2)
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(2)
+  await expect(page.locator('tbody > tr')).toHaveCount(2)
   await page.locator('[data-test=delete-all]').click()
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(0)
+  await expect(
+    page.getByRole('cell', { name: 'No data available' })
+  ).toBeVisible()
 
   await page.locator('[data-test=cosmos-data-extractor-file]').click()
   await page.locator('text=Open Configuration').click()
@@ -50,7 +50,7 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('button:has-text("Ok")').click()
   // Clear the success toast
   await page.locator('button:has-text("Dismiss")').click()
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(2)
+  await expect(page.locator('tbody > tr')).toHaveCount(2)
 
   // Delete this test configuation
   await page.locator('[data-test=cosmos-data-extractor-file]').click()
@@ -134,22 +134,12 @@ test('cancels a process', async ({ page, utils }) => {
 
 test('adds an entire target', async ({ page, utils }) => {
   await utils.addTargetPacketItem('INST')
-  // Since we're checking count() which is instant we need to poll
-  await expect
-    .poll(() => page.locator('[data-test=item-list] > div').count())
-    .toBeGreaterThan(50)
+  await expect(page.getByText('1-20 of 131')).toBeVisible()
 })
 
 test('adds an entire packet', async ({ page, utils }) => {
   await utils.addTargetPacketItem('INST', 'HEALTH_STATUS')
-  // Since we're checking count() which is instant we need to poll
-  await expect
-    .poll(() => page.locator('[data-test=item-list] > div').count())
-    .toBeGreaterThan(10)
-  // Ensure we didn't add the entire packet like above
-  await expect
-    .poll(() => page.locator('[data-test=item-list] > div').count())
-    .toBeLessThan(50)
+  await expect(page.getByText('1-20 of 35')).toBeVisible()
 })
 
 test('add, edits, deletes items', async ({ page, utils }) => {
@@ -158,25 +148,23 @@ test('add, edits, deletes items', async ({ page, utils }) => {
   await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSVER')
   await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSTYPE')
   await utils.addTargetPacketItem('INST', 'ADCS', 'CCSDSSHF')
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(3)
+  await expect(page.locator('tbody > tr')).toHaveCount(3)
   // Delete CCSDSVER by clicking Delete icon
-  await page
-    .locator('.v-list div:nth-child(1) .v-list-item div:nth-child(3) .v-icon')
-    .click()
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(2)
+  let row = await page.locator('tr:has-text("CCSDSVER")')
+  await row.locator('td >> button').nth(1).click()
+  await expect(page.locator('tbody > tr')).toHaveCount(2)
   // Delete CCSDSTYPE
-  await page
-    .locator('.v-list div:nth-child(1) .v-list-item div:nth-child(3) .v-icon')
-    .click()
-  await expect(page.locator('[data-test=item-list] > div')).toHaveCount(1)
+  row = await page.locator('tr:has-text("CCSDSTYPE")')
+  await row.locator('td >> button').nth(1).click()
+  await expect(page.locator('tbody > tr')).toHaveCount(1)
   // Edit CCSDSSHF
-  await page.locator('[data-test=item-list] button').first().click()
+  row = await page.locator('tr:has-text("CCSDSSHF")')
+  await expect(row.locator('td:has-text("CONVERTED")')).toBeVisible()
+  await row.locator('td >> button').nth(0).click()
   await page.locator('text=Value Type').click()
   await page.locator('text=RAW').click()
   await page.locator('button:has-text("CLOSE")').click()
-  await page.locator(
-    '[data-test=item-list] >> text=INST - ADCS - CCSDSSHF + (RAW)'
-  )
+  await expect(row.locator('td:has-text("RAW")')).toBeVisible()
 
   await utils.download(page, 'text=Process', function (contents) {
     const lines = contents.split('\n')
@@ -190,20 +178,14 @@ test('edit all items', async ({ page, utils }) => {
   const start = sub(new Date(), { minutes: 1 })
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'ADCS')
-  expect(
-    await page.locator('[data-test=item-list] > div').count()
-  ).toBeGreaterThan(20)
+  await expect(page.getByText('1-20 of 36')).toBeVisible()
+  expect(await page.locator('tr:has-text("CONVERTED")').count()).toBe(20)
   await page.locator('[data-test=editAll]').click()
   await page.locator('text=Value Type').click()
   await page.locator('text=RAW').click()
   await page.locator('button:has-text("Ok")').click()
-  // Spot check a few items ... they have all changed to (RAW)
-  await page.locator(
-    '[data-test=item-list] >> text=INST - ADCS - CCSDSSHF + (RAW)'
-  )
-  await page.locator('[data-test=item-list] >> text=INST - ADCS - POSX + (RAW)')
-  await page.locator('[data-test=item-list] >> text=INST - ADCS - VELX + (RAW)')
-  await page.locator('[data-test=item-list] >> text=INST - ADCS - Q1 + (RAW)')
+  await expect(page.locator('tr:has-text("CONVERTED")')).not.toBeVisible()
+  expect(await page.locator('tr:has-text("RAW")').count()).toBe(20)
 })
 
 test('processes commands', async ({ page, utils }) => {
