@@ -175,8 +175,11 @@ test('shows ignored items', async ({ page, utils }) => {
 test('displays derived first', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   // First row is the header: Index, Name, Value so grab second (1)
-  await expect(page.locator('tr').nth(1)).toContainText('TIMESEC')
+  await expect(page.locator('tr').nth(1)).toContainText('PACKET_TIMESECONDS')
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Display Derived').click()
-  await expect(page.locator('tr').nth(1)).toContainText('PACKET_TIMESECONDS')
+  await expect(page.locator('tr').nth(1)).toContainText('TIMESEC')
+  // Check 2 because TIMESEC is included in PACKET_<TIMESEC>ONDS
+  // so the first check could result in a false positive
+  await expect(page.locator('tr').nth(2)).toContainText('TIMEUS')
 })
