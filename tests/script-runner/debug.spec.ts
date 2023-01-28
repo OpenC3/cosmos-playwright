@@ -192,3 +192,73 @@ test('displays disconnect icon', async ({ page, utils }) => {
   await page.locator('[data-test=cosmos-script-runner-script]').click()
   await page.locator('text=Toggle Disconnect').click()
 })
+
+test('sets & clears breakpoints', async ({ page, utils }) => {
+  await page.locator('textarea').fill(`puts "a"
+puts "b"
+puts "c"
+puts "d"
+puts "e"`)
+  await page.locator('.ace_gutter-cell').nth(2).click({ force: true })
+
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('breakpoint', {
+    timeout: 20000,
+  })
+  await page.locator('[data-test=go-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+
+  // Disable the breakpoint
+  await page.locator('.ace_gutter-cell').nth(2).click({ force: true })
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+})
+
+test.only('remembers breakpoints & clears all', async ({ page, utils }) => {
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await utils.sleep(1000)
+  await page.locator('[data-test=file-open-save-search]').type('checks')
+  await page.locator('text=checks >> nth=0').click() // nth=0 because INST, INST2
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  expect(await page.locator('#sr-controls')).toContainText(
+    `INST/procedures/checks.rb`
+  )
+  await page.locator('.ace_gutter-cell').nth(1).click({ force: true })
+  await page.locator('.ace_gutter-cell').nth(3).click({ force: true })
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=Save File').click()
+  await page.reload()
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=Open File').click()
+  await utils.sleep(1000)
+  await page.locator('[data-test=file-open-save-search]').type('checks')
+  await page.locator('text=checks >> nth=0').click() // nth=0 because INST, INST2
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  expect(await page.locator('#sr-controls')).toContainText(
+    `INST/procedures/checks.rb`
+  )
+  await page.locator('button:has-text("dismiss")').click()
+
+  await expect(page.locator('.ace_gutter-cell').nth(1)).toHaveClass(
+    'ace_gutter-cell ace_breakpoint'
+  )
+  await expect(page.locator('.ace_gutter-cell').nth(3)).toHaveClass(
+    'ace_gutter-cell ace_breakpoint'
+  )
+
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
+  await page.getByText('Delete All Breakpoints').click()
+  await page.locator('.v-dialog >> button:has-text("Delete")').click()
+
+  await expect(page.locator('.ace_gutter-cell').nth(1)).toHaveClass(
+    'ace_gutter-cell '
+  )
+  await expect(page.locator('.ace_gutter-cell').nth(3)).toHaveClass(
+    'ace_gutter-cell '
+  )
+})
