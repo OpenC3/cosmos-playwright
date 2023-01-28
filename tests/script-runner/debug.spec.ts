@@ -218,7 +218,7 @@ puts "e"`)
   })
 })
 
-test.only('remembers breakpoints & clears all', async ({ page, utils }) => {
+test('remembers breakpoints & clears all', async ({ page, utils }) => {
   await page.locator('[data-test=cosmos-script-runner-file]').click()
   await page.locator('text=Open File').click()
   await utils.sleep(1000)
