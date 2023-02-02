@@ -228,6 +228,7 @@ test('remembers breakpoints & clears all', async ({ page, utils }) => {
   expect(await page.locator('#sr-controls')).toContainText(
     `INST/procedures/checks.rb`
   )
+  await utils.sleep(1000) // Clicking on the ace gutters requires a little wait
   await page.locator('.ace_gutter-cell').nth(1).click({ force: true })
   await page.locator('.ace_gutter-cell').nth(3).click({ force: true })
   await page.locator('[data-test=cosmos-script-runner-file]').click()
@@ -242,7 +243,11 @@ test('remembers breakpoints & clears all', async ({ page, utils }) => {
   expect(await page.locator('#sr-controls')).toContainText(
     `INST/procedures/checks.rb`
   )
-  await page.locator('button:has-text("dismiss")').click()
+
+  // If we see read-only mode toast, dismiss it
+  if (await page.$('text=Editor is in read-only mode')) {
+    await page.locator('button:has-text("dismiss")').click()
+  }
 
   await expect(page.locator('.ace_gutter-cell').nth(1)).toHaveClass(
     'ace_gutter-cell ace_breakpoint'
