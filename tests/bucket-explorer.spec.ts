@@ -33,17 +33,17 @@ test('navigate config', async ({ page, utils }) => {
   await page.getByText('config').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
   await page.getByRole('cell', { name: 'DEFAULT' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText('/DEFAULT/')
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2FDEFAULT%2F/)
   await page.getByRole('cell', { name: 'targets' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText(
+  await expect(page.locator('[data-test="file-path"]')).toHaveText(
     '/DEFAULT/targets/'
   )
   await expect(page).toHaveURL(
     /.*\/tools\/bucketexplorer\/config%2FDEFAULT%2Ftargets%2F/
   )
   await page.getByRole('cell', { name: 'INST' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText(
+  await expect(page.locator('[data-test="file-path"]')).toHaveText(
     '/DEFAULT/targets/INST/'
   )
   await expect(page).toHaveURL(
@@ -60,7 +60,7 @@ test('navigate config', async ({ page, utils }) => {
   // Download the file
   await utils.download(
     page,
-    'tbody > tr:has-text("target.txt") >> button',
+    'tbody > tr:has-text("target.txt") [data-test="download-file"]',
     function (contents) {
       expect(contents).toContain('REQUIRE')
       expect(contents).toContain('IGNORE_PARAMETER')
@@ -70,21 +70,21 @@ test('navigate config', async ({ page, utils }) => {
 
   // codegen created this weird named button for back
   await page.getByRole('button', { name: '󰧙' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText(
+  await expect(page.locator('[data-test="file-path"]')).toHaveText(
     '/DEFAULT/targets/'
   )
   await expect(page).toHaveURL(
     /.*\/tools\/bucketexplorer\/config%2FDEFAULT%2Ftargets%2F/
   )
   await page.getByRole('button', { name: '󰧙' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText('/DEFAULT/')
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2FDEFAULT%2F/)
   await page.getByRole('button', { name: '󰧙' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText('/')
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
   // Back again just to show that doesn't break things
   await page.getByRole('button', { name: '󰧙' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText('/')
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
 })
 
@@ -92,11 +92,42 @@ test('navigate logs and tools', async ({ page, utils }) => {
   await page.getByText('logs').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/logs%2F/)
   await page.getByRole('cell', { name: 'DEFAULT' }).click()
-  await expect(page.locator('.v-data-table > span')).toHaveText('/DEFAULT/')
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/logs%2FDEFAULT%2F/)
   await expect(page.locator('tbody > tr').first()).toHaveText(/\w+_logs/)
 
   await page.getByText('tools').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/tools%2F/)
   await expect(page.locator('tbody > tr')).toHaveCount(17)
+})
+
+test('upload and delete', async ({ page, utils }) => {
+  await page.getByText('config').click()
+  await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/')
+  await page.getByRole('cell', { name: 'DEFAULT' }).click()
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
+  await page.getByRole('cell', { name: 'targets_modified' }).click()
+  await expect(page.locator('[data-test="file-path"]')).toHaveText(
+    '/DEFAULT/targets_modified/'
+  )
+  await utils.sleep(300) // Ensure the table is rendered before getting the count
+  let count = await page.locator('tbody > tr').count()
+
+  // Note that Promise.all prevents a race condition
+  // between clicking and waiting for the file chooser.
+  const [fileChooser] = await Promise.all([
+    // It is important to call waitForEvent before click to set up waiting.
+    page.waitForEvent('filechooser'),
+    // Opens the file chooser.
+    await page.getByRole('button', { name: 'prepend icon' }).click(),
+  ])
+  await fileChooser.setFiles('package.json')
+  await expect(page.locator('tbody > tr')).toHaveCount(count + 1)
+  await expect(page.getByRole('cell', { name: 'package.json' })).toBeVisible()
+  await page
+    .locator('tr:has-text("package.json") [data-test="delete-file"]')
+    .click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(page.locator('tbody > tr')).toHaveCount(count)
 })

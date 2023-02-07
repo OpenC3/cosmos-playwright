@@ -37,7 +37,7 @@ test('creates a single binary file', async ({ page, utils }) => {
   await page.locator('text=MCConfig >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test="file-open-save-submit-btn"]').click()
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
-  expect(await page.locator('.v-tab').count()).toBe(1)
+  expect(await page.locator('.v-tab')).toHaveCount(1)
   expect(await page.inputValue('[data-test=definition-filename]')).toMatch(
     'INST/tables/config/MCConfigurationTable_def.txt'
   )
@@ -57,7 +57,7 @@ test('edits a binary file', async ({ page, utils }) => {
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
   await expect(page.locator('id=openc3-tool')).toContainText('TLM_MONITORING')
   await expect(page.locator('id=openc3-tool')).toContainText('PPS_SELECTION')
-  expect(await page.locator('.v-tab').count()).toBe(3)
+  expect(await page.locator('.v-tab')).toHaveCount(3)
   expect(
     await page.locator('[data-test=definition-filename]').inputValue()
   ).toMatch('INST/tables/config/ConfigTables_def.txt')
@@ -182,7 +182,7 @@ test('opens and searches file', async ({ page, utils }) => {
   await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
   await expect(page.locator('id=openc3-tool')).toContainText('TLM_MONITORING')
   await expect(page.locator('id=openc3-tool')).toContainText('PPS_SELECTION')
-  expect(await page.locator('.v-tab').count()).toBe(3)
+  expect(await page.locator('.v-tab')).toHaveCount(3)
   expect(
     await page.locator('[data-test=definition-filename]').inputValue()
   ).toMatch('INST/tables/config/ConfigTables_def.txt')
@@ -191,7 +191,7 @@ test('opens and searches file', async ({ page, utils }) => {
   )
 
   // Test searching
-  expect(await page.locator('tr').count()).toBe(12)
+  expect(await page.locator('tr')).toHaveCount(12)
   await page.locator('text=Items >> input').fill('UNEDIT')
   await expect.poll(() => page.locator('tr').count()).toBe(4)
   // Vuetify sets the disabled attribute to disabled so just check for that

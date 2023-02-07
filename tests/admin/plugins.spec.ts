@@ -245,12 +245,10 @@ test.describe(() => {
   test('modifies plugin files', async ({ page, utils }) => {
     // Check that there are no links (a) under the current plugin (no modified files)
     await expect(
-      await page
-        .locator(
-          `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-        )
-        .count()
-    ).toEqual(0)
+      await page.locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
+    ).toHaveCount(0)
 
     // Create a new script
     await page.goto('/tools/scriptrunner')
@@ -297,12 +295,10 @@ test.describe(() => {
 
     // Check that we have a link to click
     await expect(
-      await page
-        .locator(
-          `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-        )
-        .count()
-    ).toEqual(1)
+      await page.locator(
+        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+      )
+    ).toHaveCount(1)
 
     const [download1] = await Promise.all([
       // Start waiting for the download
@@ -423,12 +419,10 @@ test('upgrades existing plugin', async ({ page, utils }) => {
 
   // Check that there are no longer any links (modified targets)
   await expect(
-    await page
-      .locator(
-        `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
-      )
-      .count()
-  ).toEqual(0)
+    await page.locator(
+      `[data-test=plugin-list] div[role=listitem]:has-text("${plugin}") >> a`
+    )
+  ).toHaveCount(0)
 })
 
 test('edits existing plugin', async ({ page, utils }) => {

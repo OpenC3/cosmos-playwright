@@ -179,13 +179,13 @@ test('edit all items', async ({ page, utils }) => {
   await page.locator('[data-test=start-time]').fill(format(start, 'HH:mm:ss'))
   await utils.addTargetPacketItem('INST', 'ADCS')
   await expect(page.getByText('1-20 of 36')).toBeVisible()
-  expect(await page.locator('tr:has-text("CONVERTED")').count()).toBe(20)
+  expect(await page.locator('tr:has-text("CONVERTED")')).toHaveCount(20)
   await page.locator('[data-test=editAll]').click()
   await page.locator('text=Value Type').click()
   await page.locator('text=RAW').click()
   await page.locator('button:has-text("Ok")').click()
   await expect(page.locator('tr:has-text("CONVERTED")')).not.toBeVisible()
-  expect(await page.locator('tr:has-text("RAW")').count()).toBe(20)
+  expect(await page.locator('tr:has-text("RAW")')).toHaveCount(20)
 })
 
 test('processes commands', async ({ page, utils }) => {

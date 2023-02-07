@@ -175,22 +175,22 @@ test('ignores items', async ({ page, utils }) => {
 test('ignores entire packets', async ({ page, utils }) => {
   // The INST and INST2 targets both have VALUE2 & VALUE4 as red
   expect(
-    await page.locator('[data-test=limits-row]:has-text("VALUE2")').count()
-  ).toBe(2)
+    await page.locator('[data-test=limits-row]:has-text("VALUE2")')
+  ).toHaveCount(2)
   expect(
-    await page.locator('[data-test=limits-row]:has-text("VALUE4")').count()
-  ).toBe(2)
+    await page.locator('[data-test=limits-row]:has-text("VALUE4")')
+  ).toHaveCount(2)
 
   // Ignore the entire VALUE2 packet
   await page
     .locator('[data-test=limits-row]:has-text("VALUE2") button >> nth=0')
     .click()
   expect(
-    await page.locator('[data-test=limits-row]:has-text("VALUE2")').count()
-  ).toBe(1)
+    await page.locator('[data-test=limits-row]:has-text("VALUE2")')
+  ).toHaveCount(1)
   expect(
-    await page.locator('[data-test=limits-row]:has-text("VALUE4")').count()
-  ).toBe(1)
+    await page.locator('[data-test=limits-row]:has-text("VALUE4")')
+  ).toHaveCount(1)
 
   // Check the menu
   await page.locator('[data-test=cosmos-limits-monitor-file]').click()
