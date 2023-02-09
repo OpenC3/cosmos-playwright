@@ -26,7 +26,7 @@ test.use({
   toolName: 'Script Runner',
 })
 
-test('view started scripts', async ({ page, utils }) => {
+test('show started scripts', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   await page.locator('textarea').fill(`
   puts "now we wait"
@@ -48,7 +48,7 @@ test('view started scripts', async ({ page, utils }) => {
     .textContent()
 
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text="View Started Scripts"').click()
+  await page.locator('text="Show Exec Status"').click()
   await utils.sleep(1000)
   // Each section has a Refresh button so click the first one
   await page.locator('button:has-text("Refresh")').first().click()
@@ -63,7 +63,7 @@ test('view started scripts', async ({ page, utils }) => {
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text="View Started Scripts"').click()
+  await page.locator('text="Show Exec Status"').click()
   await utils.sleep(1000)
   await page.locator('button:has-text("Refresh")').first().click()
   await expect(page.locator('[data-test=running-scripts]')).not.toContainText(
@@ -83,7 +83,7 @@ test('sets environment variables', async ({ page, utils }) => {
   await page.locator('[data-test=env-value]').fill('VALUE')
   await page.locator('[data-test=add-env]').click()
   await page
-    .locator('#openc3-menu >> text=Script Runner')
+    .locator('[data-test=cosmos-script-runner-file]')
     .click({ force: true })
 
   await page.locator('[data-test=env-button]').click()
@@ -188,6 +188,70 @@ test('sets metadata', async ({ page, utils }) => {
   await expect(page.locator('[data-test=output-messages]')).toContainText(
     '"inputkey"=>"inputvalue"'
   )
+})
+
+test('show overrides', async ({ page, utils }) => {
+  await page.locator('textarea').fill(`
+  set_tlm("INST HEALTH_STATUS COLLECTS = 5")
+  override_tlm("INST HEALTH_STATUS COLLECTS = 10")
+  override_tlm("INST", "HEALTH_STATUS", "DURATION", "10", type: :CONVERTED)
+  `)
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+  // Run twice to view the overrides in the output messages
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'The following overrides were present'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'INST HEALTH_STATUS COLLECTS = 10, type: :RAW'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'INST HEALTH_STATUS COLLECTS = 10, type: :CONVERTED'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'INST HEALTH_STATUS COLLECTS = 10, type: :FORMATTED'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'INST HEALTH_STATUS COLLECTS = 10, type: :WITH_UNITS'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    'INST HEALTH_STATUS DURATION = 10, type: :CONVERTED'
+  )
+
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
+  await page.locator('text=Show Overrides').click()
+  await expect(page.locator('.v-dialog >> tbody > tr')).toHaveCount(5)
+  await expect(page.locator('.v-dialog >> tbody > tr').nth(0)).toContainText(
+    'INSTHEALTH_STATUSCOLLECTSRAW10'
+  )
+  await expect(page.locator('.v-dialog >> tbody > tr').nth(1)).toContainText(
+    'INSTHEALTH_STATUSCOLLECTSCONVERTED10'
+  )
+  await expect(page.locator('.v-dialog >> tbody > tr').nth(2)).toContainText(
+    'INSTHEALTH_STATUSCOLLECTSFORMATTED10'
+  )
+  await expect(page.locator('.v-dialog >> tbody > tr').nth(3)).toContainText(
+    'INSTHEALTH_STATUSCOLLECTSWITH_UNITS10'
+  )
+  await expect(page.locator('.v-dialog >> tbody > tr').nth(4)).toContainText(
+    'INSTHEALTH_STATUSDURATIONCONVERTED10'
+  )
+  // Click the delete button on the first item
+  await page.locator('.v-dialog >> tbody > tr >> nth=0 >> button').click()
+  await expect(page.locator('.v-dialog >> tbody > tr')).toHaveCount(4)
+  // Clear all overrides
+  await page.locator('[data-test=overrides-dialog-clear-all]').click()
+  await expect(
+    page.getByRole('cell', { name: 'No data available' })
+  ).toBeVisible()
+  await page.locator('[data-test=overrides-dialog-ok]').click()
+  await expect(page.locator('.v-dialog')).not.toBeVisible()
 })
 
 test('ruby syntax check', async ({ page, utils }) => {
