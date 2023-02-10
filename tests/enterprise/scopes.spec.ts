@@ -17,12 +17,15 @@
 import { test, expect } from './../fixture'
 
 test.use({
-  toolPath: '/tools/admin/scopes',
+  // Go to the admin plugins page so we're not going directly to scopes
+  // which a normal operator does not have permissions to view
+  toolPath: '/tools/admin/plugins',
   toolName: 'Administrator',
   storageState: 'adminStorageState.json',
 })
 
 test('creates scope as admin', async ({ page, utils }) => {
+  await page.goto('/tools/admin/scopes')
   // Create duplicate scope
   await page.getByLabel('Scope Name').fill('default')
   await page.locator('[data-test="scopeAdd"]').click()
@@ -52,7 +55,6 @@ test('scope isolation', async ({ page, utils }) => {
   let pluginGem = 'openc3-cosmos-pw-test-1.0.0.gem'
 
   // Install plugin to new TEST scope
-  await page.goto('/tools/admin/plugins')
   await page.getByRole('button', { name: 'Scope DEFAULT' }).click()
   await page.getByRole('option', { name: 'TEST' }).click()
 
@@ -173,6 +175,7 @@ test('scope role / permissions', async ({ page, utils }) => {
 })
 
 test('delete role and scope', async ({ page, utils }) => {
+  await page.goto('/tools/admin/scopes')
   await page.locator('[data-test=user-menu]').click()
   await Promise.all([
     page.waitForNavigation(),
