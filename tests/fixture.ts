@@ -72,13 +72,23 @@ export const test = base.extend<{
     if (process.env.ENTERPRISE === '1') {
       // Check to see if we redirect to authenticate
       if (page.url().includes('/auth/')) {
-        await page.locator('input[name="username"]').fill('operator')
-        await page.locator('input[name="password"]').fill('operator')
-        await Promise.all([
-          page.waitForNavigation(),
-          page.locator('input:has-text("Sign In")').click(),
-        ])
-        await page.context().storageState({ path: 'storageState.json' })
+        if (page.url().includes('admin')) {
+          await page.locator('input[name="username"]').fill('admin')
+          await page.locator('input[name="password"]').fill('admin')
+          await Promise.all([
+            page.waitForNavigation(),
+            page.locator('input:has-text("Sign In")').click(),
+          ])
+          await page.context().storageState({ path: 'adminStorageState.json' })
+        } else {
+          await page.locator('input[name="username"]').fill('operator')
+          await page.locator('input[name="password"]').fill('operator')
+          await Promise.all([
+            page.waitForNavigation(),
+            page.locator('input:has-text("Sign In")').click(),
+          ])
+          await page.context().storageState({ path: 'storageState.json' })
+        }
       }
     }
     await expect(page.locator('.v-app-bar')).toContainText(toolName, {
@@ -113,7 +123,7 @@ export const test = base.extend<{
     for (const page of context.pages()) {
       await page.evaluate(() =>
         window.collectIstanbulCoverage(JSON.stringify(window.__coverage__))
-      );
+      )
     }
     // End Copyright
   },
