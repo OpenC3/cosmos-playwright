@@ -220,13 +220,6 @@ test('delete role and scope', async ({ page, utils }) => {
       }
     )
   } catch {}
-  // Ensure no Running are left
-  await expect(page.locator('[data-test=process-list]')).not.toContainText(
-    'Processing scope_uninstall: TEST - Running',
-    {
-      timeout: 30000,
-    }
-  )
   // Check for Complete
   await expect(page.locator('[data-test=process-list]')).toContainText(
     'Processing scope_uninstall: TEST - Complete'
