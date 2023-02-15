@@ -22,7 +22,7 @@ test.use({
   storageState: 'adminStorageState.json',
 })
 
-test('upload and delete', async ({ page, utils }) => {
+test('enterprise upload and delete', async ({ page, utils }) => {
   // Admin can upload and delete anywhere but normal users can not
   await page.getByText('config').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)

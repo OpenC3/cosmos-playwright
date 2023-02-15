@@ -101,6 +101,22 @@ test('navigate logs and tools', async ({ page, utils }) => {
   await expect(page.locator('tbody > tr')).toHaveCount(17)
 })
 
+// Create a new screen so we have modifications to browse
+test('creates new screen', async ({ page, utils }) => {
+  await page.goto('/tools/tlmviewer')
+  await expect(page.locator('.v-app-bar')).toContainText('Telemetry Viewer')
+  await page.locator('.v-app-bar__nav-icon').click()
+  await page.locator('[data-test=new-screen]').click()
+  await expect(
+    page.locator(`.v-system-bar:has-text("New Screen")`)
+  ).toBeVisible()
+  await page.locator('[data-test=new-screen-name]').fill('NEW_SCREEN')
+  await page.locator('button:has-text("Ok")').click()
+  await expect(
+    page.locator(`.v-system-bar:has-text("NEW_SCREEN")`)
+  ).toBeVisible()
+})
+
 test('upload and delete', async ({ page, utils }) => {
   await page.getByText('config').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
