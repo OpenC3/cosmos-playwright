@@ -48,7 +48,7 @@ test('show started scripts', async ({ page, utils }) => {
     .textContent()
 
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text="Show Exec Status"').click()
+  await page.locator('text="Execution Status"').click()
   await utils.sleep(1000)
   // Each section has a Refresh button so click the first one
   await page.locator('button:has-text("Refresh")').first().click()
@@ -63,7 +63,7 @@ test('show started scripts', async ({ page, utils }) => {
   await page.locator('[data-test=go-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text="Show Exec Status"').click()
+  await page.locator('text="Execution Status"').click()
   await utils.sleep(1000)
   await page.locator('button:has-text("Refresh")').first().click()
   await expect(page.locator('[data-test=running-scripts]')).not.toContainText(
@@ -76,43 +76,66 @@ test('show started scripts', async ({ page, utils }) => {
 })
 
 test('sets environment variables', async ({ page, utils }) => {
-  await page.locator('textarea').fill(`puts "ENV:#{ENV['KEY']}"`)
+  await page.locator('textarea').fill(`puts ENV.inspect`)
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text=Show Environment').click()
+  await page.locator('text=Global Environment').click()
   await page.locator('[data-test=env-key]').fill('KEY')
   await page.locator('[data-test=env-value]').fill('VALUE')
   await page.locator('[data-test=add-env]').click()
-  await page
-    .locator('[data-test=cosmos-script-runner-file]')
-    .click({ force: true })
+  await page.locator('[data-test=env-key]').fill('USER')
+  await page.locator('[data-test=env-value]').fill('RYAN')
+  await page.locator('[data-test=add-env]').click()
+  await page.locator('.v-dialog').press('Escape')
 
-  await page.locator('[data-test=env-button]').click()
-  await page
-    .locator('div[role="button"]:has-text("Select Environment Options")')
-    .click()
-  await page.locator('div[role="option"]:has-text("KEY=VALUE")').click()
-  await page.locator('[data-test=environment-dialog-save]').click()
+  await page.locator('[data-test="env-button"]').click()
+  await page.locator('[data-test="new-metadata-icon"]').click()
+  await page.locator('[data-test="key-0"]').fill('USER')
+  await page.locator('[data-test="value-0"]').fill('JASON')
+  await page.locator('[data-test="environment-dialog-save"]').click()
 
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
   await expect(page.locator('[data-test=output-messages]')).toContainText(
-    'ENV:VALUE'
+    '"KEY"=>"VALUE"'
+  )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '"USER"=>"JASON"' // JASON not RYAN because it was overriden locally
   )
   await page.locator('[data-test=clear-log]').click()
   await page.locator('button:has-text("Clear")').click()
-  await expect(page.locator('[data-test=output-messages]')).not.toContainText(
-    'ENV:VALUE'
-  )
-  // Re-run and ensure the env vars are still set
+
+  // Clear the local override
+  await page.locator('[data-test="env-button"]').click()
+  await page.locator('[data-test="remove-env-icon-0"]').click()
+  await page.locator('[data-test="environment-dialog-save"]').click()
+
+  // Re-run and verify the global is output
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
   await expect(page.locator('[data-test=output-messages]')).toContainText(
-    'ENV:VALUE'
+    '"KEY"=>"VALUE"'
   )
+  await expect(page.locator('[data-test=output-messages]')).toContainText(
+    '"USER"=>"RYAN"'
+  )
+
+  // Clear the globals
+  await page.locator('[data-test=cosmos-script-runner-script]').click()
+  await page.locator('text=Global Environment').click()
+  await page
+    .getByRole('row', { name: 'KEY VALUE' })
+    .locator('[data-test="item-delete"]')
+    .click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await page
+    .getByRole('row', { name: 'USER RYAN' })
+    .locator('[data-test="item-delete"]')
+    .click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
 })
 
 test('sets and gets stash', async ({ page, utils }) => {
@@ -143,7 +166,9 @@ test('sets metadata', async ({ page, utils }) => {
   await page.locator('text=metadata >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text=Show Metadata').click()
+  await page
+    .locator('[data-test="cosmos-script-runner-script-metadata"]')
+    .click()
   await expect(page.locator('.v-dialog')).toBeVisible()
   // Delete any existing metadata so we start fresh
   while (true) {
@@ -225,7 +250,9 @@ test('show overrides', async ({ page, utils }) => {
   )
 
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text=Show Overrides').click()
+  await page
+    .locator('[data-test="cosmos-script-runner-script-overrides"]')
+    .click()
   await expect(page.locator('.v-dialog >> tbody > tr')).toHaveCount(5)
   await expect(page.locator('.v-dialog >> tbody > tr').nth(0)).toContainText(
     'INSTHEALTH_STATUSCOLLECTSRAW10'
@@ -301,7 +328,7 @@ test('mnemonic check', async ({ page, utils }) => {
 test('view instrumented script', async ({ page, utils }) => {
   await page.locator('textarea').fill('puts "HI"')
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text=View Instrumented Script').click()
+  await page.locator('text=Instrumented Script').click()
   await expect(page.locator('.v-dialog')).toContainText('binding')
   await page.locator('button:has-text("Ok")').click()
 })

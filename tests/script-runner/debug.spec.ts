@@ -115,15 +115,17 @@ test('retries failed checks', async ({ page, utils }) => {
 })
 
 test('displays the call stack', async ({ page, utils }) => {
-  // Show Call Stack is disabled unless a script is running
+  // Call Stack is disabled unless a script is running
   await page.locator('[data-test=cosmos-script-runner-script]').click()
   // NOTE: This doesn't work in playwright 1.21.0 due to unexpected value "false"
-  // await expect(page.locator('text=Show Call Stack')).toBeDisabled()
+  // await expect(page.locator('text=Call Stack')).toBeDisabled()
   // See: https://github.com/microsoft/playwright/issues/13583
   // See: https://github.com/vuetifyjs/vuetify/issues/14968
-  // await expect(page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')).toBeDisabled()
+  // await expect(
+  //   page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')
+  // ).toBeDisabled()
   await expect(
-    page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')
+    page.locator('[data-test=cosmos-script-runner-script-call-stack]')
   ).toHaveAttribute('aria-disabled', 'true')
   // await expect(page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')).toBeDisabled()
 
@@ -144,7 +146,7 @@ test('displays the call stack', async ({ page, utils }) => {
   await expect(page.locator('[data-test=state]')).toHaveValue('paused')
 
   await page.locator('[data-test=cosmos-script-runner-script]').click()
-  await page.locator('text=Show Call Stack').click()
+  await page.locator('text=Call Stack').click()
   await expect(page.locator('.v-dialog')).toContainText('Call Stack')
   await page.locator('button:has-text("Ok")').click()
   await page.locator('[data-test=stop-button]').click()
@@ -152,7 +154,7 @@ test('displays the call stack', async ({ page, utils }) => {
 
   await page.locator('[data-test=cosmos-script-runner-script]').click()
   await expect(
-    page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')
+    page.locator('[data-test=cosmos-script-runner-script-call-stack]')
   ).toHaveAttribute('aria-disabled', 'true')
 })
 
