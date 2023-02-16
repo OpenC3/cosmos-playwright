@@ -122,12 +122,12 @@ test('displays the call stack', async ({ page, utils }) => {
   // See: https://github.com/microsoft/playwright/issues/13583
   // See: https://github.com/vuetifyjs/vuetify/issues/14968
   // await expect(
-  //   page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')
+  //   page.locator('[data-test=cosmos-script-runner-script-call-stack]')
   // ).toBeDisabled()
   await expect(
     page.locator('[data-test=cosmos-script-runner-script-call-stack]')
   ).toHaveAttribute('aria-disabled', 'true')
-  // await expect(page.locator('[data-test=cosmos-script-runner-script-show-call-stack]')).toBeDisabled()
+  // await expect(page.locator('[data-test=cosmos-script-runner-script-call-stack]')).toBeDisabled()
 
   await page.locator('textarea').fill(`
   def one
