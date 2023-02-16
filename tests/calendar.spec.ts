@@ -34,9 +34,6 @@ async function formatDate(date) {
   return format(date, 'yyyy-MM-dd')
 }
 
-//
-// Test the basic functionality of the application
-//
 test('test top bar', async ({ page, utils }) => {
   // test the day calendar view
   await page.locator('[data-test=change-type]').click()
@@ -58,6 +55,12 @@ test('test top bar', async ({ page, utils }) => {
   // test the mini calendar
   await page.locator('[data-test=mini-prev]').click()
   await page.locator('[data-test=mini-next]').click()
+
+  // Display the environment variables
+  await page.locator('[data-test="view-environment-dialog"]').click()
+  await expect(page.getByText('Global Environment Variables')).toBeVisible()
+  // Get out of the dialog
+  await page.locator('.v-dialog').press('Escape')
 
   // test settings functionality
 
@@ -146,12 +149,14 @@ test('test create metadata', async ({ page, utils }) => {
 })
 
 test('test create timeline', async ({ page, utils }) => {
-  await page.locator('[data-test=create-timeline]').click()
-  await page.locator('[data-test=input-timeline-name]').fill('Alpha')
-  await page.locator('[data-test=create-timeline-cancel-btn]').click()
-  await page.locator('[data-test=create-timeline]').click()
-  await page.locator('[data-test=input-timeline-name]').fill('Alpha')
-  await page.locator('[data-test=create-timeline-submit-btn]').click()
+  await page.locator('[data-test="create-event"]').click()
+  await page.locator('[data-test="create-timeline"]').click()
+  await page.locator('[data-test="input-timeline-name"]').fill('Alpha')
+  await page.locator('[data-test="create-timeline-cancel-btn"]').click()
+  await page.locator('[data-test="create-event"]').click()
+  await page.locator('[data-test="create-timeline"]').click()
+  await page.locator('[data-test="input-timeline-name"]').fill('Alpha')
+  await page.locator('[data-test="create-timeline-submit-btn"]').click()
 })
 
 test('test create activity', async ({ page, utils }) => {
