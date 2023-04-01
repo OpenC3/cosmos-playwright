@@ -70,11 +70,38 @@ test('selects a target and packet to display', async ({ page, utils }) => {
 test('gets details with right click', async ({ page, utils }) => {
   await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
   await page
-    .locator('tr:has-text("TEMP1") td >> nth=2')
+    .locator('tr:has-text("TEMP2") td >> nth=2')
     .click({ button: 'right' })
-  await page.locator('text=Details').click()
-  await expect(page.locator('.v-dialog')).toContainText(
-    'INST HEALTH_STATUS TEMP1'
+  await page.getByRole('menuitem', { name: 'Details' }).click()
+  await expect(page.locator('.v-dialog--active')).toBeVisible()
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'INST HEALTH_STATUS TEMP2'
+  )
+  // Check that a few of the details are there ... that proves the API request
+  await expect(page.locator('.v-dialog--active')).toContainText('FLOAT')
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'PolynomialConversion'
+  )
+  await expect(page.locator('.v-dialog--active')).toContainText('CELSIUS')
+
+  // Get out of the details dialog
+  await page
+    .locator('#openc3-menu >> text=Packet Viewer')
+    .click({ force: true })
+  await expect(page.locator('.v-dialog--active')).not.toBeVisible()
+
+  await page
+    .locator('tr:has-text("PACKET_TIMESECONDS") td >> nth=2')
+    .click({ button: 'right' })
+  await page.getByRole('menuitem', { name: 'Details' }).click()
+  await expect(page.locator('.v-dialog--active')).toBeVisible()
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'INST HEALTH_STATUS PACKET_TIMESECONDS'
+  )
+  // Check that a few of the details are there ... that proves the API request
+  await expect(page.locator('.v-dialog--active')).toContainText('DERIVED')
+  await expect(page.locator('.v-dialog--active')).toContainText(
+    'PacketTimeSecondsConversion'
   )
 })
 
