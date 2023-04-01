@@ -80,13 +80,31 @@ async function runAndCheckResults(
       page,
       'button:has-text("Download")',
       function (contents) {
-        expect(contents).toContain('Test Report')
+        expect(contents).toContain('Script Report')
         validator(contents)
       }
     )
   }
   await page.locator('button:has-text("Ok")').click()
 }
+
+test('generates a suite template', async ({ page, utils }) => {
+  await page.locator('[data-test=cosmos-script-runner-file]').click()
+  await page.locator('text=New Test Suite').click()
+  await utils.sleep(1000)
+  // Verify the drop downs are populated
+  await expect(
+    page.locator('role=button[name="Suite: TestSuite"]')
+  ).toBeEnabled()
+  await expect(page.locator('role=button[name="Group: Power"]')).toBeEnabled()
+  await expect(
+    page.locator('role=button[name="Script: script_power_on"]')
+  ).toBeEnabled()
+  // // Verify Suite Start buttons are enabled
+  await expect(page.locator('[data-test=start-suite]')).toBeEnabled()
+  await expect(page.locator('[data-test=start-group]')).toBeEnabled()
+  await expect(page.locator('[data-test=start-script]')).toBeEnabled()
+})
 
 test('loads Suite controls when opening a suite', async ({ page, utils }) => {
   // Open the file
@@ -109,14 +127,12 @@ test('loads Suite controls when opening a suite', async ({ page, utils }) => {
   await expect(page.locator('[data-test=abort-after-error]')).not.toBeChecked()
   await expect(page.locator('[data-test=break-loop-on-error]')).toBeDisabled()
   // Verify the drop downs are populated
+  await expect(page.locator('role=button[name="Suite: MySuite"]')).toBeEnabled()
   await expect(
-    page.locator('div[role="button"]:has-text("MySuite")')
+    page.locator('role=button[name="Group: ExampleGroup"]')
   ).toBeEnabled()
   await expect(
-    page.locator('div[role="button"]:has-text("ExampleGroup")')
-  ).toBeEnabled()
-  await expect(
-    page.locator('div[role="button"]:has-text("script_2")')
+    page.locator('role=button[name="Script: script_2"]')
   ).toBeEnabled()
   // // Verify Suite Start buttons are enabled
   await expect(page.locator('[data-test=start-suite]')).toBeEnabled()
