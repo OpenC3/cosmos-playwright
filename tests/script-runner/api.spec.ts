@@ -80,3 +80,25 @@ test('opens a target file', async ({ page, utils }) => {
   )
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
 })
+
+test('runs a script', async ({ page, utils }) => {
+  await page.locator('textarea').fill(`
+  script_run("INST/procedures/disconnect.rb")
+  `)
+  await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
+    timeout: 20000,
+  })
+
+  await page.locator('[data-test="cosmos-script-runner-script"]').click()
+  await page.getByText('Execution Status').click()
+
+  const [page1] = await Promise.all([
+    page.waitForEvent('popup'),
+    page.getByRole('cell', { name: 'Connect' }).click(),
+  ])
+  await expect(page1.locator('[data-test=state]')).toHaveValue('error')
+  await page1.locator('[data-test="stop-button"]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
+  await page1.close()
+})
