@@ -39,10 +39,7 @@ test('displays target details', async ({ page, utils }) => {
     .filter({ hasText: /^INST$/ })
     .getByRole('button')
     .click()
-  expect(
-    await page.locator('[data-test="editTextInput"]').inputValue()
-  ).toMatch('"name": "INST"')
-
+  expect(await page.locator('#editor')).toContainText('"name": "INST"')
   await utils.download(page, '[data-test="downloadIcon"]', function (contents) {
     expect(contents).toContain('"name": "INST"')
   })
