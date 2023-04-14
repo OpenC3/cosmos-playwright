@@ -37,7 +37,7 @@ test('displays interface details', async ({ page, utils }) => {
     .filter({ hasText: 'INST_INT' })
     .getByRole('button')
     .click()
-  expect(await page.locator('#editor')).toContainText('"name": "INST_INT"')
+  expect(await page.locator('.editor')).toContainText('"name": "INST_INT"')
   await utils.download(page, '[data-test="downloadIcon"]', function (contents) {
     expect(contents).toContain('"name": "INST_INT"')
   })

@@ -49,7 +49,7 @@ test('displays microservice details', async ({ page, utils }) => {
     .filter({ hasText: 'DEFAULT__CLEANUP__INST2' })
     .getByRole('button')
     .click()
-  expect(await page.locator('#editor')).toContainText(
+  expect(await page.locator('.editor')).toContainText(
     '"name": "DEFAULT__CLEANUP__INST2"'
   )
   await utils.download(page, '[data-test="downloadIcon"]', function (contents) {

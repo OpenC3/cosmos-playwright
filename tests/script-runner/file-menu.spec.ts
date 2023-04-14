@@ -29,10 +29,10 @@ test('clears the editor on File->New', async ({ page, utils }) => {
   // Have to fill on an editable area like the textarea
   await page.locator('textarea').fill('this is a test')
   // But can't check on the textarea because it has an input
-  await expect(page.locator('#editor')).toContainText('this is a test')
+  await expect(page.locator('.editor')).toContainText('this is a test')
   await page.locator('[data-test=cosmos-script-runner-file]').click()
   await page.locator('text=New File').click()
-  await expect(page.locator('#editor')).not.toContainText('this is a test')
+  await expect(page.locator('.editor')).not.toContainText('this is a test')
 })
 
 test('open a file', async ({ page, utils }) => {
