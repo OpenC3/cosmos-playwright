@@ -26,6 +26,23 @@ test.use({
   toolName: 'Limits Monitor',
 })
 
+test('changes the limits set', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Log' }).click()
+  await page.locator('[data-test="limits-set"]').click()
+  await page.getByRole('option', { name: 'TVAC' }).getByText('TVAC').click()
+  await expect(page.locator('[data-test=limits-events]')).toContainText(
+    'Setting Limits Set: TVAC'
+  )
+  await page.locator('[data-test="limits-set"]').click()
+  await page
+    .getByRole('option', { name: 'DEFAULT' })
+    .getByText('DEFAULT')
+    .click()
+  await expect(page.locator('[data-test=limits-events]')).toContainText(
+    'Setting Limits Set: DEFAULT'
+  )
+})
+
 test('saves and opens the configuration', async ({ page, utils }) => {
   await expect
     .poll(
