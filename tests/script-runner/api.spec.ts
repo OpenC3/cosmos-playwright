@@ -95,6 +95,7 @@ test('runs a script', async ({ page, utils }) => {
 
   const [page1] = await Promise.all([
     page.waitForEvent('popup'),
+    expect(page.getByRole('cell', { name: 'Connect' })).toBeVisible(),
     page.getByRole('cell', { name: 'Connect' }).click(),
   ])
   await expect(page1.locator('[data-test=state]')).toHaveValue('error')
