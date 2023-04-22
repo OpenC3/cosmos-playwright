@@ -262,6 +262,7 @@ test('downloads binary, definition, report', async ({ page, utils }) => {
 test('save as', async ({ page, utils }) => {
   await page.locator('[data-test=cosmos-table-manager-file]').click()
   await page.locator('text=Open File').click()
+  await expect(page.locator('.v-dialog')).toBeVisible()
   await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-search]')
@@ -278,6 +279,8 @@ test('save as', async ({ page, utils }) => {
 
   await page.locator('[data-test=cosmos-table-manager-file]').click()
   await page.locator('text=Save As').click()
+  await expect(page.locator('.v-dialog')).toBeVisible()
+  await utils.sleep(500) // Allow file dialog to fully render
   await page
     .locator('[data-test=file-open-save-filename]')
     .fill('INST/tables/bin/ConfigTables2.bin')
@@ -285,6 +288,63 @@ test('save as', async ({ page, utils }) => {
   await utils.sleep(1000)
   expect(await page.locator('[data-test=filename]').inputValue()).toMatch(
     'INST/tables/bin/ConfigTables2.bin'
+  )
+  expect(
+    await page.locator('[data-test=definition-filename]').inputValue()
+  ).toMatch('INST/tables/config/ConfigTables_def.txt')
+
+  // Verify we can open it cleanly
+  await page.locator('[data-test=cosmos-table-manager-file]').click()
+  await page.locator('text=Open File').click()
+  await expect(page.locator('.v-dialog')).toBeVisible()
+  await utils.sleep(500) // Allow file dialog to fully render
+  await page
+    .locator('[data-test=file-open-save-search]')
+    .type('ConfigTables2.bin')
+  await page.locator('text=ConfigTables >> nth=0').click()
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
+  expect(await page.locator('[data-test=filename]').inputValue()).toMatch(
+    'INST/tables/bin/ConfigTables2.bin'
+  )
+  expect(
+    await page.locator('[data-test=definition-filename]').inputValue()
+  ).toMatch('INST/tables/config/ConfigTables_def.txt')
+
+  // Save As to something that doesn't match the definition file convention
+  await page.locator('[data-test=cosmos-table-manager-file]').click()
+  await page.locator('text=Save As').click()
+  await expect(page.locator('.v-dialog')).toBeVisible()
+  await utils.sleep(500) // Allow file dialog to fully render
+  await page
+    .locator('[data-test=file-open-save-filename]')
+    .fill('INST/tables/bin/Binary.bin')
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await utils.sleep(1000)
+  expect(await page.locator('[data-test=filename]').inputValue()).toMatch(
+    'INST/tables/bin/Binary.bin'
+  )
+  expect(
+    await page.locator('[data-test=definition-filename]').inputValue()
+  ).toMatch('INST/tables/config/ConfigTables_def.txt')
+
+  // Now try to open it and be required to select the definition file
+  await page.locator('[data-test=cosmos-table-manager-file]').click()
+  await page.locator('text=Open File').click()
+  await expect(page.locator('.v-dialog')).toBeVisible()
+  await utils.sleep(500) // Allow file dialog to fully render
+  await page.locator('[data-test=file-open-save-search]').type('Binary.bin')
+  await page.locator('text=Binary.bin').click()
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await utils.sleep(1000) // Allow new file dialog to fully render
+  await page
+    .locator('[data-test=file-open-save-search]')
+    .type('ConfigTables_def')
+  await page.locator('text=ConfigTables_def >> nth=0').click()
+  await page.locator('[data-test=file-open-save-submit-btn]').click()
+  await expect(page.locator('id=openc3-tool')).toContainText('MC_CONFIGURATION')
+  expect(await page.locator('[data-test=filename]').inputValue()).toMatch(
+    'INST/tables/bin/Binary.bin'
   )
   expect(
     await page.locator('[data-test=definition-filename]').inputValue()
