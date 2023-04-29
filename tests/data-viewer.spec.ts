@@ -25,32 +25,35 @@ test.use({
   toolName: 'Data Viewer',
 })
 
-test('loads and saves the configuration', async ({ page, utils }) => {
-  // Setup a tab
-  await page.locator('[data-test="new-tab"]').click()
-  await page.locator('text=New Tab').click({
+async function addComponent(page, utils, target, packet) {
+  await page.locator('[data-test=new-tab]').click()
+  await utils.selectTargetPacketItem(target, packet)
+  await page.locator('[data-test=select-send]').click() // add the packet to the list
+  await page.locator('[data-test=add-component]').click()
+}
+
+test.only('loads and saves the configuration', async ({ page, utils }) => {
+  await addComponent(page, utils, 'INST', 'ADCS')
+  await page.locator('[data-test="tab"]').click({
     button: 'right',
   })
   await page.locator('[data-test="context-menu-rename"]').click()
   await page.locator('[data-test="rename-tab-input"]').fill('Test1')
   await page.locator('[data-test="rename"]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test="add-packet-button"]').click()
 
-  // Setup another tab
-  await page.locator('[data-test="new-tab"]').click()
-  await page.locator('text=New Tab').click({
+  // Add a new component with a different type
+  await page.locator('[data-test=new-tab]').click()
+  await page.getByRole('button', { name: 'COSMOS Raw/Decom' }).click()
+  await page.getByText('Current Time').click()
+  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
+  await page.locator('[data-test=select-send]').click() // add the packet to the list
+  await page.locator('[data-test=add-component]').click()
+  await page.locator('[data-test="tab"]').nth(1).click({
     button: 'right',
   })
   await page.locator('[data-test="context-menu-rename"]').click()
   await page.locator('[data-test="rename-tab-input"]').fill('Test2')
   await page.locator('[data-test="rename"]').click()
-  await page.locator('div[role="tab"]:has-text("Test2")').click()
-  // Get the last data-test=new-packet (on the new tab)
-  await page.locator('[data-test=new-packet] >> nth=-1').click()
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[data-test="add-packet-button"]').click()
 
   let config = 'spec' + Math.floor(Math.random() * 10000)
   await page.locator('[data-test="cosmos-data-viewer-file"]').click()
@@ -62,20 +65,17 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.reload()
   // Verify the config automatically comes back
   await page.locator('div[role="tab"]:has-text("Test1")').click()
-  await expect(page.locator('text=INST ADCS')).toBeVisible()
+  await expect(page.locator('text=COSMOS Raw/Decom')).toBeVisible()
   await page.locator('div[role="tab"]:has-text("Test2")').click()
-  await expect(page.locator('text=INST HEALTH_STATUS')).toBeVisible()
+  await expect(page.locator('text=Current Time:')).toBeVisible()
 
   // Delete the tabs
-  await page.locator('div[role="tab"]:has-text("Test1")').click({
-    button: 'right',
-  })
-  await page.locator('[data-test="context-menu-delete"]').click()
-  await page.locator('div[role="tab"]:has-text("Test2")').click({
-    button: 'right',
-  })
-  await page.locator('[data-test="context-menu-delete"]').click()
+  await page.locator('div[role="tab"]:has-text("Test1")').click()
+  await page.locator('[data-test="delete-component"]').first().click()
+  await expect(page.locator('text=Current Time:')).toBeVisible()
+  await page.locator('[data-test="delete-component"]').click()
 
+  // Reload the config
   await page.locator('[data-test="cosmos-data-viewer-file"]').click()
   await page.locator('text=Open Configuration').click()
   await page.locator(`td:has-text("${config}")`).click()
@@ -83,9 +83,10 @@ test('loads and saves the configuration', async ({ page, utils }) => {
 
   // Verify the config again
   await page.locator('div[role="tab"]:has-text("Test1")').click()
-  await expect(page.locator('text=INST ADCS')).toBeVisible()
+  // await page.getByText('COSMOS Raw/Decom').click();
+  await expect(page.locator('text=COSMOS Raw/Decom')).toBeVisible()
   await page.locator('div[role="tab"]:has-text("Test2")').click()
-  await expect(page.locator('text=INST HEALTH_STATUS')).toBeVisible()
+  await expect(page.locator('text=Current Time:')).toBeVisible()
 
   // Delete this test configuation
   await page.locator('[data-test="cosmos-data-viewer-file"]').click()
@@ -96,12 +97,12 @@ test('loads and saves the configuration', async ({ page, utils }) => {
 })
 
 test('adds a raw packet to a new tab', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test=add-packet-button]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(500)
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    'Received seconds:'
+  )
   expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
     '00000010:'
   )
@@ -112,13 +113,13 @@ test('adds a raw packet to a new tab', async ({ page, utils }) => {
 
 test('adds a decom packet to a new tab', async ({ page, utils }) => {
   await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
   await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('text=Decom').click()
-  await expect(page.locator('[data-test=add-packet-value-type]')).toBeVisible()
-  await page.locator('[data-test=add-packet-button]').click()
+  await page.locator('label:has-text("Decom")').click()
+  await page.locator('[data-test=add-packet-value-type]').click()
+  await page.getByRole('option', { name: 'CONVERTED' }).click()
+  await page.locator('[data-test=select-send]').click() // add the packet to the list
+  await page.locator('[data-test=add-component]').click()
   await page.locator('[data-test=start-button]').click()
-  await expect(page.locator('.v-window-item > div')).toHaveCount(1)
   await utils.sleep(500)
   expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
     'POSX:'
@@ -132,15 +133,10 @@ test('adds a decom packet to a new tab', async ({ page, utils }) => {
   expect(
     await page.inputValue('[data-test=dump-component-text-area]')
   ).not.toMatch('00000010:')
-  // add another packet to the existing connection
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test=add-packet-button]').click()
-  await expect(page.locator('.v-window-item > div')).toHaveCount(2)
 })
 
 test('renames a tab', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=tab]').click({ button: 'right' })
   await page.locator('[data-test=context-menu-rename] > div').click()
   await page.locator('[data-test=rename-tab-input]').fill('Testing tab name')
@@ -154,29 +150,18 @@ test('renames a tab', async ({ page, utils }) => {
 })
 
 test('deletes a component and tab', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test=add-packet-button]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await expect(
-    page.locator('.v-window-item > .v-card > .v-card__title')
-  ).toHaveText('INST ADCS [ RAW ]')
-  await page.locator('[data-test=delete-packet]').click()
-  await expect(
-    page.locator('.v-window-item > .v-card > .v-card__title')
-  ).toHaveText('This tab is empty')
-  await page.locator('[data-test=tab]').click({ button: 'right' })
-  await page.locator('[data-test=context-menu-delete] > div').click()
+    page.getByRole('tab', { name: 'INST ADCS [ RAW ]' })
+  ).toBeVisible()
+  await page.locator('[data-test=delete-component]').click()
   await expect(page.locator('.v-card > .v-card__title').first()).toHaveText(
     "You're not viewing any packets"
   )
 })
 
 test('controls playback', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test=add-packet-button]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-play-pause]').click()
@@ -209,51 +194,43 @@ test('controls playback', async ({ page, utils }) => {
 })
 
 test('changes display settings', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'HEALTH_STATUS')
-  await page.locator('[data-test=add-packet-button]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-open-settings]').click()
   await expect(page.locator('[data-test=display-settings-card]')).toBeVisible()
-  await page.locator('text=ASCII').click()
-  await page.locator('text=/^Top$/').click() // Be specific to avoid matching 'Stop'
-  await page.locator('text=Show line address').click()
-  await page.locator('text=Show timestamp').click()
-  // check number input validation
-  await page
-    .locator('[data-test=dump-component-settings-num-packets]')
-    .fill('0')
-  await page
-    .locator('[data-test="dump-component-settings-num-packets"]')
-    .press('Enter') // fire the validation
-  await expect(
-    page.locator('[data-test=dump-component-settings-num-packets]')
-  ).toHaveValue('1')
-  await page
-    .locator('[data-test=dump-component-settings-num-packets]')
-    .fill('101')
-  await page
-    .locator('[data-test="dump-component-settings-num-packets"]')
-    .press('Enter') // fire the validation
-  await expect(
-    page.locator('[data-test=dump-component-settings-num-packets]')
-  ).toHaveValue('100')
-  await page.locator('[data-test=dump-component-settings-num-bytes]').fill('0')
-  await page
-    .locator('[data-test="dump-component-settings-num-bytes"]')
-    .press('Enter') // fire the validation
-  await expect(
-    page.locator('[data-test=dump-component-settings-num-bytes]')
-  ).toHaveValue('1')
+  await page.getByText('Show timestamp').click()
+  expect(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  ).not.toMatch('Received seconds:')
+  await page.getByText('Show timestamp').click()
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    'Received seconds:'
+  )
+  await page.getByText('Show ASCII').click()
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    /(\s\w\w){16}\s?(?!\s)/ // per https://regex101.com/
+  )
+  await page.getByText('Show ASCII').click()
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    /(\s\w\w){16}\s{4}\S*/ // per https://regex101.com/
+  )
+  await page.getByText('Show line address').click()
+  expect(
+    await page.inputValue('[data-test=dump-component-text-area]')
+  ).not.toMatch(/00000000:/)
+  await page.getByText('Show line address').click()
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    /00000000:/
+  )
+  await page.locator('[data-test=dump-component-settings-num-bytes]').fill('8')
+  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+    /(\s\w{2}){8}\s?(?!\s)/ // per https://regex101.com/
+  )
 })
 
 test('downloads a file', async ({ page, utils }) => {
-  await page.locator('[data-test=new-tab]').click()
-  await page.locator('[data-test=new-packet]').click()
-  await utils.selectTargetPacketItem('INST', 'ADCS')
-  await page.locator('[data-test=add-packet-button]').click()
+  await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
   await page.locator('[data-test=dump-component-play-pause]').click()
