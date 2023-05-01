@@ -225,7 +225,7 @@ test('changes display settings', async ({ page, utils }) => {
   )
   await page.locator('[data-test=dump-component-settings-num-bytes]').fill('8')
   expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    /(\s\w{2}){8}\s?(?!\s)/ // per https://regex101.com/
+    /(\s\w\w){8}\s{4}\S*/ // per https://regex101.com/
   )
 })
 
