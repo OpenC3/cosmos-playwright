@@ -100,15 +100,15 @@ test('adds a raw packet to a new tab', async ({ page, utils }) => {
   await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(500)
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    'Received seconds:'
-  )
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    '00000010:'
-  )
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    '00000020:'
-  )
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('Received seconds:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('00000010:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('00000020:')
 })
 
 test('adds a decom packet to a new tab', async ({ page, utils }) => {
@@ -121,17 +121,17 @@ test('adds a decom packet to a new tab', async ({ page, utils }) => {
   await page.locator('[data-test=add-component]').click()
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(500)
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    'POSX:'
-  )
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    'POSY:'
-  )
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    'POSZ:'
-  )
   expect(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('POSX:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('POSY:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('POSZ:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
   ).not.toMatch('00000010:')
 })
 
@@ -164,32 +164,32 @@ test('controls playback', async ({ page, utils }) => {
   await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
-  await page.locator('[data-test=dump-component-play-pause]').click()
+  await page.locator('[data-test=history-component-play-pause]').click()
   await utils.sleep(500) // Ensure it's stopped and draws the last packet contents
   let content: string = await page.inputValue(
-    '[data-test=dump-component-text-area]'
+    '[data-test=history-component-text-area]'
   )
   // Step back and forth
   await page.locator('[aria-label="prepend icon"]').click()
   expect(content).not.toEqual(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   )
   await page.locator('[aria-label="append icon"]').click()
   expect(content).toEqual(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   )
   // Resume
-  await page.locator('[data-test=dump-component-play-pause]').click()
+  await page.locator('[data-test=history-component-play-pause]').click()
   expect(content).not.toEqual(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   )
   // Stop
   await page.locator('[data-test="stop-button"]').click()
   await utils.sleep(500) // Ensure it's stopped and draws the last packet contents
-  content = await page.inputValue('[data-test=dump-component-text-area]')
+  content = await page.inputValue('[data-test=history-component-text-area]')
   await utils.sleep(500) // Wait for potential changes
   expect(content).toEqual(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   )
 })
 
@@ -197,34 +197,42 @@ test('changes display settings', async ({ page, utils }) => {
   await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
-  await page.locator('[data-test=dump-component-open-settings]').click()
+  await page.locator('[data-test=history-component-open-settings]').click()
   await expect(page.locator('[data-test=display-settings-card]')).toBeVisible()
   await page.getByText('Show timestamp').click()
   expect(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   ).not.toMatch('Received seconds:')
   await page.getByText('Show timestamp').click()
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    'Received seconds:'
-  )
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch('Received seconds:')
   await page.getByText('Show ASCII').click()
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(
     /(\s\w\w){16}\s?(?!\s)/ // per https://regex101.com/
   )
   await page.getByText('Show ASCII').click()
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(
     /(\s\w\w){16}\s{4}\S*/ // per https://regex101.com/
   )
   await page.getByText('Show line address').click()
   expect(
-    await page.inputValue('[data-test=dump-component-text-area]')
+    await page.inputValue('[data-test=history-component-text-area]')
   ).not.toMatch(/00000000:/)
   await page.getByText('Show line address').click()
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
-    /00000000:/
-  )
-  await page.locator('[data-test=dump-component-settings-num-bytes]').fill('8')
-  expect(await page.inputValue('[data-test=dump-component-text-area]')).toMatch(
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(/00000000:/)
+  await page
+    .locator('[data-test=history-component-settings-num-bytes]')
+    .fill('8')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(
     /(\s\w\w){8}\s{4}\S*/ // per https://regex101.com/
   )
 })
@@ -233,12 +241,14 @@ test('downloads a file', async ({ page, utils }) => {
   await addComponent(page, utils, 'INST', 'ADCS')
   await page.locator('[data-test=start-button]').click()
   await utils.sleep(1000) // Allow a few packets to come in
-  await page.locator('[data-test=dump-component-play-pause]').click()
+  await page.locator('[data-test=history-component-play-pause]').click()
 
-  const textarea = await page.inputValue('[data-test=dump-component-text-area]')
+  const textarea = await page.inputValue(
+    '[data-test=history-component-text-area]'
+  )
   await utils.download(
     page,
-    '[data-test=dump-component-download]',
+    '[data-test=history-component-download]',
     function (contents) {
       expect(contents).toEqual(textarea)
     }
