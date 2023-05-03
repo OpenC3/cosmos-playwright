@@ -40,6 +40,13 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('[data-test="context-menu-rename"]').click()
   await page.locator('[data-test="rename-tab-input"]').fill('Test1')
   await page.locator('[data-test="rename"]').click()
+  // Change a display setting
+  await page.locator('[data-test=history-component-open-settings]').click()
+  await expect(page.locator('[data-test=display-settings-card]')).toBeVisible()
+  await page
+    .locator('[data-test=history-component-settings-history]')
+    .fill('200')
+  await page.locator('#openc3-menu >> text=Data Viewer').click({ force: true })
 
   // Add a new component with a different type
   await page.locator('[data-test=new-tab]').click()
@@ -66,6 +73,13 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   // Verify the config automatically comes back
   await page.locator('div[role="tab"]:has-text("Test1")').click()
   await expect(page.locator('text=COSMOS Raw/Decom')).toBeVisible()
+  // Verify display setting
+  await page.locator('[data-test=history-component-open-settings]').click()
+  await expect(page.locator('[data-test=display-settings-card]')).toBeVisible()
+  expect(
+    await page.inputValue('[data-test=history-component-settings-history]')
+  ).toMatch('200')
+  await page.locator('#openc3-menu >> text=Data Viewer').click({ force: true })
   await page.locator('div[role="tab"]:has-text("Test2")').click()
   await expect(page.locator('text=Current Time:')).toBeVisible()
 
@@ -133,6 +147,26 @@ test('adds a decom packet to a new tab', async ({ page, utils }) => {
   expect(
     await page.inputValue('[data-test=history-component-text-area]')
   ).not.toMatch('00000010:')
+})
+
+test('adds a custom component a new tab', async ({ page, utils }) => {
+  await page.locator('[data-test=new-tab]').click()
+  await page.locator('[data-test="select-component"]').click()
+  await page.getByText('Quaternion').click()
+  await utils.selectTargetPacketItem('INST', 'ADCS')
+  await page.locator('label:has-text("Decom")').click()
+  await page.locator('[data-test=select-send]').click() // add the packet to the list
+  await page.locator('[data-test=add-component]').click()
+
+  await page.locator('[data-test=start-button]').click()
+  await utils.sleep(500)
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(/(.*\n)+Magnitude:.*/)
+  await page.locator('[data-test=history-component-search]').fill('Magnitude:')
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(/^Magnitude:.*$/)
 })
 
 test('renames a tab', async ({ page, utils }) => {
@@ -235,6 +269,19 @@ test('changes display settings', async ({ page, utils }) => {
   ).toMatch(
     /(\s\w\w){8}\s{4}\S*/ // per https://regex101.com/
   )
+
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).not.toMatch(/Received seconds:(.*\n)+.*Received seconds:/)
+  await page
+    .locator('[data-test=history-component-settings-num-packets]')
+    .fill('2')
+  await utils.sleep(100)
+  expect(
+    await page.inputValue('[data-test=history-component-text-area]')
+  ).toMatch(
+    /Received seconds:(.*\n)+.*Received seconds:/ // per https://regex101.com/
+  )
 })
 
 test('downloads a file', async ({ page, utils }) => {
@@ -277,7 +324,7 @@ test('validates start and end time inputs', async ({ page, utils }) => {
 
 test('validates start and end time values', async ({ page, utils }) => {
   // validate future start date
-  await page.locator('[data-test=start-date]').fill('4000-01-01') // If this version of OpenC3 is still used 2000 years from now, this test will need to be updated
+  await page.locator('[data-test=start-date]').fill('4000-01-01')
   await page.locator('[data-test=start-time]').fill('12:15:15')
   await page.locator('[data-test=start-button]').click()
   await expect(page.locator('.warning')).toContainText(
