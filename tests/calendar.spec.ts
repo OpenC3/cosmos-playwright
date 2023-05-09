@@ -212,9 +212,7 @@ test('test create activity', async ({ page, utils }) => {
 })
 
 test('test timeline select and activity delete', async ({ page, utils }) => {
-  // Delete the metadata, it shows something like 'Metadata, HH:MM AM - HH:MM AM'
-  // So we use the comma to avoid selecting the other Metadata text on page
-  await page.locator('text=Metadata,').click()
+  await page.locator('strong:has-text("Metadata")').click()
   await page.locator('[data-test=delete-metadata]').click()
   await page.locator('button:has-text("Delete")').click()
   // Delete the note (use nth=0 in case it spans a day)

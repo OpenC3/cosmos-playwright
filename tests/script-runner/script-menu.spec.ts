@@ -169,34 +169,37 @@ test('sets metadata', async ({ page, utils }) => {
   await page
     .locator('[data-test="cosmos-script-runner-script-metadata"]')
     .click()
-  await expect(page.locator('.v-dialog')).toBeVisible()
+  // await expect(page.locator('.v-dialog')).toBeVisible()
+  await expect(page.getByText('MetadataSearch')).toBeVisible()
   // Delete any existing metadata so we start fresh
   while (true) {
-    if (await page.$('[data-test=delete-metadata-icon]')) {
-      await page.locator('[data-test=delete-metadata-icon] >> nth=0').click()
+    if (await page.$('[data-test=delete-event]')) {
+      await page.locator('[data-test=delete-event] >> nth=0').click()
+      await page.locator('[data-test=confirm-dialog-delete]').click()
       await utils.sleep(300)
     } else {
       break
     }
   }
-  await page.locator('[data-test=new-metadata-icon]').click()
-  await page.keyboard.press('Tab')
-  await page.keyboard.type('metakey')
-  await page.keyboard.press('Tab')
-  await page.keyboard.type('metaval')
-  await page.locator('[data-test=metadata-dialog-save]').click()
+  await page.locator('[data-test="new-event"]').click()
+  await page.locator('[data-test="create-metadata-step-two-btn"]').click()
+  await page.locator('[data-test="new-metadata-icon"]').click()
+  await page.locator('[data-test="key-0"]').fill('metakey')
+  await page.locator('[data-test="value-0"]').fill('metaval')
+  await page.locator('[data-test="create-metadata-submit-btn"]').click()
+  await page.locator('[data-test="close-event-list"]').click()
 
   await page.locator('[data-test=start-button]').click()
-  await expect(page.locator('.v-dialog')).toBeVisible({
+  await expect(page.getByText('MetadataSearch')).toBeVisible({
     timeout: 20000,
   })
-  await page.locator('[data-test=new-metadata-icon]').click()
-  // key is 0 based and we should already have 2 entries
-  await page.locator('[data-test=key-2]').click()
-  await page.keyboard.type('inputkey')
-  await page.keyboard.press('Tab')
-  await page.keyboard.type('inputvalue')
-  await page.locator('[data-test=metadata-dialog-save]').click()
+  await page.locator('[data-test="new-event"]').click()
+  await page.locator('[data-test="create-metadata-step-two-btn"]').click()
+  await page.locator('[data-test="new-metadata-icon"]').click()
+  await page.locator('[data-test="key-0"]').fill('inputkey')
+  await page.locator('[data-test="value-0"]').fill('inputvalue')
+  await page.locator('[data-test="create-metadata-submit-btn"]').click()
+  await page.locator('[data-test="close-event-list"]').click()
 
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
