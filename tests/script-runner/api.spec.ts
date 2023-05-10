@@ -91,14 +91,10 @@ test('runs a script', async ({ page, utils }) => {
   })
 
   await page.locator('[data-test="cosmos-script-runner-script"]').click()
-  const [page1] = await Promise.all([
-    page.waitForEvent('popup'),
-    page.getByText('Execution Status').click(),
-    expect(page.getByRole('cell', { name: 'Connect' })).toBeVisible(),
-    page.getByRole('cell', { name: 'Connect' }).click(),
-  ])
-  await expect(page1.locator('[data-test=state]')).toHaveValue('error')
-  await page1.locator('[data-test="stop-button"]').click()
+  await page.getByText('Execution Status').click()
+  await page.getByRole('cell', { name: 'Connect' }).click()
+
+  await expect(page.locator('[data-test=state]')).toHaveValue('error')
+  await page.locator('[data-test="stop-button"]').click()
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped')
-  await page1.close()
 })
