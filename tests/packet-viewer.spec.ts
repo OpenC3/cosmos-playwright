@@ -194,7 +194,7 @@ test('shows ignored items', async ({ page, utils }) => {
   await expect(page.locator('text=CCSDSVER')).toBeVisible()
   await page.locator('[data-test=cosmos-packet-viewer-view]').click()
   await page.locator('text=Show Ignored').click()
-  await expect(page.locator('text=CCSDSVER')).toBeVisible()
+  await expect(page.locator('text=CCSDSVER')).not.toBeVisible()
 })
 
 test('displays derived first', async ({ page, utils }) => {
