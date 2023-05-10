@@ -92,7 +92,7 @@ test('runs a script', async ({ page, utils }) => {
 
   await page.locator('[data-test="cosmos-script-runner-script"]').click()
   await page.getByText('Execution Status').click()
-  await page.getByRole('cell', { name: 'Connect' }).click()
+  await page.getByRole('cell', { name: 'Connect' }).nth(0).click()
 
   await expect(page.locator('[data-test=state]')).toHaveValue('error')
   await page.locator('[data-test="stop-button"]').click()
