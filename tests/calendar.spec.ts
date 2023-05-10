@@ -34,6 +34,28 @@ async function formatDate(date) {
   return format(date, 'yyyy-MM-dd')
 }
 
+test('file menu', async ({ page, utils }) => {
+  await page.locator('[data-test="cosmos-calendar-file"]').click()
+  await page.getByText('Global Environment').click()
+  await page.locator('.v-dialog').press('Escape')
+  await page.locator('[data-test="cosmos-calendar-file"]').click()
+  await page.getByText('Refresh Display').click()
+  await page.locator('[data-test="cosmos-calendar-file"]').click()
+  await page.getByText('Show Table Display').click()
+  await page.locator('[data-test="close-event-list"]').click()
+  await page.locator('[data-test="cosmos-calendar-file"]').click()
+  await page.getByText('Toggle UTC Display').click()
+  await page.locator('[data-test="cosmos-calendar-file"]').click()
+  await utils.sleep(100)
+  await utils.download(
+    page,
+    '[data-test=cosmos-calendar-file-download-event-list]',
+    function (contents) {
+      expect(contents).toContain('') // % is empty
+    }
+  )
+})
+
 test('test top bar', async ({ page, utils }) => {
   // test the day calendar view
   await page.locator('[data-test=change-type]').click()
@@ -55,30 +77,6 @@ test('test top bar', async ({ page, utils }) => {
   // test the mini calendar
   await page.locator('[data-test=mini-prev]').click()
   await page.locator('[data-test=mini-next]').click()
-
-  // Display the environment variables
-  await page.locator('[data-test="view-environment-dialog"]').click()
-  await expect(page.getByText('Global Environment Variables')).toBeVisible()
-  // Get out of the dialog
-  await page.locator('.v-dialog').press('Escape')
-
-  // test settings functionality
-
-  // refresh
-  await page.locator('[data-test=settings]').click()
-  await page.locator('[data-test=refresh]').click()
-  // display time in utc
-  await page.locator('[data-test=settings]').click()
-  await page.locator('[data-test=display-utc-time]').click()
-  // download event list
-  await page.locator('[data-test=settings]').click()
-  await utils.download(
-    page,
-    '[data-test=download-event-list]',
-    function (contents) {
-      expect(contents).toContain('') // % is empty
-    }
-  )
 })
 
 test('test create note', async ({ page, utils }) => {
