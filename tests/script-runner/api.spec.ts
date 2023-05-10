@@ -91,10 +91,9 @@ test('runs a script', async ({ page, utils }) => {
   })
 
   await page.locator('[data-test="cosmos-script-runner-script"]').click()
-  await page.getByText('Execution Status').click()
-
   const [page1] = await Promise.all([
     page.waitForEvent('popup'),
+    page.getByText('Execution Status').click(),
     expect(page.getByRole('cell', { name: 'Connect' })).toBeVisible(),
     page.getByRole('cell', { name: 'Connect' }).click(),
   ])
