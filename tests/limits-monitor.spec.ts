@@ -28,6 +28,7 @@ test.use({
 
 test('changes the limits set', async ({ page, utils }) => {
   await page.getByRole('tab', { name: 'Log' }).click()
+  await page.getByLabel('Search').fill('Setting')
   await page.locator('[data-test="limits-set"]').click()
   await page.getByRole('option', { name: 'TVAC' }).getByText('TVAC').click()
   await expect(page.locator('[data-test=limits-events]')).toContainText(
