@@ -182,11 +182,11 @@ test('can delete all temp files', async ({ page, utils }) => {
   await expect(page.locator(`.v-dialog >> text=${tempFile1}`)).toBeVisible()
   await expect(page.locator(`.v-dialog >> text=${tempFile2}`)).toBeVisible()
 
-  // await page.locator('.v-treeview-node__append > .v-btn').click();
   await page
     .locator('.v-dialog >> .v-treeview-node:has-text("__TEMP__") >> .v-btn')
     .click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await utils.sleep(300) // Allow confirm to complete
   await page.locator('[data-test="file-open-save-cancel-btn"]').click()
 
   // Open file
