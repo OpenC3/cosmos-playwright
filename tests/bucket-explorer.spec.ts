@@ -24,7 +24,7 @@ test.use({
 //
 // Test the basic functionality of the application
 //
-test('navigate config', async ({ page, utils }) => {
+test('navigate config bucket', async ({ page, utils }) => {
   // Initially empty
   await expect(
     page.getByRole('cell', { name: 'No data available' })
@@ -69,29 +69,34 @@ test('navigate config', async ({ page, utils }) => {
   )
 
   // codegen created this weird named button for back
-  await page.getByRole('button', { name: '󰧙' }).click()
+  await page.getByRole('button', { name: '󰧙' }).nth(1).click()
   await expect(page.locator('[data-test="file-path"]')).toHaveText(
     '/DEFAULT/targets/'
   )
   await expect(page).toHaveURL(
     /.*\/tools\/bucketexplorer\/config%2FDEFAULT%2Ftargets%2F/
   )
-  await page.getByRole('button', { name: '󰧙' }).click()
+  await page.getByRole('button', { name: '󰧙' }).nth(1).click()
   await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2FDEFAULT%2F/)
-  await page.getByRole('button', { name: '󰧙' }).click()
+  await page.getByRole('button', { name: '󰧙' }).nth(1).click()
   await expect(page.locator('[data-test="file-path"]')).toHaveText('/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
   // Back again just to show that doesn't break things
-  await page.getByRole('button', { name: '󰧙' }).click()
+  await page.getByRole('button', { name: '󰧙' }).nth(1).click()
   await expect(page.locator('[data-test="file-path"]')).toHaveText('/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/config%2F/)
 })
 
-test('navigate logs and tools', async ({ page, utils }) => {
+test('navigate logs and tools bucket', async ({ page, utils }) => {
   await page.getByText('logs').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/logs%2F/)
   await page.getByRole('cell', { name: 'DEFAULT' }).click()
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
+  await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/logs%2FDEFAULT%2F/)
+  await expect(page.locator('tbody > tr').first()).toHaveText(/\w+_logs/)
+  // Reload and ensure we get to the same place
+  await page.reload()
   await expect(page.locator('[data-test="file-path"]')).toHaveText('/DEFAULT/')
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/logs%2FDEFAULT%2F/)
   await expect(page.locator('tbody > tr').first()).toHaveText(/\w+_logs/)
@@ -99,6 +104,46 @@ test('navigate logs and tools', async ({ page, utils }) => {
   await page.getByText('tools').click()
   await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/tools%2F/)
   await expect(page.locator('tbody > tr')).toHaveCount(17)
+})
+
+test('navigate gems volume', async ({ page, utils }) => {
+  await page.getByText('gems').click()
+  // Note the URL is prefixed with %2F, i.e. '/'
+  await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/%2Fgems%2F/)
+  await page.getByRole('cell', { name: 'cache' }).click()
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/cache/')
+  await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/%2Fgems%2Fcache%2F/)
+
+  await page.locator('internal:label=Search').fill('bucket')
+  await expect(page.locator('tbody > tr')).toHaveCount(1)
+  // Download the file
+  await utils.download(page, 'tbody > tr [data-test="download-file"]')
+
+  // Reload and ensure we get to the same place
+  await page.reload()
+  await expect(page.locator('[data-test="file-path"]')).toHaveText('/cache/')
+  await expect(page).toHaveURL(/.*\/tools\/bucketexplorer\/%2Fgems%2Fcache%2F/)
+  await page.locator('internal:label=Search').fill('bucket')
+  await expect(page.locator('tbody > tr')).toHaveCount(1)
+})
+
+test('direct URLs', async ({ page, utils }) => {
+  // Verify using slashes rather than %2F works
+  await page.goto('/tools/bucketexplorer/config/DEFAULT/targets/')
+  await expect(page.locator('tbody > tr')).toHaveCount(5)
+
+  // Basic makes it a bucket
+  await page.goto('/tools/bucketexplorer/blah')
+  await expect(
+    page.getByText('Unknown bucket / volume OPENC3_BLAH_BUCKET')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
+  // Prepending %2F makes it a volume
+  await page.goto('/tools/bucketexplorer/%2FBAD')
+  await expect(
+    page.getByText('Unknown bucket / volume OPENC3_BAD_VOLUME')
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
 })
 
 // Create a new screen so we have modifications to browse
