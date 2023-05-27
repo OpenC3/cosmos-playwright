@@ -130,7 +130,8 @@ test('navigate gems volume', async ({ page, utils }) => {
 test('direct URLs', async ({ page, utils }) => {
   // Verify using slashes rather than %2F works
   await page.goto('/tools/bucketexplorer/config/DEFAULT/targets/')
-  await expect(page.locator('tbody > tr')).toHaveCount(5)
+  // Can't match exact because Enterprise has the PW_TEST target
+  await expect(page.locator('tbody > tr')).toBeGreaterThan(4)
 
   // Basic makes it a bucket
   await page.goto('/tools/bucketexplorer/blah')
