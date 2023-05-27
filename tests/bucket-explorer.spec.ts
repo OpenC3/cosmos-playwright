@@ -131,7 +131,7 @@ test('direct URLs', async ({ page, utils }) => {
   // Verify using slashes rather than %2F works
   await page.goto('/tools/bucketexplorer/config/DEFAULT/targets/')
   // Can't match exact because Enterprise has the PW_TEST target
-  await expect(page.locator('tbody > tr')).toBeGreaterThan(4)
+  await expect(page.locator('tbody > tr').count()).toBeGreaterThan(4)
 
   // Basic makes it a bucket
   await page.goto('/tools/bucketexplorer/blah')
