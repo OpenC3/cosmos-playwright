@@ -180,7 +180,9 @@ test('displays disconnect icon', async ({ page, utils }) => {
   `)
 
   await page.locator('[data-test=start-button]').click()
-  // Runs without stopping
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
@@ -215,6 +217,9 @@ puts "e"`)
   // Disable the breakpoint
   await page.locator('.ace_gutter-cell').nth(2).click({ force: true })
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })

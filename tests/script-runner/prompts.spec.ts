@@ -52,6 +52,9 @@ test('does not hazardous prompt for cmd_no_hazardous_check, cmd_no_checks', asyn
   cmd_no_checks("INST CLEAR")
   `)
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
@@ -81,6 +84,9 @@ test('does not out of range error for cmd_no_range_check, cmd_no_checks', async 
   cmd_no_checks("INST COLLECT with DURATION 11, TYPE 'NORMAL'")
   `)
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })

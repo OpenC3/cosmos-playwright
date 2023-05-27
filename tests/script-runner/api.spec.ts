@@ -86,6 +86,9 @@ test('runs a script', async ({ page, utils }) => {
   script_run("INST/procedures/disconnect.rb")
   `)
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })

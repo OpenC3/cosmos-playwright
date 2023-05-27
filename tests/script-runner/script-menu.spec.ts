@@ -94,6 +94,9 @@ test('sets environment variables', async ({ page, utils }) => {
   await page.locator('[data-test="environment-dialog-save"]').click()
 
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
@@ -113,6 +116,9 @@ test('sets environment variables', async ({ page, utils }) => {
 
   // Re-run and verify the global is output
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
@@ -148,6 +154,9 @@ test('sets and gets stash', async ({ page, utils }) => {
   await page.locator('text=stash >> nth=0').click() // nth=0 because INST, INST2
   await page.locator('[data-test=file-open-save-submit-btn]').click()
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
@@ -225,11 +234,17 @@ test('show overrides', async ({ page, utils }) => {
   override_tlm("INST", "HEALTH_STATUS", "DURATION", "10", type: :CONVERTED)
   `)
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
   // Run twice to view the overrides in the output messages
   await page.locator('[data-test=start-button]').click()
+  await expect(page.locator('[data-test=state]')).toHaveValue('Connecting...', {
+    timeout: 5000,
+  })
   await expect(page.locator('[data-test=state]')).toHaveValue('stopped', {
     timeout: 20000,
   })
