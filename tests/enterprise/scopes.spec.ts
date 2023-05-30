@@ -37,7 +37,6 @@ test('creates scope as admin', async ({ page, utils }) => {
   await page.getByLabel('Scope Name').fill('test')
   await page.locator('[data-test="scopeAdd"]').click()
   await expect(page.getByRole('alert')).toHaveText('Added scope TEST')
-  page.waitForNavigation() // Adding scope causes reload
   await page.locator('.v-app-bar__nav-icon').click()
 
   // Validate the existing scope (DEFAULT) has the demo plugin
@@ -45,7 +44,9 @@ test('creates scope as admin', async ({ page, utils }) => {
   await expect(page.getByText('openc3-cosmos-demo')).toBeVisible()
   // Switch to the new scope and validate that there are no plugins
   await page.getByRole('button', { name: 'Scope DEFAULT' }).click()
+  const navigationPromise = page.waitForNavigation() // Changing scope causes reload
   await page.getByRole('option', { name: 'TEST' }).click()
+  await navigationPromise
   await expect(page.getByText('openc3-cosmos-demo')).not.toBeVisible()
 })
 
@@ -114,7 +115,7 @@ test('scope role / permissions', async ({ page, utils }) => {
   await page.getByRole('link', { name: 'Realm roles' }).click()
   await page.getByTestId('create-role').click()
   await page.getByLabel('Role name *').fill('DEFAULT__custom')
-  await page.getByTestId('realm-roles-save-button').click()
+  await page.getByTestId('save').click()
   await utils.sleep(500)
 
   // Create user
@@ -220,7 +221,13 @@ test('delete role and scope', async ({ page, utils }) => {
       }
     )
   } catch {}
-  // Check for Complete
+  // Ensure no Running are left
+  await expect(page.locator('[data-test=process-list]')).not.toContainText(
+    'Processing scope_uninstall: TEST - Running',
+    {
+      timeout: 30000,
+    }
+  ) // Check for Complete
   await expect(page.locator('[data-test=process-list]')).toContainText(
     'Processing scope_uninstall: TEST - Complete'
   )
