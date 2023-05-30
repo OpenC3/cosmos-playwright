@@ -132,7 +132,7 @@ test('direct URLs', async ({ page, utils }) => {
   await page.goto('/tools/bucketexplorer/config/DEFAULT/targets/')
   await utils.sleep(300) // Ensure the page is rendered before getting the count
   // Can't match exact because Enterprise has the PW_TEST target
-  expect(await page.locator('tbody > tr').count()).toBeGreaterThan(4)
+  await expect.poll(() => page.locator('tr').count()).toBeGreaterThan(4)
 
   // Basic makes it a bucket
   await page.goto('/tools/bucketexplorer/blah')
