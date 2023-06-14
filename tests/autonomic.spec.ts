@@ -1,5 +1,5 @@
 /*
-# Copyright 2022 Ball Aerospace & Technologies Corp.
+# Copyright 2023 OpenC3, Inc.
 # All Rights Reserved.
 #
 # This program is free software; you can modify and/or redistribute it
@@ -11,10 +11,6 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-#
-# Modified by OpenC3, Inc.
-# All changes Copyright 2022, OpenC3, Inc.
-# All Rights Reserved
 */
 
 // @ts-check
@@ -32,6 +28,7 @@ test('test trigger groups', async ({ page, utils }) => {
   ).toBeVisible()
   await page.locator('[data-test="add-group"]').click()
   await expect(page.locator('.v-dialog')).toBeVisible()
+  await expect(page.getByText('Group name can not be blank.')).toBeVisible()
   await page.locator('[data-test="group-input-name"]').fill('DEFAULT')
   await expect(
     page.getByText('Group name must be unique. Duplicate name found: DEFAULT.')
@@ -77,6 +74,9 @@ test('create item value trigger', async ({ page, utils }) => {
   await page.getByRole('option', { name: 'Value' }).click()
   await page.locator('[data-test="trigger-operand-right-float"]').fill('100')
   await page.locator('[data-test="trigger-operand-right-float"]').press('Enter')
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS TEMP1 (CONVERTED) > 100'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG1 in group DEFAULT was created'
@@ -141,7 +141,7 @@ test('manually run a reaction', async ({ page, utils }) => {
     page.getByText('reaction: REACT1 has manually executed its actions.')
   ).toBeVisible()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'Reaction REACT1 was run'
+    'Reaction REACT1 was executed'
   )
   // Check the notification
   await page.getByRole('button', { name: 'Badge' }).click()
@@ -150,6 +150,40 @@ test('manually run a reaction', async ({ page, utils }) => {
   )
   await expect(page.locator('[data-test="notification-list"]')).toContainText(
     'INST ABORT was sent'
+  )
+})
+
+test('edit a reaction', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await page.locator('[data-test="item-edit"]').click()
+  await expect(page.locator('[data-test="level-trigger"]')).toHaveAttribute(
+    'aria-checked',
+    'true'
+  )
+  await expect(page.locator('span:has-text("TRIG1")')).toBeVisible()
+  await page.locator('[data-test="reaction-create-step-two-btn"]').click()
+  await utils.sleep(500)
+  await page
+    .locator('[data-test="reaction-action-option-script"]')
+    .locator('..') // Can only click on the parent
+    .click()
+  await page.getByLabel('Select a script').click()
+  await page.locator('[data-test="select-script"]').fill('stash')
+  await utils.sleep(100)
+  await page.getByText('INST/procedures/stash.rb').click()
+  await page.locator('[data-test="reaction-notification"]').click()
+  await page.getByText('caution').click()
+  await page
+    .locator('[data-test="reaction-notify-text"]')
+    .fill('stash script run')
+  await page.locator('[data-test="reaction-create-step-three-btn"]').click()
+  await page.locator('[data-test="reaction-snooze-input"]').fill('15')
+  await page.locator('[data-test="reaction-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 was updated'
   )
 })
 
@@ -163,6 +197,9 @@ test('edit a trigger', async ({ page, utils }) => {
   await page.getByRole('button', { name: 'Operator >' }).click()
   await page.getByRole('option', { name: '<=' }).click()
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS TEMP1 (CONVERTED) <= 100'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG1 in group DEFAULT was updated'
@@ -238,6 +275,9 @@ test('create item state trigger', async ({ page, utils }) => {
   await page.getByRole('option', { name: 'RED' }).click()
   await page.locator('[data-test="trigger-operand-right-limit"]').click()
   await page.getByRole('option', { name: 'HIGH' }).click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS TEMP1 (CONVERTED) == RED_HIGH'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG2 in group DEFAULT was created'
@@ -253,6 +293,23 @@ test('create item state trigger', async ({ page, utils }) => {
     'Trigger TRIG2 in group DEFAULT was enabled',
     { timeout: 75000 } // Takes 1:15 to full cyle but worst case is about 1:10 for outside RED_HIGH
   )
+
+  // Edit it to ensure the fields are populated correctly and we can change
+  await page.locator('[data-test="item-edit"]').nth(1).click()
+  await page.locator('[data-test="trigger-create-step-two-btn"]').click()
+  await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  await page.locator('[data-test="trigger-operand-right-limit"]').click()
+  await page.getByRole('option', { name: 'LOW' }).click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS TEMP1 (CONVERTED) == RED_LOW'
+  )
+  await page.locator('[data-test="trigger-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG2 in group DEFAULT was updated'
+  )
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=2')
+  ).toContainText('TEMP1 == RED_LOW')
 })
 
 test('create item change trigger', async ({ page, utils }) => {
@@ -268,6 +325,9 @@ test('create item change trigger', async ({ page, utils }) => {
   await page.locator('[data-test="trigger-create-select-operator"]').click()
   await page.getByRole('option', { name: 'DOES NOT CHANGE' }).click()
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS CCSDSVER (CONVERTED) DOES NOT CHANGE'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG3 in group DEFAULT was created'
@@ -282,6 +342,23 @@ test('create item change trigger', async ({ page, utils }) => {
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG3 in group DEFAULT was enabled'
   )
+
+  // Edit it to ensure the fields are populated correctly and we can change
+  await page.locator('[data-test="item-edit"]').nth(2).click()
+  await page.locator('[data-test="trigger-create-step-two-btn"]').click()
+  await page.locator('[data-test="trigger-create-select-operator"]').click()
+  await page.getByRole('option', { name: 'CHANGES' }).click()
+  await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS CCSDSVER (CONVERTED) CHANGES'
+  )
+  await page.locator('[data-test="trigger-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG3 in group DEFAULT was updated'
+  )
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=3')
+  ).toContainText('CCSDSVER CHANGES')
 })
 
 test('create item string trigger', async ({ page, utils }) => {
@@ -301,7 +378,7 @@ test('create item string trigger', async ({ page, utils }) => {
   await page.getByRole('option', { name: 'GROUND1STATUS' }).click()
   await page.locator('[data-test="trigger-create-step-two-btn"]').click()
   await page.locator('[data-test="trigger-create-select-operator"]').click()
-  await page.getByRole('option', { name: '==' }).click()
+  await page.getByRole('option', { name: '!=' }).click()
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
   await page.locator('[data-test="trigger-operand-right-type"]').click()
   await page.getByRole('option', { name: 'String' }).click()
@@ -311,6 +388,9 @@ test('create item string trigger', async ({ page, utils }) => {
   await page
     .locator('[data-test="trigger-operand-right-string"]')
     .press('Enter')
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS GROUND1STATUS (CONVERTED) != CONNECTED'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG4 in group DEFAULT was created'
@@ -321,11 +401,32 @@ test('create item string trigger', async ({ page, utils }) => {
   ).toContainText('TRIG4')
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=4')
-  ).toContainText('GROUND1STATUS == CONNECTED')
+  ).toContainText('GROUND1STATUS != CONNECTED')
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG4 in group DEFAULT was enabled',
     { timeout: 15000 } // 10s cycle
   )
+
+  // Edit it to ensure the fields are populated correctly and we can change
+  await page.locator('[data-test="item-edit"]').nth(3).click()
+  await page.locator('[data-test="trigger-create-step-two-btn"]').click()
+  await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  await page
+    .locator('[data-test="trigger-operand-right-string"]')
+    .fill('UNAVAILABLE')
+  await page
+    .locator('[data-test="trigger-operand-right-string"]')
+    .press('Enter')
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS GROUND1STATUS (CONVERTED) != UNAVAILABLE'
+  )
+  await page.locator('[data-test="trigger-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG4 in group DEFAULT was updated'
+  )
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=4')
+  ).toContainText('GROUND1STATUS != UNAVAILABLE')
 })
 
 test('create item regex trigger', async ({ page, utils }) => {
@@ -347,6 +448,9 @@ test('create item regex trigger', async ({ page, utils }) => {
     .locator('[data-test="trigger-operand-right-regex"]')
     .fill('\\d\\d.*')
   await page.locator('[data-test="trigger-operand-right-regex"]').press('Enter')
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS ASCIICMD (CONVERTED) == \\d\\d.*'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG5 in group DEFAULT was created'
@@ -384,6 +488,29 @@ test('create item regex trigger', async ({ page, utils }) => {
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG5 in group DEFAULT was enabled'
   )
+
+  // Manually change sorting from Updated At to Name so we have a consistent sort
+  await page.getByText('Updated At').click()
+  await page.getByText('Name').click()
+  // Edit it to ensure the fields are populated correctly and we can change
+  await page.locator('[data-test="item-edit"]').nth(4).click()
+  await page.locator('[data-test="trigger-create-step-two-btn"]').click()
+  await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  await page.locator('[data-test="trigger-operand-right-regex"]').fill('*')
+  await page.locator('[data-test="trigger-operand-right-regex"]').press('Enter')
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'INST HEALTH_STATUS ASCIICMD (CONVERTED) == *'
+  )
+  await page.locator('[data-test="trigger-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG5 in group DEFAULT was updated'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG5 in group DEFAULT was deactivated'
+  )
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=5')
+  ).toContainText('ASCIICMD == *')
 })
 
 test('create item dependent trigger', async ({ page, utils }) => {
@@ -402,8 +529,11 @@ test('create item dependent trigger', async ({ page, utils }) => {
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
   await page.locator('[data-test="trigger-operand-right-trigger"]').click()
   await page
-    .getByRole('option', { name: 'TRIG4 (GROUND1STATUS == CONNECTED)' })
+    .getByRole('option', { name: 'TRIG4 (GROUND1STATUS != UNAVAILABLE)' })
     .click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'TRIG1 (TEMP1 <= 100) AND TRIG4 (GROUND1STATUS != UNAVAILABLE)'
+  )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG6 in group DEFAULT was created'
@@ -414,12 +544,29 @@ test('create item dependent trigger', async ({ page, utils }) => {
   ).toContainText('TRIG6')
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=6')
-  ).toContainText('(TEMP1 <= 100) AND (GROUND1STATUS == CONNECTED)')
+  ).toContainText('(TEMP1 <= 100) AND (GROUND1STATUS != UNAVAILABLE)')
 
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG6 in group DEFAULT was enabled',
     { timeout: 15000 } // 10s cycle
   )
+
+  // Edit it to ensure the fields are populated correctly and we can change
+  await page.locator('[data-test="item-edit"]').nth(5).click()
+  await page.locator('[data-test="trigger-create-step-two-btn"]').click()
+  await page.locator('[data-test="trigger-create-select-operator"]').click()
+  await page.getByRole('option', { name: 'OR' }).click()
+  await page.locator('[data-test="trigger-create-step-three-btn"]').click()
+  expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
+    'TRIG1 (TEMP1 <= 100) OR TRIG4 (GROUND1STATUS != UNAVAILABLE)'
+  )
+  await page.locator('[data-test="trigger-create-submit-btn"]').click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger TRIG6 in group DEFAULT was updated'
+  )
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=6')
+  ).toContainText('(TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE)')
 })
 
 test('delete a trigger dependent trigger', async ({ page, utils }) => {
@@ -450,7 +597,7 @@ test('delete a trigger', async ({ page, utils }) => {
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(
     page.getByText(
-      'Trigger: (TEMP1 <= 100) AND (GROUND1STATUS == CONNECTED) has been deleted.'
+      'Trigger: (TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE) has been deleted.'
     )
   ).toBeVisible()
 
@@ -508,4 +655,69 @@ test('delete a reaction', async ({ page, utils }) => {
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger TRIG1 in group DEFAULT was deleted'
   )
+})
+
+test('event table', async ({ page, utils }) => {
+  await page.locator('[data-test="pause"]').click() // pause
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'TRIGGER' }).click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBe(2) // Header plus No data available
+  await page.locator('[data-test="pause"]').click() // resume
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'TRIGGER'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'GROUP'
+  )
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('[data-test="events-download"]').click(),
+  ])
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'REACTION' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'TRIGGER'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'GROUP'
+  )
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'GROUP' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'GROUP'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'TRIGGER'
+  )
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'ALL' }).click()
+  await page.locator('[data-test="search-log-messages"]').fill('TRIG3')
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeLessThan(10)
+  await page.locator('[data-test="search-log-messages"]').fill('')
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeGreaterThan(20)
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-cancel"]').click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeGreaterThan(20)
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-clear"]').click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeLessThan(10)
 })
