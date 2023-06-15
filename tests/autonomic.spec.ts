@@ -95,11 +95,12 @@ test('create item value trigger', async ({ page, utils }) => {
   ).not.toHaveClass(/mdi-bell-ring/)
 })
 
-test('create reaction', async ({ page, utils }) => {
+test('create command reaction', async ({ page, utils }) => {
   await page.getByRole('tab', { name: 'Reactions' }).click()
   await expect(page).toHaveURL(
     'http://localhost:2900/tools/autonomic/reactions'
   )
+  await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
   await page.locator('[data-test="new-reaction"]').click()
   await page.getByText('Level Trigger').click() // Default is 'Edge Trigger'
   await page.locator('[data-test="reaction-select-triggers"]').click()
@@ -140,8 +141,15 @@ test('manually run a reaction', async ({ page, utils }) => {
   await expect(
     page.getByText('reaction: REACT1 has manually executed its actions.')
   ).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Reaction REACT1 was executed'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 of type command was run'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 of type notify was run'
   )
   // Check the notification
   await page.getByRole('button', { name: 'Badge' }).click()
@@ -180,7 +188,6 @@ test('edit a reaction', async ({ page, utils }) => {
     .locator('[data-test="reaction-notify-text"]')
     .fill('stash script run')
   await page.locator('[data-test="reaction-create-step-three-btn"]').click()
-  await page.locator('[data-test="reaction-snooze-input"]').fill('15')
   await page.locator('[data-test="reaction-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Reaction REACT1 was updated'
@@ -221,7 +228,38 @@ test('edit a trigger', async ({ page, utils }) => {
     'Trigger TRIG1 in group DEFAULT was enabled'
   )
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'Reaction REACT1 was run'
+    'Reaction REACT1 of type script was run'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 of type notify was run'
+  )
+})
+
+test('activate & deactivate a reaction', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await page.locator('[data-test="reaction-deactivate-icon"]').click()
+  await expect(page.getByText('REACT1 has been deactivated.')).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 was deactivated'
+  )
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-clear"]').click()
+  await utils.sleep(5000)
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'Reaction REACT1'
+  )
+  await page.locator('[data-test="reaction-activate-icon"]').click()
+  await expect(page.getByText('REACT1 has been activated.')).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 was activated'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 of type script was run'
   )
 })
 
@@ -239,6 +277,9 @@ test('activate & deactivate a trigger', async ({ page, utils }) => {
       '[data-test="triggers-table"] >> tr >> nth=1 >> td >> nth=2 >> i'
     )
   ).not.toHaveClass(/mdi-bell-ring/)
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-clear"]').click()
+  await utils.sleep(5000)
   await page.locator('[data-test="trigger-activate-icon"]').click()
   await expect(
     page.locator(
@@ -252,7 +293,10 @@ test('activate & deactivate a trigger', async ({ page, utils }) => {
     'Trigger TRIG1 in group DEFAULT was enabled'
   )
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'Reaction REACT1 was run'
+    'Reaction REACT1 of type script was run'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT1 of type notify was run'
   )
 })
 
@@ -569,6 +613,21 @@ test('create item dependent trigger', async ({ page, utils }) => {
   ).toContainText('(TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE)')
 })
 
+test('download triggers', async ({ page, utils }) => {
+  await utils.download(
+    page,
+    '[data-test="trigger-download"]',
+    function (contents) {
+      expect(contents).toContain('TRIG1')
+      expect(contents).toContain('TRIG2')
+      expect(contents).toContain('TRIG3')
+      expect(contents).toContain('TRIG4')
+      expect(contents).toContain('TRIG5')
+      expect(contents).toContain('TRIG6')
+    }
+  )
+})
+
 test('delete a trigger dependent trigger', async ({ page, utils }) => {
   // Manually change sorting from Updated At to Name so we have a consistent sort
   await page.getByText('Updated At').click()
@@ -580,6 +639,54 @@ test('delete a trigger dependent trigger', async ({ page, utils }) => {
     page.getByText('Failed to delete trigger TRIG4 from group DEFAULT.')
   ).toBeVisible()
   await expect(page.getByText('due to dependents: ["TRIG6"]')).toBeVisible()
+})
+
+test('create notification reaction', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
+  await page.locator('[data-test="new-reaction"]').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG3').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG4').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG5').click()
+  await page.locator('[data-test="reaction-create-remove-trigger-0"]').click()
+  await page.locator('[data-test="reaction-create-step-two-btn"]').click()
+  await utils.sleep(500)
+  await page.getByText('Notify Only').click()
+  await page.locator('[data-test="reaction-notification"]').click()
+  await page.getByText('normal').click()
+  await page.locator('[data-test="reaction-notify-text"]').fill('Normal event')
+  await page.locator('[data-test="reaction-create-step-three-btn"]').click()
+  await utils.sleep(500)
+  await page.locator('[data-test="reaction-snooze-input"]').fill('60')
+  await page.locator('[data-test="reaction-create-submit-btn"]').click()
+  await expect(
+    page.locator('[data-test="reactions-table"] >> tr >> nth=2')
+  ).toContainText('REACT2')
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT2 was created'
+  )
+})
+
+test('download reactions', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
+  await utils.download(
+    page,
+    '[data-test="reaction-download"]',
+    function (contents) {
+      expect(contents).toContain('REACT1')
+      expect(contents).toContain('REACT2')
+    }
+  )
 })
 
 test('delete a trigger', async ({ page, utils }) => {
