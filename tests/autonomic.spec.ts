@@ -632,208 +632,208 @@ test('delete a trigger dependent trigger', async ({ page, utils }) => {
   await expect(page.getByText('due to dependents: ["TRIG5"]')).toBeVisible()
 })
 
-// test('create notification reaction', async ({ page, utils }) => {
-//   await page.getByRole('tab', { name: 'Reactions' }).click()
-//   await expect(page).toHaveURL(
-//     'http://localhost:2900/tools/autonomic/reactions'
-//   )
-//   await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
-//   await page.locator('[data-test="new-reaction"]').click()
-//   await page.locator('[data-test="reaction-select-triggers"]').click()
-//   await page.getByText('DEFAULT: TRIG3').click()
-//   await page.locator('[data-test="reaction-select-triggers"]').click()
-//   await page.getByText('DEFAULT: TRIG4').click()
-//   await page.locator('[data-test="reaction-select-triggers"]').click()
-//   await page.getByText('DEFAULT: TRIG5').click()
-//   await page.locator('[data-test="reaction-create-remove-trigger-0"]').click()
-//   await page.locator('[data-test="reaction-create-step-two-btn"]').click()
-//   await utils.sleep(500)
-//   await page.getByText('Notify Only').click()
-//   await page.locator('[data-test="reaction-notification"]').click()
-//   await page.getByText('normal').click()
-//   await page.locator('[data-test="reaction-notify-text"]').fill('Normal event')
-//   await page.locator('[data-test="reaction-create-step-three-btn"]').click()
-//   await utils.sleep(500)
-//   await page.locator('[data-test="reaction-snooze-input"]').fill('60')
-//   await page.locator('[data-test="reaction-create-submit-btn"]').click()
-//   await expect(
-//     page.locator('[data-test="reactions-table"] >> tr >> nth=2')
-//   ).toContainText('REACT2')
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'Reaction REACT2 was created'
-//   )
-// })
+test('create notification reaction', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
+  await page.locator('[data-test="new-reaction"]').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG3').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG4').click()
+  await page.locator('[data-test="reaction-select-triggers"]').click()
+  await page.getByText('DEFAULT: TRIG5').click()
+  await page.locator('[data-test="reaction-create-remove-trigger-0"]').click()
+  await page.locator('[data-test="reaction-create-step-two-btn"]').click()
+  await utils.sleep(500)
+  await page.getByText('Notify Only').click()
+  await page.locator('[data-test="reaction-notification"]').click()
+  await page.getByText('normal').click()
+  await page.locator('[data-test="reaction-notify-text"]').fill('Normal event')
+  await page.locator('[data-test="reaction-create-step-three-btn"]').click()
+  await utils.sleep(500)
+  await page.locator('[data-test="reaction-snooze-input"]').fill('60')
+  await page.locator('[data-test="reaction-create-submit-btn"]').click()
+  await expect(
+    page.locator('[data-test="reactions-table"] >> tr >> nth=2')
+  ).toContainText('REACT2')
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Reaction REACT2 was created'
+  )
+})
 
-// test('download reactions', async ({ page, utils }) => {
-//   await page.getByRole('tab', { name: 'Reactions' }).click()
-//   await expect(page).toHaveURL(
-//     'http://localhost:2900/tools/autonomic/reactions'
-//   )
-//   await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
-//   await utils.download(
-//     page,
-//     '[data-test="reaction-download"]',
-//     function (contents) {
-//       expect(contents).toContain('REACT1')
-//       expect(contents).toContain('REACT2')
-//     }
-//   )
-// })
+test('download reactions', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await expect(page).toHaveURL(
+    'http://localhost:2900/tools/autonomic/reactions'
+  )
+  await expect(page.locator('[data-test="new-reaction"]')).toBeEnabled()
+  await utils.download(
+    page,
+    '[data-test="reaction-download"]',
+    function (contents) {
+      expect(contents).toContain('REACT1')
+      expect(contents).toContain('REACT2')
+    }
+  )
+})
 
-// test('delete a trigger', async ({ page, utils }) => {
-//   // Manually change sorting from Updated At to Name so we have a consistent sort
-//   await page.getByText('Updated At').click()
-//   await page.getByText('Name').click()
+test('delete a trigger', async ({ page, utils }) => {
+  // Manually change sorting from Updated At to Name so we have a consistent sort
+  await page.getByText('Updated At').click()
+  await page.getByText('Name').click()
 
-//   await page.locator('[data-test="item-delete"]').nth(4).click()
-//   await page.locator('[data-test="confirm-dialog-cancel"]').click()
-//   await expect(
-//     page.locator('[data-test="triggers-table"] >> tr >> nth=5')
-//   ).toContainText('TRIG5')
+  await page.locator('[data-test="item-delete"]').nth(4).click()
+  await page.locator('[data-test="confirm-dialog-cancel"]').click()
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=5')
+  ).toContainText('TRIG5')
 
-//   await page.locator('[data-test="item-delete"]').nth(4).click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
-//   await expect(
-//     page.getByText(
-//       'Trigger: (TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE) has been deleted.'
-//     )
-//   ).toBeVisible()
+  await page.locator('[data-test="item-delete"]').nth(4).click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(
+    page.getByText(
+      'Trigger: (TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE) has been deleted.'
+    )
+  ).toBeVisible()
 
-//   await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
-//     'TRIG5'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'DEFAULT:TRIG5 (TRIG1 OR TRIG4) was deleted'
-//   )
-// })
+  await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
+    'TRIG5'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'DEFAULT:TRIG5 (TRIG1 OR TRIG4) was deleted'
+  )
+})
 
-// test('delete a reaction dependent trigger', async ({ page, utils }) => {
-//   // Manually change sorting from Updated At to Name so we have a consistent sort
-//   await page.getByText('Updated At').click()
-//   await page.getByText('Name').click()
+test('delete a reaction dependent trigger', async ({ page, utils }) => {
+  // Manually change sorting from Updated At to Name so we have a consistent sort
+  await page.getByText('Updated At').click()
+  await page.getByText('Name').click()
 
-//   await page.locator('[data-test="item-delete"]').nth(0).click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
-//   await expect(
-//     page.getByText('Failed to delete trigger TRIG1 from group DEFAULT.')
-//   ).toBeVisible()
-//   await expect(page.getByText('due to dependents: ["REACT1"]')).toBeVisible()
-// })
+  await page.locator('[data-test="item-delete"]').nth(0).click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(
+    page.getByText('Failed to delete trigger TRIG1 from group DEFAULT.')
+  ).toBeVisible()
+  await expect(page.getByText('due to dependents: ["REACT1"]')).toBeVisible()
+})
 
-// test('delete a reaction', async ({ page, utils }) => {
-//   await page.getByRole('tab', { name: 'Reactions' }).click()
-//   await page.locator('[data-test="item-delete"]').nth(0).click()
-//   await page.locator('[data-test="confirm-dialog-cancel"]').click()
-//   await expect(page.locator('[data-test="reactions-table"]')).toContainText(
-//     'REACT1'
-//   )
-//   await page.locator('[data-test="item-delete"]').nth(0).click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
-//   await expect(
-//     page.getByText('Reaction: REACT1 has been deleted.')
-//   ).toBeVisible()
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'REACT1 was deleted'
-//   )
+test('delete a reaction', async ({ page, utils }) => {
+  await page.getByRole('tab', { name: 'Reactions' }).click()
+  await page.locator('[data-test="item-delete"]').nth(0).click()
+  await page.locator('[data-test="confirm-dialog-cancel"]').click()
+  await expect(page.locator('[data-test="reactions-table"]')).toContainText(
+    'REACT1'
+  )
+  await page.locator('[data-test="item-delete"]').nth(0).click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(
+    page.getByText('Reaction: REACT1 has been deleted.')
+  ).toBeVisible()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'REACT1 was deleted'
+  )
 
-//   // Now try to delete the reaction dependent trigger
-//   await page.getByRole('tab', { name: 'Triggers' }).click()
-//   // Manually change sorting from Updated At to Name so we have a consistent sort
-//   await page.getByText('Updated At').click()
-//   await page.getByText('Name').click()
-//   await page.locator('[data-test="item-delete"]').nth(0).click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
-//   await expect(
-//     page.getByText('Trigger: TEMP1 <= 100 has been deleted.')
-//   ).toBeVisible()
+  // Now try to delete the reaction dependent trigger
+  await page.getByRole('tab', { name: 'Triggers' }).click()
+  // Manually change sorting from Updated At to Name so we have a consistent sort
+  await page.getByText('Updated At').click()
+  await page.getByText('Name').click()
+  await page.locator('[data-test="item-delete"]').nth(0).click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(
+    page.getByText('Trigger: TEMP1 <= 100 has been deleted.')
+  ).toBeVisible()
 
-//   await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
-//     'TRIG1'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'DEFAULT:TRIG1 (TEMP1 <= 100) was deleted'
-//   )
-// })
+  await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
+    'TRIG1'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'DEFAULT:TRIG1 (TEMP1 <= 100) was deleted'
+  )
+})
 
-// test('delete trigger group', async ({ page, utils }) => {
-//   await page.getByRole('button', { name: 'Group DEFAULT' }).click()
-//   await page.getByRole('option', { name: 'TEST' }).click()
+test('delete trigger group', async ({ page, utils }) => {
+  await page.getByRole('button', { name: 'Group DEFAULT' }).click()
+  await page.getByRole('option', { name: 'TEST' }).click()
 
-//   await page.locator('[data-test="item-delete"]').nth(0).click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await page.locator('[data-test="item-delete"]').nth(0).click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
 
-//   await page.locator('[data-test="delete-group"]').click()
-//   await page.locator('[data-test="group-delete-submit-btn"]').click()
-//   await page.locator('[data-test="confirm-dialog-delete"]').click()
-//   await expect(
-//     page.getByText('TriggerGroup: TEST has been deleted')
-//   ).toBeVisible()
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'Trigger group TEST was deleted'
-//   )
-// })
+  await page.locator('[data-test="delete-group"]').click()
+  await page.locator('[data-test="group-delete-submit-btn"]').click()
+  await page.locator('[data-test="confirm-dialog-delete"]').click()
+  await expect(
+    page.getByText('TriggerGroup: TEST has been deleted')
+  ).toBeVisible()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'Trigger group TEST was deleted'
+  )
+})
 
-// test('event table', async ({ page, utils }) => {
-//   await page.locator('[data-test="pause"]').click() // pause
-//   await page.locator('[data-test="filter-type"]').click()
-//   await page.getByRole('option', { name: 'TRIGGER' }).click()
-//   await expect
-//     .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
-//     .toBe(2) // Header plus No data available
-//   await page.locator('[data-test="pause"]').click() // resume
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'TRIGGER'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'REACTION'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'GROUP'
-//   )
-//   const [download] = await Promise.all([
-//     page.waitForEvent('download'),
-//     page.locator('[data-test="events-download"]').click(),
-//   ])
-//   await page.locator('[data-test="filter-type"]').click()
-//   await page.getByRole('option', { name: 'REACTION' }).click()
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'REACTION'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'TRIGGER'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'GROUP'
-//   )
-//   await page.locator('[data-test="filter-type"]').click()
-//   await page.getByRole('option', { name: 'GROUP' }).click()
-//   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-//     'GROUP'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'REACTION'
-//   )
-//   await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
-//     'TRIGGER'
-//   )
-//   await page.locator('[data-test="filter-type"]').click()
-//   await page.getByRole('option', { name: 'ALL' }).click()
-//   await page.locator('[data-test="search-log-messages"]').fill('TRIG3')
-//   await expect
-//     .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
-//     .toBeLessThan(10)
-//   await page.locator('[data-test="search-log-messages"]').fill('')
-//   await expect
-//     .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
-//     .toBeGreaterThan(20)
-//   await page.locator('[data-test="events-clear"]').click()
-//   await page.locator('[data-test="confirm-dialog-cancel"]').click()
-//   await expect
-//     .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
-//     .toBeGreaterThan(20)
-//   await page.locator('[data-test="events-clear"]').click()
-//   await page.locator('[data-test="confirm-dialog-clear"]').click()
-//   await expect
-//     .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
-//     .toBeLessThan(10)
-// })
+test('event table', async ({ page, utils }) => {
+  await page.locator('[data-test="pause"]').click() // pause
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'TRIGGER' }).click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBe(2) // Header plus No data available
+  await page.locator('[data-test="pause"]').click() // resume
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'TRIGGER'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'GROUP'
+  )
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('[data-test="events-download"]').click(),
+  ])
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'REACTION' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'TRIGGER'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'GROUP'
+  )
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'GROUP' }).click()
+  await expect(page.locator('[data-test="log-messages"]')).toContainText(
+    'GROUP'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'REACTION'
+  )
+  await expect(page.locator('[data-test="log-messages"]')).not.toContainText(
+    'TRIGGER'
+  )
+  await page.locator('[data-test="filter-type"]').click()
+  await page.getByRole('option', { name: 'ALL' }).click()
+  await page.locator('[data-test="search-log-messages"]').fill('TRIG3')
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeLessThan(10)
+  await page.locator('[data-test="search-log-messages"]').fill('')
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeGreaterThan(20)
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-cancel"]').click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeGreaterThan(20)
+  await page.locator('[data-test="events-clear"]').click()
+  await page.locator('[data-test="confirm-dialog-clear"]').click()
+  await expect
+    .poll(() => page.locator('[data-test="log-messages"] >> tr').count())
+    .toBeLessThan(10)
+})

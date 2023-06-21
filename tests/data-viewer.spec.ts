@@ -67,6 +67,8 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   await page.locator('text=Save Configuration').click()
   await page.locator('[data-test="name-input-save-config-dialog"]').fill(config)
   await page.locator('button:has-text("Ok")').click()
+  await expect(page.getByText(`Saved configuration: ${config}`)).toBeVisible()
+  await page.getByRole('button', { name: 'Dismiss' }).click()
 
   // Reload page
   await page.reload()
