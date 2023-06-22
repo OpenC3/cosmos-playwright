@@ -73,6 +73,8 @@ test('loads and saves the configuration', async ({ page, utils }) => {
   // Reload page
   await page.reload()
   // Verify the config automatically comes back
+  await page.getByText('Loading configuration')
+  await page.getByRole('button', { name: 'Dismiss' }).click()
   await page.locator('div[role="tab"]:has-text("Test1")').click()
   await expect(page.locator('text=COSMOS Raw/Decom')).toBeVisible()
   // Verify display setting
@@ -166,6 +168,7 @@ test('adds a custom component a new tab', async ({ page, utils }) => {
     await page.inputValue('[data-test=history-component-text-area]')
   ).toMatch(/(.*\n)+Magnitude:.*/)
   await page.locator('[data-test=history-component-search]').fill('Magnitude:')
+  await utils.sleep(100)
   expect(
     await page.inputValue('[data-test=history-component-text-area]')
   ).toMatch(/^Magnitude:.*$/)
