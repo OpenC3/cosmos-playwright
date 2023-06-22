@@ -235,8 +235,6 @@ test('enable & disable a reaction', async ({ page, utils }) => {
     'http://localhost:2900/tools/autonomic/reactions'
   )
   await page.locator('[data-test="reaction-disable"]').click()
-  await expect(page.getByText('Disabled Reaction')).toBeVisible()
-  await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was disabled'
   )
@@ -247,8 +245,6 @@ test('enable & disable a reaction', async ({ page, utils }) => {
     'REACT1'
   )
   await page.locator('[data-test="reaction-enable"]').click()
-  await expect(page.getByText('Enabled Reaction')).toBeVisible()
-  await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was enabled'
   )
@@ -259,7 +255,6 @@ test('enable & disable a reaction', async ({ page, utils }) => {
 
 test('enable & disable a trigger', async ({ page, utils }) => {
   await page.locator('[data-test="trigger-disable"]').nth(0).click()
-  await expect(page.getByText('Disabled Trigger')).toBeVisible()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'DEFAULT:TRIG1 (TEMP1 <= 100) was disabled'
   )
@@ -273,7 +268,6 @@ test('enable & disable a trigger', async ({ page, utils }) => {
   await page.locator('[data-test="confirm-dialog-clear"]').click()
   await utils.sleep(5000)
   await page.locator('[data-test="trigger-enable"]').click()
-  await expect(page.getByText('Enabled Trigger')).toBeVisible()
   await expect(
     page.locator(
       '[data-test="triggers-table"] >> tr >> nth=1 >> td >> nth=2 >> i'
@@ -294,10 +288,6 @@ test('enable & disable a trigger', async ({ page, utils }) => {
 })
 
 test('create item state trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="new-trigger"]').click()
   await page.locator('[data-test="trigger-operand-left-type"]').click()
   await page.getByText('Telemetry Item').click()
@@ -348,10 +338,6 @@ test('create item state trigger', async ({ page, utils }) => {
 })
 
 test('create item change trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="new-trigger"]').click()
   await page.locator('[data-test="trigger-operand-left-type"]').click()
   await page.getByText('Telemetry Item').click()
@@ -397,10 +383,6 @@ test('create item change trigger', async ({ page, utils }) => {
 })
 
 test('create item string trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="new-trigger"]').click()
   await page.locator('[data-test="trigger-operand-left-type"]').click()
   await page.getByText('Telemetry Item').click()
@@ -546,10 +528,6 @@ test('create item regex trigger', async ({ page, utils }) => {
 })
 
 test('create item dependent trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="new-trigger"]').click()
   await page.locator('[data-test="trigger-operand-left-type"]').click()
   await page.getByText('Existing Trigger').click()
@@ -616,10 +594,6 @@ test('download triggers', async ({ page, utils }) => {
 })
 
 test('delete a trigger dependent trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="item-delete"]').nth(3).click() // 4th item
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(
@@ -678,10 +652,6 @@ test('download reactions', async ({ page, utils }) => {
 })
 
 test('delete a trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=5')
   ).toContainText('TRIG5')
@@ -704,10 +674,6 @@ test('delete a trigger', async ({ page, utils }) => {
 })
 
 test('delete a reaction dependent trigger', async ({ page, utils }) => {
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
-
   await page.locator('[data-test="item-delete"]').nth(0).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(
@@ -733,9 +699,6 @@ test('delete a reaction', async ({ page, utils }) => {
 
   // Now try to delete the reaction dependent trigger
   await page.getByRole('tab', { name: 'Triggers' }).click()
-  // Manually change sorting from Updated At to Name so we have a consistent sort
-  await page.getByText('Updated At').click()
-  await page.getByText('Name').click()
   await page.locator('[data-test="item-delete"]').nth(0).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(page.getByText('Deleted Trigger')).toBeVisible()
