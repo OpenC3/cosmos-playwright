@@ -410,7 +410,7 @@ test('create item string trigger', async ({ page, utils }) => {
   await page.getByRole('option', { name: 'HEALTH_STATUS' }).click()
   await page.getByLabel('Select Item').fill('gr')
   await utils.sleep(100)
-  await page.getByRole('option', { name: 'GROUND1STATUS' }).click()
+  await page.getByRole('option', { name: 'GROUND2STATUS' }).click()
   await page.locator('[data-test="trigger-create-step-two-btn"]').click()
   await page.locator('[data-test="trigger-create-select-operator"]').click()
   await page.getByRole('option', { name: '!=' }).click()
@@ -424,11 +424,11 @@ test('create item string trigger', async ({ page, utils }) => {
     .locator('[data-test="trigger-operand-right-string"]')
     .press('Enter')
   expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
-    'INST HEALTH_STATUS GROUND1STATUS (CONVERTED) != CONNECTED'
+    'INST HEALTH_STATUS GROUND2STATUS (CONVERTED) != CONNECTED'
   )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'DEFAULT:TRIG4 (GROUND1STATUS != CONNECTED) was created'
+    'DEFAULT:TRIG4 (GROUND2STATUS != CONNECTED) was created'
   )
 
   await expect(
@@ -436,10 +436,10 @@ test('create item string trigger', async ({ page, utils }) => {
   ).toContainText('TRIG4')
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=4')
-  ).toContainText('GROUND1STATUS != CONNECTED')
+  ).toContainText('GROUND2STATUS != CONNECTED')
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'DEFAULT:TRIG4 (GROUND1STATUS != CONNECTED) is true',
-    { timeout: 15000 } // 10s cycle
+    'DEFAULT:TRIG4 (GROUND2STATUS != CONNECTED) is true',
+    { timeout: 15000 } // 5s cycle
   )
 
   // Edit it to ensure the fields are populated correctly and we can change
@@ -453,15 +453,15 @@ test('create item string trigger', async ({ page, utils }) => {
     .locator('[data-test="trigger-operand-right-string"]')
     .press('Enter')
   expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
-    'INST HEALTH_STATUS GROUND1STATUS (CONVERTED) != UNAVAILABLE'
+    'INST HEALTH_STATUS GROUND2STATUS (CONVERTED) != UNAVAILABLE'
   )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'DEFAULT:TRIG4 (GROUND1STATUS != UNAVAILABLE) was updated'
+    'DEFAULT:TRIG4 (GROUND2STATUS != UNAVAILABLE) was updated'
   )
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=4')
-  ).toContainText('GROUND1STATUS != UNAVAILABLE')
+  ).toContainText('GROUND2STATUS != UNAVAILABLE')
 })
 
 test('create item regex trigger', async ({ page, utils }) => {
@@ -561,10 +561,10 @@ test('create item dependent trigger', async ({ page, utils }) => {
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
   await page.locator('[data-test="trigger-operand-right-trigger"]').click()
   await page
-    .getByRole('option', { name: 'TRIG4 (GROUND1STATUS != UNAVAILABLE)' })
+    .getByRole('option', { name: 'TRIG4 (GROUND2STATUS != UNAVAILABLE)' })
     .click()
   expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
-    'TRIG1 (TEMP1 <= 100) AND TRIG4 (GROUND1STATUS != UNAVAILABLE)'
+    'TRIG1 (TEMP1 <= 100) AND TRIG4 (GROUND2STATUS != UNAVAILABLE)'
   )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
@@ -576,11 +576,11 @@ test('create item dependent trigger', async ({ page, utils }) => {
   ).toContainText('TRIG5')
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=5')
-  ).toContainText('(TEMP1 <= 100) AND (GROUND1STATUS != UNAVAILABLE)')
+  ).toContainText('(TEMP1 <= 100) AND (GROUND2STATUS != UNAVAILABLE)')
 
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'DEFAULT:TRIG5 (TRIG1 AND TRIG4) is true',
-    { timeout: 20000 } // 10s cycle
+    { timeout: 15000 } // 5s cycle
   )
 
   // Edit it to ensure the fields are populated correctly and we can change
@@ -590,7 +590,7 @@ test('create item dependent trigger', async ({ page, utils }) => {
   await page.getByRole('option', { name: 'OR' }).click()
   await page.locator('[data-test="trigger-create-step-three-btn"]').click()
   expect(await page.inputValue('[data-test="trigger-create-eval"]')).toMatch(
-    'TRIG1 (TEMP1 <= 100) OR TRIG4 (GROUND1STATUS != UNAVAILABLE)'
+    'TRIG1 (TEMP1 <= 100) OR TRIG4 (GROUND2STATUS != UNAVAILABLE)'
   )
   await page.locator('[data-test="trigger-create-submit-btn"]').click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
@@ -598,7 +598,7 @@ test('create item dependent trigger', async ({ page, utils }) => {
   )
   await expect(
     page.locator('[data-test="triggers-table"] >> tr >> nth=5')
-  ).toContainText('(TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE)')
+  ).toContainText('(TEMP1 <= 100) OR (GROUND2STATUS != UNAVAILABLE)')
 })
 
 test('download triggers', async ({ page, utils }) => {
