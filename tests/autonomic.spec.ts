@@ -134,9 +134,7 @@ test('manually run a reaction', async ({ page, utils }) => {
   await page.getByRole('button', { name: '󰅀' }).click()
   await expect(page.getByText('Actions:')).toBeVisible()
   await page.locator('[data-test="execute-actions"]').click()
-  await expect(
-    page.getByText('reaction: REACT1 has manually executed its actions.')
-  ).toBeVisible()
+  await expect(page.getByText('Executed Reaction')).toBeVisible()
   await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was executed'
@@ -177,7 +175,6 @@ test('edit a reaction', async ({ page, utils }) => {
   await page.getByLabel('Select a script').click()
   await page.locator('[data-test="select-script"]').fill('stash')
   await utils.sleep(100)
-  // TODO: Better select specific
   await page.getByText('INST/procedures/stash.rb').click()
   await page.locator('[data-test="reaction-notification"]').click()
   await page.getByRole('option', { name: 'caution' }).click()
@@ -238,7 +235,7 @@ test('enable & disable a reaction', async ({ page, utils }) => {
     'http://localhost:2900/tools/autonomic/reactions'
   )
   await page.locator('[data-test="reaction-disable"]').click()
-  await expect(page.getByText('REACT1 has been disabled.')).toBeVisible()
+  await expect(page.getByText('Disabled Reaction')).toBeVisible()
   await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was disabled'
@@ -250,7 +247,7 @@ test('enable & disable a reaction', async ({ page, utils }) => {
     'REACT1'
   )
   await page.locator('[data-test="reaction-enable"]').click()
-  await expect(page.getByText('REACT1 has been enabled.')).toBeVisible()
+  await expect(page.getByText('Enabled Reaction')).toBeVisible()
   await page.getByRole('button', { name: 'Dismiss' }).click()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was enabled'
@@ -262,9 +259,7 @@ test('enable & disable a reaction', async ({ page, utils }) => {
 
 test('enable & disable a trigger', async ({ page, utils }) => {
   await page.locator('[data-test="trigger-disable"]').nth(0).click()
-  await expect(
-    page.getByText('Trigger: TEMP1 <= 100 has been disabled.')
-  ).toBeVisible()
+  await expect(page.getByText('Disabled Trigger')).toBeVisible()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'DEFAULT:TRIG1 (TEMP1 <= 100) was disabled'
   )
@@ -278,6 +273,7 @@ test('enable & disable a trigger', async ({ page, utils }) => {
   await page.locator('[data-test="confirm-dialog-clear"]').click()
   await utils.sleep(5000)
   await page.locator('[data-test="trigger-enable"]').click()
+  await expect(page.getByText('Enabled Trigger')).toBeVisible()
   await expect(
     page.locator(
       '[data-test="triggers-table"] >> tr >> nth=1 >> td >> nth=2 >> i'
@@ -627,9 +623,10 @@ test('delete a trigger dependent trigger', async ({ page, utils }) => {
   await page.locator('[data-test="item-delete"]').nth(3).click() // 4th item
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(
-    page.getByText('Failed to delete trigger TRIG4 from group DEFAULT.')
+    page.getByText(
+      'Failed to delete DEFAULT:TRIG4 due to DEFAULT:TRIG4 has dependents: ["TRIG5"]'
+    )
   ).toBeVisible()
-  await expect(page.getByText('due to dependents: ["TRIG5"]')).toBeVisible()
 })
 
 test('create notification reaction', async ({ page, utils }) => {
@@ -645,7 +642,7 @@ test('create notification reaction', async ({ page, utils }) => {
   await page.getByText('DEFAULT: TRIG4').click()
   await page.locator('[data-test="reaction-select-triggers"]').click()
   await page.getByText('DEFAULT: TRIG5').click()
-  await page.locator('[data-test="reaction-create-remove-trigger-0"]').click()
+  await page.locator('[data-test="reaction-create-remove-trigger-2"]').click()
   await page.locator('[data-test="reaction-create-step-two-btn"]').click()
   await utils.sleep(500)
   await page.getByText('Notify Only').click()
@@ -660,7 +657,7 @@ test('create notification reaction', async ({ page, utils }) => {
     page.locator('[data-test="reactions-table"] >> tr >> nth=2')
   ).toContainText('REACT2')
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
-    'Reaction REACT2 was created'
+    'REACT2 was created'
   )
 })
 
@@ -685,6 +682,9 @@ test('delete a trigger', async ({ page, utils }) => {
   await page.getByText('Updated At').click()
   await page.getByText('Name').click()
 
+  await expect(
+    page.locator('[data-test="triggers-table"] >> tr >> nth=5')
+  ).toContainText('TRIG5')
   await page.locator('[data-test="item-delete"]').nth(4).click()
   await page.locator('[data-test="confirm-dialog-cancel"]').click()
   await expect(
@@ -693,11 +693,7 @@ test('delete a trigger', async ({ page, utils }) => {
 
   await page.locator('[data-test="item-delete"]').nth(4).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
-  await expect(
-    page.getByText(
-      'Trigger: (TEMP1 <= 100) OR (GROUND1STATUS != UNAVAILABLE) has been deleted.'
-    )
-  ).toBeVisible()
+  await expect(page.getByText('Deleted Trigger')).toBeVisible()
 
   await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
     'TRIG5'
@@ -715,9 +711,10 @@ test('delete a reaction dependent trigger', async ({ page, utils }) => {
   await page.locator('[data-test="item-delete"]').nth(0).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
   await expect(
-    page.getByText('Failed to delete trigger TRIG1 from group DEFAULT.')
+    page.getByText(
+      'Failed to delete DEFAULT:TRIG1 due to DEFAULT:TRIG1 has dependents: ["REACT1"]'
+    )
   ).toBeVisible()
-  await expect(page.getByText('due to dependents: ["REACT1"]')).toBeVisible()
 })
 
 test('delete a reaction', async ({ page, utils }) => {
@@ -729,9 +726,7 @@ test('delete a reaction', async ({ page, utils }) => {
   )
   await page.locator('[data-test="item-delete"]').nth(0).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
-  await expect(
-    page.getByText('Reaction: REACT1 has been deleted.')
-  ).toBeVisible()
+  await expect(page.getByText('Deleted Reaction')).toBeVisible()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'REACT1 was deleted'
   )
@@ -743,9 +738,7 @@ test('delete a reaction', async ({ page, utils }) => {
   await page.getByText('Name').click()
   await page.locator('[data-test="item-delete"]').nth(0).click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
-  await expect(
-    page.getByText('Trigger: TEMP1 <= 100 has been deleted.')
-  ).toBeVisible()
+  await expect(page.getByText('Deleted Trigger')).toBeVisible()
 
   await expect(page.locator('[data-test="triggers-table"]')).not.toContainText(
     'TRIG1'
@@ -765,9 +758,7 @@ test('delete trigger group', async ({ page, utils }) => {
   await page.locator('[data-test="delete-group"]').click()
   await page.locator('[data-test="group-delete-submit-btn"]').click()
   await page.locator('[data-test="confirm-dialog-delete"]').click()
-  await expect(
-    page.getByText('TriggerGroup: TEST has been deleted')
-  ).toBeVisible()
+  await expect(page.getByText('Deleted TriggerGroup')).toBeVisible()
   await expect(page.locator('[data-test="log-messages"]')).toContainText(
     'Trigger group TEST was deleted'
   )
