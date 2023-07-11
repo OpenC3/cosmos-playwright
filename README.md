@@ -1,4 +1,6 @@
-# Testing OpenC3 with Playwright
+# !Repo is archived and all playwright tests merged into the [main repo](https://github.com/OpenC3/cosmos/tree/main/playwright)
+
+## Testing OpenC3 with Playwright
 
 NOTE: All commands are assumed to be executed from this (playwright) directory unless otherwise noted
 
